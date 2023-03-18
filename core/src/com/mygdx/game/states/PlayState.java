@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State{
-    private static final int NR_OF_MINIONS = 0;
+    private static final int NR_OF_MINIONS = 2;
     private static final float REPULSION_FACTOR = 0.5f;
     private List<Enemy> minions;
     private PlayerChampion target;
@@ -27,8 +27,8 @@ public class PlayState extends State{
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.add(new Minion(i * 100, i * 300));
         }
-        target = new Player(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
-        camera.setToOrtho(false, TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
+        target = new Player(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
+        camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
     }
     @Override
     protected void handleInput() {
@@ -48,7 +48,7 @@ public class PlayState extends State{
 
     @Override
     protected void render(SpriteBatch batch) {
-        //batch.setProjectionMatrix(camera.combined);
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
         batch.draw(background, 0, 0);
         batch.draw(target.getSprite(), target.getRelativePosition().x, target.getRelativePosition().y,
@@ -57,7 +57,7 @@ public class PlayState extends State{
                 target.getSprite().getRegionHeight(), 1, 1,
                 target.getHeading());
         for(int i=0; i<NR_OF_MINIONS; i++) {
-            batch.draw(minions.get(i).getSprite(), minions.get(i).getPosition().x, minions.get(i).getPosition().y,
+            batch.draw(minions.get(i).getSprite(), minions.get(i).getRelativePosition().x, minions.get(i).getRelativePosition().y,
                     minions.get(i).getSprite().getRegionWidth()/ 2,
                     minions.get(i).getSprite().getRegionHeight() / 2, minions.get(i).getSprite().getRegionWidth(),
                     minions.get(i).getSprite().getRegionHeight(), 1, 1,
