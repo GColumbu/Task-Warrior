@@ -12,16 +12,18 @@ public abstract class Enemy {
 
     protected Vector2 position;
 
+    protected Vector2 relativePosition;
+
     protected Vector2 velocity;
     protected float maxSpeed;
     protected float maxForce;
-    protected TextureRegion sprite;
 
     protected Rectangle enemyRectangle;
 
     //constructor
     public Enemy(int x, int y, float maxSpeed, float maxForce){
         position = new Vector2(x, y);
+        relativePosition = new Vector2(x, y);
         velocity = new Vector2(0, 0);
         this.maxSpeed = maxSpeed;
         this.maxForce = maxForce;
@@ -29,6 +31,10 @@ public abstract class Enemy {
 
     public float getHeading(){
         return velocity.angleDeg();
+    }
+
+    public Vector2 getRelativePosition() {
+        return relativePosition;
     }
 
     //update the position and velocity
@@ -39,9 +45,7 @@ public abstract class Enemy {
         return position;
     }
 
-    public TextureRegion getSprite() {
-        return sprite;
-    }
+    public abstract TextureRegion getSprite();
 
     public Rectangle getEnemyRectangle() {
         return enemyRectangle;
@@ -115,15 +119,15 @@ public abstract class Enemy {
     protected void applySteeringBehaviour(Vector2 steering){
         velocity.add(steering);
         //make enemy recognize walls
-        if(position.x > 0 && position.x < TaskWarrior.WIDTH - sprite.getTexture().getWidth()) {
+        if(position.x > 0 && position.x < TaskWarrior.WIDTH - getSprite().getRegionWidth()) {
             position.x += velocity.x;
-        } else if(position.x <= 0 && isLooking("right") || position.x >= TaskWarrior.WIDTH - sprite.getTexture().getWidth() && isLooking("left")){
+        } else if(position.x <= 0 && isLooking("right") || position.x >= TaskWarrior.WIDTH - getSprite().getRegionWidth() && isLooking("left")){
             position.x += velocity.x;
         }
 
-        if(position.y > 0 && position.y < TaskWarrior.HEIGHT - sprite.getTexture().getHeight()){
+        if(position.y > 0 && position.y < TaskWarrior.HEIGHT - getSprite().getRegionHeight()){
             position.y += velocity.y;
-        } else if(position.y <= 0 && isLooking("up") || position.y >= TaskWarrior.HEIGHT - sprite.getTexture().getWidth() && isLooking("down")){
+        } else if(position.y <= 0 && isLooking("up") || position.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
             position.y += velocity.y;
         }
     }
