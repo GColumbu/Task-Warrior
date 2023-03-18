@@ -12,14 +12,14 @@ public class E_AttackAnimation {
 
     protected E_AttackAnimation(String eSpinPath, float swordGrabFrameDuration, float spinFrameDuration) {
         this.eSpinTexture = new Texture(eSpinPath);
-        int eSpinFrameWidth = eSpinTexture.getWidth() / 6;
+        int eSpinFrameWidth = eSpinTexture.getWidth() / 9;
         Array<TextureRegion> frames = new Array<>();
         for(int i=0; i<3; i++){
             frames.add(new TextureRegion(eSpinTexture, i*eSpinFrameWidth, 0, eSpinFrameWidth, eSpinTexture.getHeight()));
         }
         eSwordGrabAnimation = new Animation(swordGrabFrameDuration, frames);
         frames.clear();
-        for(int i=3; i<6; i++){
+        for(int i=3; i<8; i++){
             frames.add(new TextureRegion(eSpinTexture, i*eSpinFrameWidth, 0, eSpinFrameWidth, eSpinTexture.getHeight()));
         }
         eSpinAnimation = new Animation(spinFrameDuration, frames);
