@@ -13,13 +13,11 @@ public abstract class PlayerChampion {
 
     //vectors
     protected Vector2 position;
-
-    protected Vector2 relativePosition;
-    protected Vector2 velocity;
-
     protected float previousX;
-    float previousY;
+    protected float previousY;
+    protected Vector2 relativePosition;
     protected int speed;
+    protected Vector2 velocity;
     protected Vector2 previousMovingVelocity = new Vector2(0, 0);
 
     //player states
@@ -31,41 +29,11 @@ public abstract class PlayerChampion {
     //animations and textures
     protected TextureRegion currentRegion;
     protected TextureRegion idleTextureRegion;
-
-    //walking
-    protected Animation<TextureRegion> walkingAnimation;
-    protected Texture walkingTexture;
-
-    // w animation
-
-        //BURST
-    protected Animation<TextureRegion> wBurstAnimation;
-    protected Texture wBurstTexture;
-        //WALKING
-    protected Animation<TextureRegion> wWalkingAnimation;
-    protected Texture wWalkingTexture;
-    protected boolean isWAnimationFinished = true;
-        //IDLE
     protected TextureRegion idleInvincibilityTextureRegion;
-
-    // q slash animation
-
-    protected Animation<TextureRegion> qSlashAnimation;
-    protected Texture qSlashTexture;
-    protected boolean isQAnimationFinished = true;
-
-    // e spin animation
-
-    protected Texture eSpinTexture;
-
-        // sword grap
-
-    protected Animation<TextureRegion> eSwordGrabAnimation;
-    protected Animation<TextureRegion> eSpinAnimation;
-    protected boolean isEAnimationFinished = true;
-
-
-
+    protected WalkingAnimation walkingAnimation;
+    protected W_AttackAnimation wAnimation;
+    protected Q_AttackAnimation qAnimation;
+    protected E_AttackAnimation eAnimation;
 
     //collisions
     protected Rectangle playerRectangle;
@@ -93,28 +61,20 @@ public abstract class PlayerChampion {
     }
 
     protected Vector2 getWBurstRelativePosition() {
-        return new Vector2(position.x - wBurstAnimation.getKeyFrame(stateTimer, false).getRegionWidth() / 2, position.y - wBurstAnimation.getKeyFrame(stateTimer, false).getRegionHeight() / 2);
+        return new Vector2(position.x - wAnimation.getBurstKeyFrameWidth(stateTimer) / 2, position.y - wAnimation.getBurstKeyFrameHeight(stateTimer) / 2);
     }
 
     protected Vector2 getQSlashRelativePosition() {
-        return new Vector2(position.x - qSlashAnimation.getKeyFrame(stateTimer, false).getRegionWidth() / 2, position.y - qSlashAnimation.getKeyFrame(stateTimer, false).getRegionHeight() / 2);
+        return new Vector2(position.x - qAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - qAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
 
     protected Vector2 getESpinRelativePosition() {
-        return new Vector2(position.x - eSwordGrabAnimation.getKeyFrame(stateTimer, false).getRegionWidth() / 2, position.y - eSwordGrabAnimation.getKeyFrame(stateTimer, false).getRegionHeight() / 2);
+        return new Vector2(position.x - eAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - eAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
 
     public TextureRegion getSprite() {
         return currentRegion;
     }
-
-//    public Vector2 getTargetRelativePosition(){
-//        if(qSlashAnimation.getKeyFrame(stateTimer, false) == currentRegion){
-//            return getQSlashRelativePosition();
-//        } else if(wBurstAnimation.getKeyFrame(stateTimer, false) == currentRegion){
-//            return getWBurstRelativePosition();
-//        }
-//    }
 
     public TextureRegion getIdleTextureRegion() {return idleTextureRegion;}
 
@@ -199,37 +159,29 @@ public abstract class PlayerChampion {
         TextureRegion region;
         switch(currentState){
             case E_GRAB:
-                region = eSwordGrabAnimation.getKeyFrame(stateTimer, false);
-                relativePosition = getESpinRelativePosition();
+                region = eAnimation.getGrabKeyFrame(stateTimer);
                 break;
             case E_SPIN:
-                region = eSpinAnimation.getKeyFrame(stateTimer, true);
-                relativePosition = getESpinRelativePosition();
+                region = eAnimation.getSpinKeyFrame(stateTimer);
                 break;
             case WALKING:
-                region = walkingAnimation.getKeyFrame(stateTimer, true);
-                relativePosition = getIdleRelativePosition();
+                region = walkingAnimation.getKeyFrame(stateTimer);
                 break;
             case W:
-                region = wBurstAnimation.getKeyFrame(stateTimer, false);
-                relativePosition = getWBurstRelativePosition();
+                region = wAnimation.getBurstKeyFrame(stateTimer);
                 break;
             case W_WALKING:
-                region = wWalkingAnimation.getKeyFrame(stateTimer, true);
-                relativePosition = getIdleRelativePosition();
+                region = wAnimation.getWalkingKeyFrame(stateTimer);
                 break;
             case W_IDLE:
                 region = idleInvincibilityTextureRegion;
-                relativePosition = getIdleRelativePosition();
                 break;
             case Q:
-                region = qSlashAnimation.getKeyFrame(stateTimer, false);
-                relativePosition = getQSlashRelativePosition();
+                region = qAnimation.getKeyFrame(stateTimer);
                 break;
-            case STANDING:
             default:
+            case STANDING:
                 region = idleTextureRegion;
-                relativePosition = getIdleRelativePosition();
                 break;
         }
         if (previousState == currentState || isPartOfWAnimation()){
@@ -240,58 +192,73 @@ public abstract class PlayerChampion {
         return region;
     }
 
+    public void setRelativePosition(){
+        currentState = getState();
+        switch(currentState){
+            case E_GRAB:
+            case E_SPIN:
+                relativePosition = getESpinRelativePosition();
+                break;
+            case W:
+                relativePosition = getWBurstRelativePosition();;
+                break;
+            case Q:
+                relativePosition = getQSlashRelativePosition();
+                break;
+            case WALKING:
+            case W_WALKING:
+            case W_IDLE:
+            case STANDING:
+                relativePosition = getIdleRelativePosition();
+                break;
+        }
+    }
+
     private State getState(){
-        if(previousState == State.W && isQAnimationFinished && isWAnimationFinished && isEAnimationFinished || stateTimer < 3 && (previousState == State.W_WALKING || previousState == State.W_IDLE) && isWAnimationFinished && isEAnimationFinished){
-            relativePosition = getIdleRelativePosition();
-            isWAnimationFinished = true;
-            isEAnimationFinished = true;
-            isQAnimationFinished = true;
-            if((Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-                    || (Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.RIGHT))) {
+        // W checking state
+            //BURST
+        if((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsFinished(qAnimation, eAnimation) && wAnimation.isWalkingFinished || !wAnimation.isBurstFinished) {
+            wAnimation.updateBurstAnimationFinished(stateTimer);
+            return State.W;
+        }
+            //WALKING-IDLE
+        if(previousState == State.W && wAnimation.isBurstFinished
+                || stateTimer < 3 && (previousState == State.W_WALKING || previousState == State.W_IDLE)){
+            wAnimation.isWalkingFinished = false;
+            if(isMoving()) {
                 return State.W_WALKING;
             }
             return State.W_IDLE;
         }
-        if(previousState == State.E_GRAB && isQAnimationFinished && isWAnimationFinished && isEAnimationFinished || stateTimer < 3 && previousState == State.E_SPIN && isQAnimationFinished && isWAnimationFinished){
-            relativePosition = getESpinRelativePosition();
-            isWAnimationFinished = true;
-            isEAnimationFinished = true;
-            isQAnimationFinished = true;
-            return State.E_SPIN;
-        }
-        if((Gdx.input.isKeyPressed(Input.Keys.W)) && isQAnimationFinished && isEAnimationFinished || !isWAnimationFinished ) {
-            relativePosition = getWBurstRelativePosition();
-            isWAnimationFinished = wBurstAnimation.isAnimationFinished(stateTimer);
-            isQAnimationFinished = true;
-            isEAnimationFinished = true;
-            return State.W;
-        }
-        if((Gdx.input.isKeyPressed(Input.Keys.Q)) && isWAnimationFinished && isEAnimationFinished || !isQAnimationFinished) {
-            relativePosition = getQSlashRelativePosition();
-            isQAnimationFinished = qSlashAnimation.isAnimationFinished(stateTimer);
-            isWAnimationFinished = true;
-            isEAnimationFinished = true;
-            return State.Q;
-        }
-        if((Gdx.input.isKeyPressed(Input.Keys.E)) && isQAnimationFinished && isWAnimationFinished || !isEAnimationFinished ) {
-            relativePosition = getESpinRelativePosition();
-            isEAnimationFinished = eSwordGrabAnimation.isAnimationFinished(stateTimer);
-            isWAnimationFinished = true;
-            isQAnimationFinished = true;
+        if(stateTimer > 3 && (previousState == State.W_WALKING || previousState == State.W_IDLE))
+            wAnimation.isWalkingFinished = true;
+
+        //E checking state
+            //SWORD GRAB
+        if((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsFinished(qAnimation, wAnimation) && eAnimation.isESpinAnimationFinished || !eAnimation.isEGrabAnimationFinished) {
+            eAnimation.updateGrabAnimationFinished(stateTimer);
             return State.E_GRAB;
         }
-        if(((Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN))
-                || (Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.RIGHT))) && isQAnimationFinished  && isWAnimationFinished && isEAnimationFinished){
-            relativePosition = getIdleRelativePosition();
-            isQAnimationFinished = true;
-            isWAnimationFinished = true;
-            isEAnimationFinished = true;
+            //SPIN
+        if(previousState == State.E_GRAB && eAnimation.isEGrabAnimationFinished
+                || stateTimer < 3 && previousState == State.E_SPIN){
+            eAnimation.isESpinAnimationFinished = false;
+            return State.E_SPIN;
+        }
+        if(stateTimer > 3 && previousState == State.E_SPIN)
+            eAnimation.isESpinAnimationFinished = true;
+
+        //Q checking state
+        if((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsFinished(wAnimation, eAnimation) || !qAnimation.isQAnimationFinished) {
+            qAnimation.updateQAnimationFinished(stateTimer);
+            return State.Q;
+        }
+
+        //WALKING checking state
+        if(isMoving()){
             return State.WALKING;
         }
-        relativePosition = getIdleRelativePosition();
-        isQAnimationFinished = true;
-        isWAnimationFinished = true;
-        isEAnimationFinished = true;
+        //IDLE checking state
         return State.STANDING;
     }
     private boolean isPartOfWAnimation(){
@@ -312,5 +279,19 @@ public abstract class PlayerChampion {
         this.position.y = position;
     }
 
+    //update state functions
 
+    private boolean isMoving(){
+        return (Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN))
+                || (Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.RIGHT));
+    }
+
+    private boolean areAnimationsFinished(AttackAnimation ... animations){
+        for(AttackAnimation animation : animations){
+            if(!animation.isAnimationFinished()){
+                return false;
+            }
+        }
+        return true;
+    }
 }
