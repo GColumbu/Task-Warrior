@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
-public class W_AttackAnimation {
+public class W_AttackAnimation implements AttackAnimation{
     //BURST
     protected Animation<TextureRegion> wBurstAnimation;
     protected Texture wBurstTexture;
@@ -47,7 +47,16 @@ public class W_AttackAnimation {
         return wWalkingAnimation.getKeyFrame(stateTimer, true);
     }
 
-    public boolean isBurstAnimationFinished(float stateTimer){
-        return wBurstAnimation.isAnimationFinished(stateTimer);
+    protected void updateBurstAnimationFinished(float stateTimer){
+        isBurstFinished = wBurstAnimation.isAnimationFinished(stateTimer);
+    }
+
+    protected void updateWalkingAnimationFinished(float stateTimer){
+        isWalkingFinished = wWalkingAnimation.isAnimationFinished(stateTimer);
+    }
+
+    @Override
+    public boolean isAnimationFinished() {
+        return isBurstFinished && isWalkingFinished;
     }
 }

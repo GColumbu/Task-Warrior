@@ -5,10 +5,16 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
-public class E_AttackAnimation {
+public class E_AttackAnimation implements AttackAnimation{
     protected Texture eSpinTexture;
+
+    //SWORD GRAB
     protected Animation<TextureRegion> eSwordGrabAnimation;
+    protected boolean isEGrabAnimationFinished = true;
+    //SPIN
     protected Animation<TextureRegion> eSpinAnimation;
+    protected boolean isESpinAnimationFinished = true;
+
 
     protected E_AttackAnimation(String eSpinPath, float swordGrabFrameDuration, float spinFrameDuration) {
         this.eSpinTexture = new Texture(eSpinPath);
@@ -23,6 +29,7 @@ public class E_AttackAnimation {
             frames.add(new TextureRegion(eSpinTexture, i*eSpinFrameWidth, 0, eSpinFrameWidth, eSpinTexture.getHeight()));
         }
         eSpinAnimation = new Animation(spinFrameDuration, frames);
+        eSpinAnimation.setPlayMode(Animation.PlayMode.LOOP);
     }
 
     protected float getKeyFrameWidth(float stateTimer){
@@ -41,8 +48,16 @@ public class E_AttackAnimation {
         return eSpinAnimation.getKeyFrame(stateTimer, true);
     }
 
-    protected boolean isAnimationFinished(float stateTimer){
-        return eSpinAnimation.isAnimationFinished(stateTimer);
+    protected void updateSpinAnimationFinished(float stateTimer){
+        isESpinAnimationFinished =  eSpinAnimation.isAnimationFinished(stateTimer);
     }
 
+    protected void updateGrabAnimationFinished(float stateTimer){
+        isEGrabAnimationFinished =  eSwordGrabAnimation.isAnimationFinished(stateTimer);
+    }
+
+    @Override
+    public boolean isAnimationFinished() {
+        return isEGrabAnimationFinished && isESpinAnimationFinished;
+    }
 }

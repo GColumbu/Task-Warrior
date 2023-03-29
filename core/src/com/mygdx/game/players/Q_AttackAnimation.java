@@ -5,10 +5,12 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
-public class Q_AttackAnimation {
+public class Q_AttackAnimation implements AttackAnimation{
 
     protected Animation<TextureRegion> qAnimation;
     protected Texture qTexture;
+
+    protected boolean isQAnimationFinished = true;
 
     public Q_AttackAnimation(String qTexture1, String qTexture2, float frameDuration) {
         Array<TextureRegion> frames = new Array<>();
@@ -36,7 +38,12 @@ public class Q_AttackAnimation {
         return qAnimation.getKeyFrame(stateTimer, false);
     }
 
-    public boolean isAnimationFinished(float stateTimer){
-        return qAnimation.isAnimationFinished(stateTimer);
+    public void updateQAnimationFinished(float stateTimer){
+        isQAnimationFinished = qAnimation.isAnimationFinished(stateTimer);
+    }
+
+    @Override
+    public boolean isAnimationFinished() {
+        return isQAnimationFinished;
     }
 }
