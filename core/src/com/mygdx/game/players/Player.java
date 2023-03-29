@@ -24,6 +24,7 @@ public class Player extends PlayerChampion{
 
     @Override
     public void update(float deltaTime) {
+        setRelativePosition();
         setCurrentRegion(getFrame(deltaTime));
         setPlayerRectangle(new Rectangle(getIdleRelativePosition().x, getIdleRelativePosition().y, getIdleTextureRegion().getRegionWidth(), getIdleTextureRegion().getRegionHeight()));
         movePlayer(deltaTime);
