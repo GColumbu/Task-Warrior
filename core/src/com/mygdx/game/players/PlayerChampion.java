@@ -56,6 +56,10 @@ public abstract class PlayerChampion {
         return position;
     }
 
+    public float getStateTimer(){
+        return stateTimer;
+    }
+
     protected Vector2 getIdleRelativePosition() {
         return new Vector2(position.x - idleTextureRegion.getRegionWidth() / 2, position.y - idleTextureRegion.getRegionHeight() / 2);
     }
@@ -70,6 +74,78 @@ public abstract class PlayerChampion {
 
     protected Vector2 getESpinRelativePosition() {
         return new Vector2(position.x - eAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - eAnimation.getKeyFrameHeight(stateTimer) / 2);
+    }
+
+    public Rectangle getEAttackRange(){
+        return new Rectangle(getESpinRelativePosition().x, getESpinRelativePosition().y, eAnimation.getSpinKeyFrame(stateTimer).getRegionWidth(), eAnimation.getSpinKeyFrame(stateTimer).getRegionHeight());
+    }
+
+    public Rectangle getWAttackRange(){
+        return new Rectangle(getWBurstRelativePosition().x, getWBurstRelativePosition().y, wAnimation.getBurstKeyFrameWidth(stateTimer), wAnimation.getBurstKeyFrameHeight(stateTimer));
+    }
+
+    public Rectangle getQAttackRange(){
+        //duration and limit of first slash
+        if(stateTimer <= 0.07f * 12){
+            return getQFirstPartAttackRange();
+        }
+        //duration and limit of the second (rotative) slash
+        else if (stateTimer > 0.07f * 12 && stateTimer < 0.07f * 18){
+            return getQSecondPartAttackRange();
+        }
+        //duration and limit of third slash
+        return getQThirdPartAttackRange();
+    }
+
+    private Rectangle getQFirstPartAttackRange(){
+        if(getHeading() == 0) {
+            return new Rectangle(getIdleRelativePosition().x + 35,
+                    getIdleRelativePosition().y - 125, 200, 310);
+        } else if (getHeading() == 90) {
+            return new Rectangle(getIdleRelativePosition().x - 100,
+                    getIdleRelativePosition().y + 35, 305, 175);
+        } else if (getHeading() == 180) {
+            return new Rectangle(getIdleRelativePosition().x - 125,
+                    getIdleRelativePosition().y - 125, 190, 310);
+        } else if (getHeading() == 270) {
+            return new Rectangle(getIdleRelativePosition().x - 100,
+                    getIdleRelativePosition().y - 150, 305, 195);
+        }
+        return null;
+    }
+
+    private Rectangle getQSecondPartAttackRange(){
+        if(getHeading() == 0) {
+            return new Rectangle(getIdleRelativePosition().x - 110,
+                    getIdleRelativePosition().y - 140, 347, 330);
+        } else if (getHeading() == 90) {
+            return new Rectangle(getIdleRelativePosition().x - 105,
+                    getIdleRelativePosition().y - 130, 342, 350);
+        } else if (getHeading() == 180) {
+            return new Rectangle(getIdleRelativePosition().x - 135,
+                    getIdleRelativePosition().y - 130, 350, 345);
+        } else if (getHeading() == 270) {
+            return new Rectangle(getIdleRelativePosition().x - 130,
+                    getIdleRelativePosition().y - 150, 342, 350);
+        }
+        return null;
+    }
+
+    private Rectangle getQThirdPartAttackRange(){
+        if(getHeading() == 0) {
+            return new Rectangle(getQSlashRelativePosition().x + qAnimation.getKeyFrameWidth(stateTimer) / 2 - 13,
+                    getQSlashRelativePosition().y, qAnimation.getKeyFrameWidth(stateTimer) / 2, qAnimation.getKeyFrameHeight(stateTimer));
+        } else if (getHeading() == 90) {
+            return new Rectangle(getQSlashRelativePosition().x + 50, getQSlashRelativePosition().y + qAnimation.getKeyFrameHeight(stateTimer) / 2 - 20,
+                    qAnimation.getKeyFrameWidth(stateTimer) - 100, qAnimation.getKeyFrameHeight(stateTimer) / 2 + 50);
+        } else if (getHeading() == 180) {
+            return new Rectangle(getQSlashRelativePosition().x,
+                    getQSlashRelativePosition().y, qAnimation.getKeyFrameWidth(stateTimer) / 2, qAnimation.getKeyFrameHeight(stateTimer));
+        } else if (getHeading() == 270) {
+            return new Rectangle(getQSlashRelativePosition().x + 50, getQSlashRelativePosition().y - 75,
+                    qAnimation.getKeyFrameWidth(stateTimer) - 100, qAnimation.getKeyFrameHeight(stateTimer) / 2 + 125);
+        }
+        return null;
     }
 
     public TextureRegion getSprite() {
@@ -128,7 +204,7 @@ public abstract class PlayerChampion {
                 }
             }
             //movement on x axis
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 if (getIdleRelativePosition().x > 0) {
                     previousX = position.x;
                     velocity.x = -deltaTime * speed;
@@ -214,7 +290,7 @@ public abstract class PlayerChampion {
         }
     }
 
-    private State getState(){
+    public State getState(){ //TODO: remove
         // W checking state
             //BURST
         if((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsFinished(qAnimation, eAnimation) && wAnimation.isWalkingFinished || !wAnimation.isBurstFinished) {

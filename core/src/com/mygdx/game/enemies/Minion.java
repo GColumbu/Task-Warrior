@@ -39,7 +39,7 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(flee(player.getPosition().cpy(), deltaTime));
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
-        setEnemyRectangle(new Rectangle(position.x, position.y, getSprite().getRegionWidth(), getSprite().getRegionHeight()));
+        setEnemyRectangle(new Rectangle(relativePosition.x, relativePosition.y, getSprite().getRegionWidth() / 2 , getSprite().getRegionHeight()));
         moveAndRecognizeCollision(player, deltaTime);
     }
     @Override

@@ -48,10 +48,6 @@ public class E_AttackAnimation implements AttackAnimation{
         return eSpinAnimation.getKeyFrame(stateTimer, true);
     }
 
-    protected void updateSpinAnimationFinished(float stateTimer){
-        isESpinAnimationFinished =  eSpinAnimation.isAnimationFinished(stateTimer);
-    }
-
     protected void updateGrabAnimationFinished(float stateTimer){
         isEGrabAnimationFinished =  eSwordGrabAnimation.isAnimationFinished(stateTimer);
     }
