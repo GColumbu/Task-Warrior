@@ -9,8 +9,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
 
 public class Minion extends Enemy {
+    //constants TODO: maybe calculate them dynamically based on difficulty
     private final static int MINION_MAX_SPEED = 175;
     private final static int MINION_MAX_FORCE = 50;
+    private final static int MINION_HEALTH = 300;
 
     //minion states
     protected enum State {WALKING, ATTACK};
@@ -26,7 +28,7 @@ public class Minion extends Enemy {
     protected TextureRegion idleTextureRegion;
     protected WalkingAnimation walkingAnimation;
     public Minion(int x, int y) {
-        super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE);
+        super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE, MINION_HEALTH);
         stateTimer = 0;
         currentState = State.WALKING;
         idleTextureRegion = new TextureRegion(new Texture("minion_idle.png"));
@@ -40,6 +42,7 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
         setEnemyRectangle(new Rectangle(relativePosition.x, relativePosition.y, getSprite().getRegionWidth() / 2 , getSprite().getRegionHeight()));
+        calculateDamage(player);
         moveAndRecognizeCollision(player, deltaTime);
     }
     @Override
@@ -61,7 +64,11 @@ public class Minion extends Enemy {
                 //TODO:: minion attack animation
             case WALKING:
             default:
-                region = walkingAnimation.getKeyFrame(stateTimer);
+                if(isAttacked)
+                    region = walkingAnimation.getKeyFrame(stateTimer);
+                else
+                    // TODO: change with red animation
+                    region = walkingAnimation.getKeyFrame(stateTimer);
                 relativePosition = getWalkingRelativePosition();
                 break;
         }

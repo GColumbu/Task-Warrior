@@ -8,12 +8,15 @@ import com.badlogic.gdx.utils.Array;
 public class E_AttackAnimation implements AttackAnimation{
     protected Texture eSpinTexture;
 
-    //SWORD GRAB
+        //SWORD GRAB
     protected Animation<TextureRegion> eSwordGrabAnimation;
     protected boolean isEGrabAnimationFinished = true;
-    //SPIN
+        //SPIN
     protected Animation<TextureRegion> eSpinAnimation;
     protected boolean isESpinAnimationFinished = true;
+
+    //TODO: calculate it based on player enhancements
+    protected int eSpinAttackDamage = 2;
 
 
     protected E_AttackAnimation(String eSpinPath, float swordGrabFrameDuration, float spinFrameDuration) {

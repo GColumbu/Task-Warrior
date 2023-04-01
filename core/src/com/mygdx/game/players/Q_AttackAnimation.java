@@ -9,8 +9,10 @@ public class Q_AttackAnimation implements AttackAnimation{
 
     protected Animation<TextureRegion> qAnimation;
     protected Texture qTexture;
-
     protected boolean isQAnimationFinished = true;
+
+    //TODO: calculate it based on player enhancements
+    protected int qAttackDamage;
 
     public Q_AttackAnimation(String qTexture1, String qTexture2, float frameDuration) {
         Array<TextureRegion> frames = new Array<>();

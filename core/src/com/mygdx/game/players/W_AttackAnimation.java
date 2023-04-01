@@ -6,11 +6,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
 public class W_AttackAnimation implements AttackAnimation{
-    //BURST
+        //BURST
     protected Animation<TextureRegion> wBurstAnimation;
     protected Texture wBurstTexture;
     protected boolean isBurstFinished = true;
-    //WALKING
+
+    //TODO: calculate it based on player enhancements
+    protected int wAttackDamage = 20;
+        //WALKING
     protected Animation<TextureRegion> wWalkingAnimation;
     protected Texture wWalkingTexture;
     protected boolean isWalkingFinished = true;

@@ -3,6 +3,7 @@ package com.mygdx.game.enemies;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.TaskWarrior;
@@ -12,21 +13,23 @@ public abstract class Enemy {
 
     protected Vector2 position;
 
+    protected int health;
     protected Vector2 relativePosition;
-
     protected Vector2 velocity;
     protected float maxSpeed;
     protected float maxForce;
+    protected boolean isAttacked = false;
 
     protected Rectangle enemyRectangle;
 
     //constructor
-    public Enemy(int x, int y, float maxSpeed, float maxForce){
+    public Enemy(int x, int y, float maxSpeed, float maxForce, int health){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
         velocity = new Vector2(0, 0);
         this.maxSpeed = maxSpeed;
         this.maxForce = maxForce;
+        this.health = health;
     }
 
     public float getHeading(){
@@ -59,8 +62,8 @@ public abstract class Enemy {
         return velocity;
     }
 
-    public void setPosition(Vector2 position) {
-        this.position = position;
+    public int getHealth() {
+        return health;
     }
 
     //orientations
@@ -129,6 +132,28 @@ public abstract class Enemy {
             position.y += velocity.y;
         } else if(position.y <= 0 && isLooking("up") || position.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
             position.y += velocity.y;
+        }
+    }
+
+    // player related behaviours
+    protected void calculateDamage(PlayerChampion player) {
+        if(player.getState() == PlayerChampion.State.E_SPIN && player.getEAttackRange().overlaps(enemyRectangle)) {
+            health -= player.getEAttackDamage();
+            isAttacked = true;
+            //debug
+            System.out.println(health);
+        } else if(player.getState() == PlayerChampion.State.Q && player.getWAttackRange().overlaps(enemyRectangle)){
+            health -= player.getQAttackDamage();
+            isAttacked = true;
+            //debug
+            System.out.println(health);
+        } else if(player.getState() == PlayerChampion.State.W && player.getStateTimer() > 0.07f * 6 && player.getWAttackRange().overlaps(enemyRectangle)){
+            health -= player.getWAttackDamage();
+            isAttacked = true;
+            //debug
+            System.out.println(health);
+        } else {
+            isAttacked = false;
         }
     }
 

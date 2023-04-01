@@ -80,21 +80,36 @@ public abstract class PlayerChampion {
         return new Rectangle(getESpinRelativePosition().x, getESpinRelativePosition().y, eAnimation.getSpinKeyFrame(stateTimer).getRegionWidth(), eAnimation.getSpinKeyFrame(stateTimer).getRegionHeight());
     }
 
+    public int getEAttackDamage() {
+        return eAnimation.eSpinAttackDamage;
+    }
+
     public Rectangle getWAttackRange(){
         return new Rectangle(getWBurstRelativePosition().x, getWBurstRelativePosition().y, wAnimation.getBurstKeyFrameWidth(stateTimer), wAnimation.getBurstKeyFrameHeight(stateTimer));
+    }
+
+    public int getWAttackDamage() {
+        return wAnimation.wAttackDamage;
     }
 
     public Rectangle getQAttackRange(){
         //duration and limit of first slash
         if(stateTimer <= 0.07f * 12){
+            qAnimation.qAttackDamage = 1;
             return getQFirstPartAttackRange();
         }
         //duration and limit of the second (rotative) slash
         else if (stateTimer > 0.07f * 12 && stateTimer < 0.07f * 18){
+            qAnimation.qAttackDamage = 2;
             return getQSecondPartAttackRange();
         }
         //duration and limit of third slash
+        qAnimation.qAttackDamage = 3;
         return getQThirdPartAttackRange();
+    }
+
+    public int getQAttackDamage() {
+        return qAnimation.qAttackDamage;
     }
 
     private Rectangle getQFirstPartAttackRange(){
