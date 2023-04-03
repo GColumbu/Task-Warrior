@@ -1,9 +1,13 @@
 package com.mygdx.game.states;
 
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.Enemy;
@@ -15,12 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State{
-    private static int NR_OF_MINIONS = 2;
+    private static int NR_OF_MINIONS = 1;
     private static final float REPULSION_FACTOR = 0.5f;
     private List<Enemy> minions;
     private PlayerChampion target;
     private Texture background;
 
+    ShapeRenderer shapeRenderer;
     protected PlayState(GameStateManager gsm){
         super(gsm);
         background = new Texture("background.png");
@@ -30,6 +35,7 @@ public class PlayState extends State{
         }
         target = new Player(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
         camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
+        shapeRenderer = new ShapeRenderer();
     }
     @Override
     protected void handleInput() {
@@ -40,13 +46,32 @@ public class PlayState extends State{
     protected void update(float deltaTime) {
         handleInput();
         target.update(deltaTime);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        if(target.getState() == PlayerChampion.State.E_SPIN){
+            shapeRenderer.rect(target.getEAttackRange().getX(), target.getEAttackRange().getY(), target.getEAttackRange().getWidth(), target.getEAttackRange().getHeight());
+        }
+        if(target.getState() == PlayerChampion.State.Q ){
+            if(target.isAngled()) {
+                shapeRenderer.polygon(target.getAngledQAttackDamage().getVertices());
+            }
+            else
+                shapeRenderer.rect(target.getQAttackRange().getX(), target.getQAttackRange().getY(), target.getQAttackRange().getWidth(), target.getQAttackRange().getHeight());
+        }
+        if(target.getState() == PlayerChampion.State.W && target.getStateTimer() > 0.07f * 6){
+            shapeRenderer.rect(target.getWAttackRange().getX(), target.getWAttackRange().getY(), target.getWAttackRange().getWidth(), target.getWAttackRange().getHeight());
+        }
+        shapeRenderer.rect(target.getPlayerRectangle().getX(), target.getPlayerRectangle().getY(), target.getPlayerRectangle().getWidth(), target.getPlayerRectangle().getHeight());
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.get(i).update(target, deltaTime);
             if(minions.get(i).getHealth() <= 0){
                 minions.remove(i);
                 NR_OF_MINIONS--;
+                i--;
             }
+            if(NR_OF_MINIONS > 0)
+                shapeRenderer.rect(minions.get(i).getEnemyRectangle().getX(), minions.get(i).getEnemyRectangle().getY(), minions.get(i).getEnemyRectangle().getWidth(), minions.get(i).getEnemyRectangle().getHeight());
         }
+
         //avoidEnemyCollisions(minions, deltaTime);
         updateCamera(target);
     }
@@ -69,6 +94,7 @@ public class PlayState extends State{
                     minions.get(i).getHeading());
         }
         batch.end();
+        shapeRenderer.end();
     }
 
     @Override

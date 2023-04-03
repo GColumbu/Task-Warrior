@@ -95,7 +95,7 @@ public class Minion extends Enemy {
             applySteeringBehaviour(pursue(player, deltaTime));
         }else{
             isInRange = true;
-            noOverlapping(player);
+            noOverlappingWithPlayer(player);
         }
     }
 

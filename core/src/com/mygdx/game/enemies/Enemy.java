@@ -1,9 +1,8 @@
 package com.mygdx.game.enemies;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.TaskWarrior;
@@ -137,27 +136,48 @@ public abstract class Enemy {
 
     // player related behaviours
     protected void calculateDamage(PlayerChampion player) {
+        // minion takes damage from E spell
         if(player.getState() == PlayerChampion.State.E_SPIN && player.getEAttackRange().overlaps(enemyRectangle)) {
-            health -= player.getEAttackDamage();
-            isAttacked = true;
-            //debug
-            System.out.println(health);
-        } else if(player.getState() == PlayerChampion.State.Q && player.getWAttackRange().overlaps(enemyRectangle)){
-            health -= player.getQAttackDamage();
-            isAttacked = true;
-            //debug
-            System.out.println(health);
-        } else if(player.getState() == PlayerChampion.State.W && player.getStateTimer() > 0.07f * 6 && player.getWAttackRange().overlaps(enemyRectangle)){
-            health -= player.getWAttackDamage();
-            isAttacked = true;
-            //debug
-            System.out.println(health);
-        } else {
+            deductEnemyHealth(player.getEAttackDamage());
+        }
+        // minion takes damage from Q spell
+        else if(player.getState() == PlayerChampion.State.Q){
+            // normal q attack range
+            if(!player.isAngled() && player.getQAttackRange().overlaps(enemyRectangle)){
+                deductEnemyHealth(player.getQAttackDamage());
+            }
+            // angled q attack range
+            if(player.isAngled() && isCollision(player.getAngledQAttackDamage(), enemyRectangle)){
+                deductEnemyHealth(player.getQAttackDamage());
+            }
+        }
+        // minion takes damage from W spell
+        else if(player.getState() == PlayerChampion.State.W && player.getStateTimer() > 0.07f * 6 && player.getWAttackRange().overlaps(enemyRectangle)){
+            deductEnemyHealth(player.getWAttackDamage());
+        }
+        //minion doesn't take damage
+        else {
             isAttacked = false;
         }
     }
 
-    protected void noOverlapping(PlayerChampion player) {
+    private void deductEnemyHealth(int damage){
+        health -= damage;
+        isAttacked = true;
+        //debug
+        System.out.println(health);
+    }
+
+    // check if Polygon intersects Rectangle
+    private boolean isCollision(Polygon p, Rectangle r) {
+        Polygon rPoly = new Polygon(new float[] { 0, 0, r.width, 0, r.width,
+                r.height, 0, r.height });
+        rPoly.setPosition(r.x, r.y);
+        return Intersector.overlapConvexPolygons(rPoly, p);
+    }
+
+    // don't allow player texture to go over the minion texture
+    protected void noOverlappingWithPlayer(PlayerChampion player) {
         float xDifference = Math.abs(player.getPosition().x - position.x);
         float xDifferencePrevious = Math.abs(player.getPreviousX() - position.x);
 

@@ -12,7 +12,7 @@ public class W_AttackAnimation implements AttackAnimation{
     protected boolean isBurstFinished = true;
 
     //TODO: calculate it based on player enhancements
-    protected int wAttackDamage = 20;
+    protected int wAttackDamage = 10;
         //WALKING
     protected Animation<TextureRegion> wWalkingAnimation;
     protected Texture wWalkingTexture;
@@ -52,10 +52,6 @@ public class W_AttackAnimation implements AttackAnimation{
 
     protected void updateBurstAnimationFinished(float stateTimer){
         isBurstFinished = wBurstAnimation.isAnimationFinished(stateTimer);
-    }
-
-    protected void updateWalkingAnimationFinished(float stateTimer){
-        isWalkingFinished = wWalkingAnimation.isAnimationFinished(stateTimer);
     }
 
     @Override
