@@ -1,10 +1,7 @@
 package com.mygdx.game.enemies;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Intersector;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.players.PlayerChampion;
 
@@ -137,22 +134,32 @@ public abstract class Enemy {
     // player related behaviours
     protected void calculateDamage(PlayerChampion player) {
         // minion takes damage from E spell
-        if(player.getState() == PlayerChampion.State.E_SPIN && player.getEAttackRange().overlaps(enemyRectangle)) {
+        if(player.getState() == PlayerChampion.State.E_SPIN && isCollision(player.getEAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getEAttackDamage());
         }
         // minion takes damage from Q spell
         else if(player.getState() == PlayerChampion.State.Q){
-            // normal q attack range
-            if(!player.isAngled() && player.getQAttackRange().overlaps(enemyRectangle)){
-                deductEnemyHealth(player.getQAttackDamage());
+            // first slash (return Rectangle)
+            if(player.getQAttackRange() instanceof Rectangle){
+                Rectangle rectangle = (Rectangle)player.getQAttackRange();
+                if(rectangle.overlaps(enemyRectangle))
+                    deductEnemyHealth(player.getQAttackDamage());
             }
-            // angled q attack range
-            if(player.isAngled() && isCollision(player.getAngledQAttackDamage(), enemyRectangle)){
-                deductEnemyHealth(player.getQAttackDamage());
+            //second slash (return Circle)
+            else if(player.getQAttackRange() instanceof Circle){
+                Circle circle = (Circle)player.getQAttackRange();
+                if(isCollision(circle, enemyRectangle))
+                    deductEnemyHealth(player.getQAttackDamage());
+            }
+            //third slash (return Polygon)
+            else if(player.getQAttackRange() instanceof Polygon){
+                Polygon polygon = (Polygon)player.getQAttackRange();
+                if(isCollision(polygon, enemyRectangle))
+                    deductEnemyHealth(player.getQAttackDamage());
             }
         }
         // minion takes damage from W spell
-        else if(player.getState() == PlayerChampion.State.W && player.getStateTimer() > 0.07f * 6 && player.getWAttackRange().overlaps(enemyRectangle)){
+        else if(player.getState() == PlayerChampion.State.W && player.getStateTimer() > 0.07f * 6 && isCollision(player.getWAttackRange(), enemyRectangle)){
             deductEnemyHealth(player.getWAttackDamage());
         }
         //minion doesn't take damage
@@ -168,12 +175,41 @@ public abstract class Enemy {
         System.out.println(health);
     }
 
-    // check if Polygon intersects Rectangle
-    private boolean isCollision(Polygon p, Rectangle r) {
+    // transforms Rectangle to Polygon
+    private Polygon rectToPolygon(Rectangle r) {
         Polygon rPoly = new Polygon(new float[] { 0, 0, r.width, 0, r.width,
                 r.height, 0, r.height });
         rPoly.setPosition(r.x, r.y);
+        return rPoly;
+    }
+
+    // check if Polygon intersects Rectangle
+    private boolean isCollision(Polygon p, Rectangle r) {
+        Polygon rPoly = rectToPolygon(r);
         return Intersector.overlapConvexPolygons(rPoly, p);
+    }
+
+    //check if Circle intersects Rectangle
+    private boolean isCollision(Circle circ, Rectangle rect){
+        Polygon p = rectToPolygon(rect);
+        float[] vertices = p.getTransformedVertices();
+        Vector2 center = new Vector2(circ.x, circ.y);
+        float squareRadius = circ.radius * circ.radius;
+        for (int i = 0; i < vertices.length; i += 2) {
+            if (i == 0) {
+                if (Intersector.intersectSegmentCircle(new Vector2(
+                        vertices[vertices.length - 2],
+                        vertices[vertices.length - 1]), new Vector2(
+                        vertices[i], vertices[i + 1]), center, squareRadius))
+                    return true;
+            } else {
+                if (Intersector.intersectSegmentCircle(new Vector2(
+                        vertices[i - 2], vertices[i - 1]), new Vector2(
+                        vertices[i], vertices[i + 1]), center, squareRadius))
+                    return true;
+            }
+        }
+        return false;
     }
 
     // don't allow player texture to go over the minion texture

@@ -5,9 +5,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
 
 public abstract class PlayerChampion {
@@ -73,7 +71,6 @@ public abstract class PlayerChampion {
                 break;
             case W:
                 relativePosition = getWBurstRelativePosition();
-                ;
                 break;
             case Q:
                 relativePosition = getQSlashRelativePosition();
@@ -143,7 +140,7 @@ public abstract class PlayerChampion {
     }
 
     // normal attack range (returns Rectangle)
-    public Rectangle getQAttackRange(){
+    public Shape2D getQAttackRange(){
         //duration and limit of first slash
         if(stateTimer <= 0.15f * 12){
             qAnimation.qAttackDamage = 1;
@@ -159,168 +156,91 @@ public abstract class PlayerChampion {
         return getQThirdPartAttackRange();
     }
 
-    //angled attack range (returns Polygon)
-    public Polygon getAngledQAttackDamage() {
-        //duration and limit of first slash
-        if (stateTimer <= 0.15f * 12) {
-            qAnimation.qAttackDamage = 1;
-            return getAngledQFirstPartAttackRange();
-        }
-        //duration and limit of the second (rotative) slash
-        else if (stateTimer > 0.15f * 12 && stateTimer < 0.15f * 18){
-            qAnimation.qAttackDamage = 2;
-            return getAngledQSecondPartAttackRange();
-        }
-        //duration and limit of third slash
-        qAnimation.qAttackDamage = 3;
-        return getAngledQThirdPartAttackRange();
-    }
-
-
     // q first part
-    private Rectangle getQFirstPartAttackRange(){
-        if(getHeading() == 0) {
-            return new Rectangle(getIdleRelativePosition().x + 35,
-                    getIdleRelativePosition().y - 125, 200, 310);
-        } else if (getHeading() == 90) {
-            return new Rectangle(getIdleRelativePosition().x - 100,
-                    getIdleRelativePosition().y + 35, 305, 175);
-        } else if (getHeading() == 180) {
-            return new Rectangle(getIdleRelativePosition().x - 125,
-                    getIdleRelativePosition().y - 125, 190, 310);
-        } else if (getHeading() == 270) {
-            return new Rectangle(getIdleRelativePosition().x - 100,
-                    getIdleRelativePosition().y - 150, 305, 195);
-        }
-        return null;
-    }
-        // angled
-    private Polygon getAngledQFirstPartAttackRange(){
+    private Shape2D getQFirstPartAttackRange(){
         float x = getIdleRelativePosition().x;
         float y = getIdleRelativePosition().y;
-        float width = getIdleTextureRegion().getRegionWidth();
-        float height = getIdleTextureRegion().getRegionHeight();
-        if(getHeading() == 45) {
-            float[] vertices = {x + width + 50, y + height - 150, x + width + 180, y + height - 20, x + 70, y + height + 200, x - 65, y + height + 60};
+        if(getHeading() == 0) {
+            return new Rectangle(x + 35, y - 125, 200, 310);
+        } else if(getHeading() == 45) {
+            float[] vertices = {x + 156, y - 82, x + 286, y + 48, x + 70, y + 268, x - 65, y + 128};
             return new Polygon(vertices);
+        } else if (getHeading() == 90) {
+            return new Rectangle(x - 100, y + 35, 305, 175);
         } else if(getHeading() == 135) {
-            float[] vertices = {x - 55, y - 75, x - 180, y + 50, x + 40, y + height + 200, x + 160, y + 140};
+            float[] vertices = {x - 55, y - 75, x - 180, y + 50, x + 40, y + 268, x + 160, y + 140};
             return new Polygon(vertices);
-        } else if(getHeading() == 225) {
-            float[] vertices = {x - 55, y + height + 70, x - 180, y + 10, x + 40, y - 2* height - 50, x + width + 50, y - 55};
+        } else if (getHeading() == 180) {
+            return new Rectangle(x - 125, y - 125, 190, 310);
+        } else if (getHeading() == 225) {
+            float[] vertices = {x - 55, y + 138, x - 180, y + 10, x + 40, y - 186, x + 156, y - 55};
             return new Polygon(vertices);
+        } else if (getHeading() == 270) {
+            return new Rectangle( x - 100,y - 150, 305, 195);
         } else if (getHeading() == 315) {
-            float[] vertices = {x - 55, y - 75, x + width - 30, y - 2 * height - 50, x + 2 * width + 70, y + 20, x + 160, y + 140};
+            float[] vertices = {x - 55, y - 75, x + 76, y - 186, x + 282, y + 20, x + 160, y + 140};
             return new Polygon(vertices);
         }
         return null;
     }
 
     // q second part
-    private Rectangle getQSecondPartAttackRange(){
+    private Shape2D getQSecondPartAttackRange(){
         if(getHeading() == 0) {
-            return new Rectangle(getIdleRelativePosition().x - 110,
-                    getIdleRelativePosition().y - 140, 347, 330);
+            return new Circle(position.x + 15, position.y - 5, 175);
+        } else if(getHeading() == 45) {
+            return new Circle(position.x + 13, position.y + 6, 175);
         } else if (getHeading() == 90) {
-            return new Rectangle(getIdleRelativePosition().x - 105,
-                    getIdleRelativePosition().y - 130, 342, 350);
+            return new Circle(position.x + 9, position.y + 15, 175);
+        } else if(getHeading() == 135) {
+            return new Circle(position.x - 5, position.y + 15, 175);
         } else if (getHeading() == 180) {
-            return new Rectangle(getIdleRelativePosition().x - 135,
-                    getIdleRelativePosition().y - 130, 350, 345);
+            return new Circle(position.x - 13, position.y + 7, 175);
+        } else if(getHeading() == 225) {
+            return new Circle(position.x - 13, position.y - 5, 175);
         } else if (getHeading() == 270) {
-            return new Rectangle(getIdleRelativePosition().x - 130,
-                    getIdleRelativePosition().y - 150, 342, 350);
-        }
-        return null;
-    }
-        // angled
-    private Polygon getAngledQSecondPartAttackRange(){
-        float x = getIdleRelativePosition().x;
-        float y = getIdleRelativePosition().y;
-        float width = getIdleTextureRegion().getRegionWidth();
-        float height = getIdleTextureRegion().getRegionHeight();
-        if(getHeading() == 45) {
-            float[] vertices = {x + 110, y - 3 * height - 10, x + width + 215, y + height + 15, x + 20, y + height + 220, x - width - 80, y - 10};
-            return new Polygon(vertices);
-        }
-        if(getHeading() == 135) {
-            float[] vertices = {x + 90, y - 3 * height +10, x + width + 185, y + height + 25, x, y + height + 225, x - width - 100, y + 10};
-            return new Polygon(vertices);
-        }
-        if(getHeading() == 225) {
-            float[] vertices = {x + 75, y - 3 * height - 15, x + width + 185, y + height, x, y + height + 215, x - width - 100, y};
-            return new Polygon(vertices);
-        }
-        if(getHeading() == 315) {
-            float[] vertices = {x + 100, y - 3 * height - 20, x + width + 195, y + height - 5, x + 10, y + height + 190, x - width - 85, y - 30};
-            return new Polygon(vertices);
+            return new Circle(position.x - 7, position.y - 12, 175);
+        } else if(getHeading() == 315) {
+            return new Circle(position.x + 3, position.y - 12, 175);
         }
         return null;
     }
 
     // q third part
-    private Rectangle getQThirdPartAttackRange(){
-        if(getHeading() == 0) {
-            return new Rectangle(getQSlashRelativePosition().x + qAnimation.getKeyFrameWidth(stateTimer) / 2 - 13,
-                    getQSlashRelativePosition().y, qAnimation.getKeyFrameWidth(stateTimer) / 2, qAnimation.getKeyFrameHeight(stateTimer));
-        } else if (getHeading() == 90) {
-            return new Rectangle(getQSlashRelativePosition().x + 50, getQSlashRelativePosition().y + qAnimation.getKeyFrameHeight(stateTimer) / 2 - 20,
-                    qAnimation.getKeyFrameWidth(stateTimer) - 100, qAnimation.getKeyFrameHeight(stateTimer) / 2 + 50);
-        } else if (getHeading() == 180) {
-            return new Rectangle(getQSlashRelativePosition().x,
-                    getQSlashRelativePosition().y, qAnimation.getKeyFrameWidth(stateTimer) / 2, qAnimation.getKeyFrameHeight(stateTimer));
-        } else if (getHeading() == 270) {
-            return new Rectangle(getQSlashRelativePosition().x + 50, getQSlashRelativePosition().y - 75,
-                    qAnimation.getKeyFrameWidth(stateTimer) - 100, qAnimation.getKeyFrameHeight(stateTimer) / 2 + 125);
-        }
-        return null;
-    }
-        // angled
-    private Polygon getAngledQThirdPartAttackRange(){
+    private Shape2D getQThirdPartAttackRange(){
         float x = getIdleRelativePosition().x;
         float y = getIdleRelativePosition().y;
-        float width = getIdleTextureRegion().getRegionWidth();
-        float height = getIdleTextureRegion().getRegionHeight();
-        if(getHeading() == 45) {
-            float[] vertices = {x + width + 50,
-                    y + height - 150,
-                    x + width + 180,
-                    y + height - 20,
-                    x + 70,
-                    y + height + 200,
-                    x - 65,
-                    y + height + 60
-            };
+        if(getHeading() == 0) {
+            float[] vertices = {x + 35, y - 485, x + 250, y - 450, x + 420, y - 370, x + 595, y - 150, x + 625, y + 50, x + 605, y + 200, x + 515,
+                    y + 375, x + 450, y + 440, x + 390, y + 470, x + 320, y + 520, x + 170, y + 560, x + 50, y + 550};
+            return new Polygon(vertices);
+        }  if(getHeading() == 45) {
+            float[] vertices = {x + 410, y - 345, x + 515, y - 220, x + 572, y - 100, x + 610, y + 50, x + 605, y + 200, x + 515, y + 375, x + 460,
+                    y + 440, x + 390, y + 500, x + 320, y + 550, x + 170, y + 590, x, y + 590, x - 140, y + 540, x - 325, y + 385};
+            return new Polygon(vertices);
+        } else if (getHeading() == 90) {
+            float[] vertices = {x + 575, y + 15, x + 560, y + 200, x + 520, y + 300, x + 480, y + 375, x + 450, y + 440, x + 390, y + 500, x + 320,
+                    y + 540, x + 170, y + 590, x, y + 605, x - 140, y + 565, x - 270, y + 500, x - 430, y + 300, x - 465, y + 150, x - 457, y + 15};
             return new Polygon(vertices);
         } else if(getHeading() == 135) {
-            float[] vertices = {x - 55,
-                    y - 75,
-                    x - 180,
-                    y + 50,
-                    x + 40,
-                    y + height + 200,
-                    x + 160,
-                    y + 140};
+            float[] vertices = {x + 430, y + 385, x + 280, y + 510, x + 100, y + 575, x, y + 587, x - 140, y + 565, x - 270, y + 500, x - 430, y + 330,
+                    x - 490, y + 150, x - 490, y - 75, x - 360, y - 270, x - 300, y - 320};
+            return new Polygon(vertices);
+        } else if (getHeading() == 180) {
+            float[] vertices = {x + 70, y + 550, x -50, y + 540, x - 140, y + 520, x - 270, y + 475, x - 430, y + 330, x - 490, y + 150, x - 490, y - 75,
+                    x - 425, y - 270, x - 250, y - 420, x - 100, y - 470, x + 70, y - 470};
             return new Polygon(vertices);
         } else if(getHeading() == 225) {
-            float[] vertices = {x - 55,
-                    y + height + 70,
-                    x - 180,
-                    y + 10,
-                    x + 40,
-                    y - 2* height - 50,
-                    x + width + 50,
-                    y - 55};
+            float[] vertices = {x - 300, y + 415, x - 430, y + 230, x - 470, y + 150, x - 490, y - 75, x - 425, y - 270, x - 250, y - 430, x - 100, y - 495,
+                    x + 70, y - 510, x + 230, y - 480, x + 330, y - 400, x + 430, y - 310};
+            return new Polygon(vertices);
+        } else if (getHeading() == 270) {
+            float[] vertices = {x - 470, y + 50, x - 445, y - 150, x - 405, y - 270, x - 250, y - 430, x - 100, y - 510, x + 70, y - 530, x + 230, y - 505,
+                    x + 330, y - 440, x + 470, y - 310, x + 550, y - 150, x + 570, y + 50};
             return new Polygon(vertices);
         } else if (getHeading() == 315) {
-            float[] vertices = {x - 55,
-                    y - 75,
-                    x + width - 30,
-                    y - 2 * height - 50,
-                    x + 2 * width + 70,
-                    y + 20,
-                    x + 160,
-                    y + 140};
+            float[] vertices = {x - 320, y - 320, x - 225, y - 400, x - 100, y - 495, x + 70, y - 520, x + 230, y - 505,
+                    x + 345, y - 440, x + 495, y - 310, x + 587, y - 150, x + 597, y + 50, x + 555, y + 205, x + 505, y + 315, x + 400, y + 400};
             return new Polygon(vertices);
         }
         return null;
@@ -335,8 +255,8 @@ public abstract class PlayerChampion {
         return wAnimation.wAttackDamage;
     }
 
-    public Rectangle getWAttackRange(){
-        return new Rectangle(getWBurstRelativePosition().x, getWBurstRelativePosition().y, wAnimation.getBurstKeyFrameWidth(stateTimer), wAnimation.getBurstKeyFrameHeight(stateTimer));
+    public Circle getWAttackRange(){
+        return new Circle(position.x, position.y, 270);
     }
 
     // E spell
@@ -348,19 +268,18 @@ public abstract class PlayerChampion {
         return eAnimation.eSpinAttackDamage;
     }
 
-    public Rectangle getEAttackRange(){
-        return new Rectangle(getESpinRelativePosition().x, getESpinRelativePosition().y, eAnimation.getSpinKeyFrame(stateTimer).getRegionWidth(), eAnimation.getSpinKeyFrame(stateTimer).getRegionHeight());
+    public Circle getEAttackRange(){
+        return new Circle(position.x, position.y, 310);
     }
 
     // movement function
     protected void movePlayer(float deltaTime){
-        //reset velocity vector
+        // reset velocity vector
         velocity = new Vector2(0, 0);
-        //movement on y axis
+        // movement on y axis
         if(getState() != State.W) {
             if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 if (getIdleRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
-                    previousY = position.y;
                     velocity.y = deltaTime * speed;
                     if (getState() == State.Q) {
                         velocity.y -= (deltaTime * speed) / 2;
@@ -368,17 +287,15 @@ public abstract class PlayerChampion {
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 if (getIdleRelativePosition().y > 0) {
-                    previousY = position.y;
                     velocity.y = -deltaTime * speed;
                     if (getState() == State.Q) {
                         velocity.y += (deltaTime * speed) / 2;
                     }
                 }
             }
-            //movement on x axis
+            // movement on x axis
              if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 if (getIdleRelativePosition().x > 0) {
-                    previousX = position.x;
                     velocity.x = -deltaTime * speed;
                     if (getState() == State.Q) {
                         velocity.x += (deltaTime * speed) / 2;
@@ -386,7 +303,6 @@ public abstract class PlayerChampion {
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 if (getIdleRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
-                    previousX = position.x;
                     velocity.x = deltaTime * speed;
                     if (getState() == State.Q) {
                         velocity.x -= (deltaTime * speed) / 2;
@@ -394,10 +310,14 @@ public abstract class PlayerChampion {
                 }
             }
         }
-        //if player is not moving record the last moving velocity
+        // if player is not moving record the last moving velocity
         if(!velocity.equals(Vector2.Zero)){
             previousMovingVelocity = velocity;
         }
+        // record previous position to check for collision towards the minion
+        previousX = position.x;
+        previousY = position.y;
+        // add velocity to position vector
         position.add(velocity);
     }
 
@@ -490,10 +410,6 @@ public abstract class PlayerChampion {
     }
 
     //update state functions
-
-    public boolean isAngled() {
-        return getHeading() == 45 || getHeading() == 135 || getHeading() == 225 || getHeading() == 315;
-    }
 
     private boolean isMoving(){
         return (Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN))

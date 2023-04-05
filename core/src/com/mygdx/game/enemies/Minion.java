@@ -27,6 +27,7 @@ public class Minion extends Enemy {
     protected TextureRegion currentRegion;
     protected TextureRegion idleTextureRegion;
     protected WalkingAnimation walkingAnimation;
+    protected WalkingAnimation walkingDamageAnimation;
     public Minion(int x, int y) {
         super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE, MINION_HEALTH);
         stateTimer = 0;
@@ -34,6 +35,7 @@ public class Minion extends Enemy {
         idleTextureRegion = new TextureRegion(new Texture("minion_idle.png"));
         currentRegion = idleTextureRegion;
         walkingAnimation = new WalkingAnimation("minion_walk.png", 0.1f);
+        walkingDamageAnimation = new WalkingAnimation("minion_walk_damage.png", 0.1f);
     }
 
     @Override
@@ -42,8 +44,8 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
         setEnemyRectangle(new Rectangle(relativePosition.x, relativePosition.y, getSprite().getRegionWidth() / 2 , getSprite().getRegionHeight()));
-        calculateDamage(player);
         moveAndRecognizeCollision(player, deltaTime);
+        calculateDamage(player);
     }
     @Override
     public TextureRegion getSprite(){
@@ -64,10 +66,9 @@ public class Minion extends Enemy {
                 //TODO:: minion attack animation
             case WALKING:
             default:
-                if(isAttacked)
-                    region = walkingAnimation.getKeyFrame(stateTimer);
+                if (isAttacked)
+                    region = walkingDamageAnimation.getKeyFrame(stateTimer);
                 else
-                    // TODO: change with red animation
                     region = walkingAnimation.getKeyFrame(stateTimer);
                 relativePosition = getWalkingRelativePosition();
                 break;

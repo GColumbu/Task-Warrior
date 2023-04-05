@@ -1,11 +1,10 @@
 package com.mygdx.game.states;
 
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State{
-    private static int NR_OF_MINIONS = 1;
+    private static int NR_OF_MINIONS = 0;
     private static final float REPULSION_FACTOR = 0.5f;
     private List<Enemy> minions;
     private PlayerChampion target;
@@ -48,28 +47,33 @@ public class PlayState extends State{
         target.update(deltaTime);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         if(target.getState() == PlayerChampion.State.E_SPIN){
-            shapeRenderer.rect(target.getEAttackRange().getX(), target.getEAttackRange().getY(), target.getEAttackRange().getWidth(), target.getEAttackRange().getHeight());
+            shapeRenderer.circle(target.getEAttackRange().x, target.getEAttackRange().y, target.getEAttackRange().radius);
         }
         if(target.getState() == PlayerChampion.State.Q ){
-            if(target.isAngled()) {
-                shapeRenderer.polygon(target.getAngledQAttackDamage().getVertices());
+            if(target.getQAttackRange() instanceof Rectangle){
+                Rectangle rectangle = (Rectangle)target.getQAttackRange();
+                shapeRenderer.rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+            } else if(target.getQAttackRange() instanceof Polygon){
+                Polygon polygon = (Polygon)target.getQAttackRange();
+                shapeRenderer.polygon(polygon.getVertices());
+            } else if (target.getQAttackRange() instanceof Circle){
+                Circle circle = (Circle)target.getQAttackRange();
+                shapeRenderer.circle(circle.x, circle.y, circle.radius);
             }
-            else
-                shapeRenderer.rect(target.getQAttackRange().getX(), target.getQAttackRange().getY(), target.getQAttackRange().getWidth(), target.getQAttackRange().getHeight());
         }
         if(target.getState() == PlayerChampion.State.W && target.getStateTimer() > 0.07f * 6){
-            shapeRenderer.rect(target.getWAttackRange().getX(), target.getWAttackRange().getY(), target.getWAttackRange().getWidth(), target.getWAttackRange().getHeight());
+            shapeRenderer.circle(target.getWAttackRange().x, target.getWAttackRange().y, target.getWAttackRange().radius);
         }
         shapeRenderer.rect(target.getPlayerRectangle().getX(), target.getPlayerRectangle().getY(), target.getPlayerRectangle().getWidth(), target.getPlayerRectangle().getHeight());
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.get(i).update(target, deltaTime);
+            if(NR_OF_MINIONS > 0)
+                shapeRenderer.rect(minions.get(i).getEnemyRectangle().getX(), minions.get(i).getEnemyRectangle().getY(), minions.get(i).getEnemyRectangle().getWidth(), minions.get(i).getEnemyRectangle().getHeight());
             if(minions.get(i).getHealth() <= 0){
                 minions.remove(i);
                 NR_OF_MINIONS--;
                 i--;
             }
-            if(NR_OF_MINIONS > 0)
-                shapeRenderer.rect(minions.get(i).getEnemyRectangle().getX(), minions.get(i).getEnemyRectangle().getY(), minions.get(i).getEnemyRectangle().getWidth(), minions.get(i).getEnemyRectangle().getHeight());
         }
 
         //avoidEnemyCollisions(minions, deltaTime);
