@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State{
-    private static int NR_OF_MINIONS = 0;
+    private static int NR_OF_MINIONS = 1;
     private static final float REPULSION_FACTOR = 0.5f;
     private List<Enemy> minions;
     private PlayerChampion target;
@@ -46,7 +46,7 @@ public class PlayState extends State{
         handleInput();
         target.update(deltaTime);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        if(target.getState() == PlayerChampion.State.E_SPIN){
+        if(target.getState() == PlayerChampion.State.E){
             shapeRenderer.circle(target.getEAttackRange().x, target.getEAttackRange().y, target.getEAttackRange().radius);
         }
         if(target.getState() == PlayerChampion.State.Q ){
@@ -61,7 +61,7 @@ public class PlayState extends State{
                 shapeRenderer.circle(circle.x, circle.y, circle.radius);
             }
         }
-        if(target.getState() == PlayerChampion.State.W && target.getStateTimer() > 0.07f * 6){
+        if(target.getState() == PlayerChampion.State.W && target.getW_Animation().isBurst(target.getStateTimer(), true)){
             shapeRenderer.circle(target.getWAttackRange().x, target.getWAttackRange().y, target.getWAttackRange().radius);
         }
         shapeRenderer.rect(target.getPlayerRectangle().getX(), target.getPlayerRectangle().getY(), target.getPlayerRectangle().getWidth(), target.getPlayerRectangle().getHeight());

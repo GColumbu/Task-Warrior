@@ -9,13 +9,21 @@ public class Q_AttackAnimation implements AttackAnimation{
 
     protected Animation<TextureRegion> qAnimation;
     protected Texture qTexture;
-    protected boolean isQAnimationFinished = true;
+
+    protected int firstSlashFrames;
+    protected int secondSlashFrames;
+    protected int thirdSlashFrames;
+    protected float frameDuration;
 
     //TODO: calculate it based on player enhancements
     protected int qAttackDamage;
 
-    public Q_AttackAnimation(String qTexture1, String qTexture2, float frameDuration) {
+    protected Q_AttackAnimation(String qTexture1, String qTexture2, float frameDuration) {
         Array<TextureRegion> frames = new Array<>();
+        firstSlashFrames = 12;
+        secondSlashFrames = 5;
+        thirdSlashFrames = 5;
+        this.frameDuration = frameDuration;
         qTexture = new Texture(qTexture1);
         int qSlashFrameWidth = qTexture.getWidth() / 12;
         for(int i=0; i<12; i++){
@@ -29,23 +37,30 @@ public class Q_AttackAnimation implements AttackAnimation{
         qAnimation = new Animation(frameDuration, frames);
     }
 
-    public float getKeyFrameWidth(float stateTimer){
+    protected float getKeyFrameWidth(float stateTimer){
         return qAnimation.getKeyFrame(stateTimer, false).getRegionWidth();
     }
-    public float getKeyFrameHeight(float stateTimer){
+    protected float getKeyFrameHeight(float stateTimer){
         return qAnimation.getKeyFrame(stateTimer, false).getRegionHeight();
     }
 
-    public TextureRegion getKeyFrame(float stateTimer){
+    protected TextureRegion getKeyFrame(float stateTimer){
         return qAnimation.getKeyFrame(stateTimer, false);
     }
 
-    public void updateQAnimationFinished(float stateTimer){
-        isQAnimationFinished = qAnimation.isAnimationFinished(stateTimer);
+    public boolean isFirstSlash(float stateTimer){
+        return stateTimer <= firstSlashFrames * frameDuration;
+    }
+
+    public boolean isSecondSlash(float stateTimer){
+        return stateTimer > firstSlashFrames * frameDuration && stateTimer <= (firstSlashFrames + secondSlashFrames) * frameDuration;
+    }
+    public boolean isThirdSlash(float stateTimer){
+        return stateTimer > firstSlashFrames * frameDuration && stateTimer <= (firstSlashFrames + secondSlashFrames + thirdSlashFrames) * frameDuration;
     }
 
     @Override
-    public boolean isAnimationFinished() {
-        return isQAnimationFinished;
+    public boolean isAnimationFinished(float stateTimer) {
+        return qAnimation.isAnimationFinished(stateTimer);
     }
 }

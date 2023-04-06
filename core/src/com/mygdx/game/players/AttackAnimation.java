@@ -1,5 +1,5 @@
 package com.mygdx.game.players;
 
 public interface AttackAnimation {
-    public boolean isAnimationFinished();
+    public boolean isAnimationFinished(float stateTimer);
 }

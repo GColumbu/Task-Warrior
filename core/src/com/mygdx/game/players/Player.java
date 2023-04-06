@@ -12,11 +12,10 @@ public class Player extends PlayerChampion{
     public Player(int x, int y){
         super(x, y, 500);
         walkingAnimation = new WalkingAnimation("walk.png", 0.05f);
-        wAnimation = new W_AttackAnimation("invincibility_burst.png", "invincibility_walk.png", 0.07f, 0.05f);
-        qAnimation = new Q_AttackAnimation("slash_combo_part1.png", "slash_combo_part2.png", 0.15f);
+        wAnimation = new W_AttackAnimation("invincibility_burst.png", "invincibility_walk.png", "idle_w.png", 0.07f, 0.05f);
+        qAnimation = new Q_AttackAnimation("slash_combo_part1.png", "slash_combo_part2.png", 0.07f);
         eAnimation = new E_AttackAnimation("spin.png", 0.07f, 0.05f);
         idleTextureRegion = new TextureRegion(new Texture("idle.png"));
-        idleInvincibilityTextureRegion = new TextureRegion(new Texture("idle_w.png"));
         currentRegion = idleTextureRegion;
         currentState = State.STANDING;
         stateTimer = 0;

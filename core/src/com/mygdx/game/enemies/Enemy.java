@@ -134,7 +134,7 @@ public abstract class Enemy {
     // player related behaviours
     protected void calculateDamage(PlayerChampion player) {
         // minion takes damage from E spell
-        if(player.getState() == PlayerChampion.State.E_SPIN && isCollision(player.getEAttackRange(), enemyRectangle)) {
+        if(player.getState() == PlayerChampion.State.E && isCollision(player.getEAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getEAttackDamage());
         }
         // minion takes damage from Q spell
@@ -159,7 +159,7 @@ public abstract class Enemy {
             }
         }
         // minion takes damage from W spell
-        else if(player.getState() == PlayerChampion.State.W && player.getStateTimer() > 0.07f * 6 && isCollision(player.getWAttackRange(), enemyRectangle)){
+        else if(player.getState() == PlayerChampion.State.W && player.getW_Animation().isBurst(player.getStateTimer(), true) && isCollision(player.getWAttackRange(), enemyRectangle)){
             deductEnemyHealth(player.getWAttackDamage());
         }
         //minion doesn't take damage
