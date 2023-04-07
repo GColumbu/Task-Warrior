@@ -1,6 +1,7 @@
 package com.mygdx.game.states.PlayState;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 
 public class AttackIcon {
     //attack icon

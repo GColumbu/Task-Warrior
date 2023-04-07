@@ -28,10 +28,7 @@ public class PlayState extends State {
     private Texture background;
     private UserInterface userInterface;
 
-    private HealthBar healthBar;
-
     ShapeRenderer borderShapeRenderer;
-    ShapeRenderer healthShapeRenderer;
     public PlayState(GameStateManager gsm){
         super(gsm);
         background = new Texture("background.png");
@@ -42,9 +39,7 @@ public class PlayState extends State {
         target = new Garen(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
         camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
         borderShapeRenderer = new ShapeRenderer();
-        healthShapeRenderer = new ShapeRenderer();
-        userInterface = new UserInterface("assets/UI bar.png", target.getQ_Animation().getAttackIcon(), target.getW_Animation().getAttackIcon(), target.getE_Animation().getAttackIcon());
-        healthBar = new HealthBar(19, 46, 23, target.MAX_HEALTH);
+        userInterface = new UserInterface("assets/UI bar.png", target.getQ_Animation().getAttackIcon(), target.getW_Animation().getAttackIcon(), target.getE_Animation().getAttackIcon(), target.MAX_HEALTH);
     }
     @Override
     protected void handleInput() {
@@ -84,11 +79,9 @@ public class PlayState extends State {
                     minions.get(i).getSprite().getRegionHeight(), 1, 1,
                     minions.get(i).getHeading());
         }
-        userInterface.draw(batch, camera);
-        healthBar.draw(healthShapeRenderer, target.getHealth(), userInterface.getUIPosition(camera), camera);
+        userInterface.draw(batch, camera, target);
         batch.end();
         borderShapeRenderer.end();
-        healthShapeRenderer.end();
     }
 
     @Override
@@ -136,20 +129,6 @@ public class PlayState extends State {
             }
         }
     }
-
-    private void drawHealthBar(){
-        healthShapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        float playerHealth = target.getHealth();
-        Rectangle healthBar = new Rectangle(10, 10, 5 * playerHealth, 50);
-        if(playerHealth > 60)
-            healthShapeRenderer.setColor(Color.GREEN);
-        else if (playerHealth <= 60 && playerHealth > 30)
-            healthShapeRenderer.setColor(Color.ORANGE);
-        else
-            healthShapeRenderer.setColor(Color.RED);
-        healthShapeRenderer.rect(healthBar.getX(), healthBar.getY(), healthBar.getWidth(), healthBar.getHeight());
-    }
-
     private Vector2 calculateRepulsionVector(Enemy enemy1, Enemy enemy2, float deltaTime) {
         Vector2 enemy1ToEnemy2 = enemy2.getPosition().cpy().sub(enemy1.getPosition());
         float distance = enemy1ToEnemy2.len();

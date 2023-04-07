@@ -2,46 +2,90 @@ package com.mygdx.game.states.PlayState;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.players.PlayerChampion;
-
-import java.awt.*;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class HealthBar {
-    private final float UI_HEALTH_WIDTH = 165;
-    protected Rectangle healthBar;
-    private final int xOffset;
-    private final int yOffset;
-    private final int height;
-    private final float widthMultiplicationfactor;
+    // health bar dimension
+    private final int HEALTH_BAR_WIDTH = 165;
+    private final int HEALTH_BAR_HEIGHT = 22;
+
+    // health bar offset from UI
+    private final int OFFSET_X = 19;
+    private final int OFFSET_Y = 47;
     private final float sixtyPercentPlayerHealth;
     private final float thirtyPercentPlayerHealth;
-    protected HealthBar(int xOffset, int yOffset, int height, float playerMaxHealth){
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
-        this.height = height;
-        this.widthMultiplicationfactor = UI_HEALTH_WIDTH / playerMaxHealth;
+
+    ProgressBar.ProgressBarStyle progressBarStyle;
+
+    ProgressBar progressBar;
+
+    float playerMaxHealth;
+    protected HealthBar(float playerMaxHealth){
+        // ProgressBarStyle creates the style of the healthbar
+        progressBarStyle = new ProgressBar.ProgressBarStyle();
+
+        // creates the appearence of the background
+        Pixmap pixmap = new Pixmap(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.BLACK);
+        pixmap.fill();
+        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
+        progressBarStyle.background = drawable;
+
+        // creates the knob
+        pixmap = new Pixmap(0, HEALTH_BAR_HEIGHT, Pixmap.Format.RGBA8888);
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
+        progressBarStyle.knob = drawable;
+
+        // creates the knob before
+        pixmap = new Pixmap(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.GREEN);
+        pixmap.fill();
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
+        progressBarStyle.knobBefore = drawable;
+
+        // creates the progress bar
+        progressBar = new ProgressBar(0, playerMaxHealth, 1, false, progressBarStyle);
+
+        this.playerMaxHealth = playerMaxHealth;
         this.sixtyPercentPlayerHealth = (float)(60.0/100.0) * playerMaxHealth;
         this.thirtyPercentPlayerHealth = (float)(30.0/100.0) * playerMaxHealth;
     }
-
-    protected void update(ShapeRenderer shapeRenderer, float playerHealth){
-        if(playerHealth >= sixtyPercentPlayerHealth)
-            shapeRenderer.setColor(Color.GREEN);
-        else if(playerHealth >= thirtyPercentPlayerHealth)
-            shapeRenderer.setColor(Color.ORANGE);
-        else
-            shapeRenderer.setColor(Color.RED);
+    protected void draw(SpriteBatch spriteBatch, float posX, float posY, float playerHealth){
+        updateProgressBar(playerHealth);
+        progressBar.setValue(playerHealth);
+        progressBar.setAnimateDuration(0.05f);
+        progressBar.setPosition(posX + OFFSET_X, posY + OFFSET_Y);
+        progressBar.setWidth(HEALTH_BAR_WIDTH);
+        progressBar.setHeight(HEALTH_BAR_HEIGHT);
+        progressBar.draw(spriteBatch, 1f);
     }
 
-    protected void draw(ShapeRenderer shapeRenderer, float playerHealth, Vector2 referencePosition, OrthographicCamera camera){
-        if(playerHealth > 0) {
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setProjectionMatrix(camera.combined);
-            update(shapeRenderer, playerHealth);
-            healthBar = new Rectangle((int) referencePosition.x + xOffset, (int) referencePosition.y + yOffset, (int) (widthMultiplicationfactor * playerHealth), height);
-            shapeRenderer.rect((float) healthBar.getX(), (float) healthBar.getY(), (float) healthBar.getWidth(), (float) healthBar.getHeight());
-        }
+    protected void updateProgressBar(float playerHealth){
+        //updates the knob before
+        Pixmap pixmap = new Pixmap(HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT, Pixmap.Format.RGBA8888);
+        changePixmapColor(pixmap, playerHealth);
+        pixmap.fill();
+        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
+        progressBarStyle.knobBefore = drawable;
+
+        //updates the progress bar itself
+        progressBar = new ProgressBar(0, playerMaxHealth, 10, false, progressBarStyle);
+    }
+    private void changePixmapColor(Pixmap pixmap, float playerHealth){
+        if(playerHealth >= sixtyPercentPlayerHealth)
+            pixmap.setColor(Color.GREEN);
+        else if(playerHealth >= thirtyPercentPlayerHealth)
+            pixmap.setColor(Color.ORANGE);
+        else
+            pixmap.setColor(Color.RED);
     }
 }
