@@ -1,11 +1,12 @@
-package com.mygdx.game.players;
+package com.mygdx.game.players.garen;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.players.AttackAnimation;
 
-public class W_AttackAnimation implements AttackAnimation{
+public class Garen_W extends AttackAnimation {
     private final int INVINCIBILITY_DURATION = 3;
         //BURST
     protected Animation<TextureRegion> wBurstAnimation;
@@ -15,7 +16,7 @@ public class W_AttackAnimation implements AttackAnimation{
     protected float burstDuration;
 
     //TODO: calculate it based on player enhancements
-    protected int wAttackDamage = 10;
+    protected float wAttackDamage = 10;
         //WALKING
     protected Animation<TextureRegion> wWalkingAnimation;
     protected Texture wWalkingTexture;
@@ -24,7 +25,7 @@ public class W_AttackAnimation implements AttackAnimation{
         //IDLE
     protected TextureRegion idleInvincibilityTextureRegion;
 
-    protected W_AttackAnimation(String wBurstFilePath, String wWalkingFilePath, String wIdleTexture, float wBurstFrameDuration, float wWalkingFrameDuration) {
+    protected Garen_W(String wBurstFilePath, String wWalkingFilePath, String wIdleTexture,  String wIconFilePath, float wBurstFrameDuration, float wWalkingFrameDuration) {
         wBurstFrames = 10;
         wWalkingFrames = 12;
         this.wBurstTexture = new Texture(wBurstFilePath);
@@ -44,15 +45,8 @@ public class W_AttackAnimation implements AttackAnimation{
         wWalkingAnimation = new Animation(wWalkingFrameDuration, frames);
         this.wWalkingFrameDuration = wWalkingFrameDuration;
         idleInvincibilityTextureRegion = new TextureRegion(new Texture(wIdleTexture));
+        attackIcon = new Texture(wIconFilePath);
         burstDuration = wBurstAnimation.getAnimationDuration();
-    }
-
-    protected float getBurstKeyFrameWidth(float stateTimer){
-        return wBurstAnimation.getKeyFrame(stateTimer, false).getRegionWidth();
-    }
-
-    protected float getBurstKeyFrameHeight(float stateTimer){
-        return wBurstAnimation.getKeyFrame(stateTimer, false).getRegionHeight();
     }
 
     protected TextureRegion getBurstKeyFrame(float stateTimer){
@@ -66,6 +60,16 @@ public class W_AttackAnimation implements AttackAnimation{
         if(forCollision)
             return stateTimer> 6 * wBurstFrameDuration && stateTimer <= wBurstFrames * wBurstFrameDuration;
         return stateTimer <= wBurstFrames * wBurstFrameDuration;
+    }
+
+    @Override
+    public float getKeyFrameWidth(float stateTimer){
+        return wBurstAnimation.getKeyFrame(stateTimer, false).getRegionWidth();
+    }
+
+    @Override
+    public float getKeyFrameHeight(float stateTimer){
+        return wBurstAnimation.getKeyFrame(stateTimer, false).getRegionHeight();
     }
 
     @Override

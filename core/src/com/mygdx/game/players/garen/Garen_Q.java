@@ -1,11 +1,12 @@
-package com.mygdx.game.players;
+package com.mygdx.game.players.garen;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.players.AttackAnimation;
 
-public class Q_AttackAnimation implements AttackAnimation{
+public class Garen_Q extends AttackAnimation {
 
     protected Animation<TextureRegion> qAnimation;
     protected Texture qTexture;
@@ -16,9 +17,9 @@ public class Q_AttackAnimation implements AttackAnimation{
     protected float frameDuration;
 
     //TODO: calculate it based on player enhancements
-    protected int qAttackDamage;
+    protected float qAttackDamage;
 
-    protected Q_AttackAnimation(String qTexture1, String qTexture2, float frameDuration) {
+    protected Garen_Q(String qTexture1, String qTexture2, String qIconFilePath, float frameDuration) {
         Array<TextureRegion> frames = new Array<>();
         firstSlashFrames = 12;
         secondSlashFrames = 5;
@@ -35,13 +36,7 @@ public class Q_AttackAnimation implements AttackAnimation{
             frames.add(new TextureRegion(qTexture, i*qSlashFrameWidth, 0, qSlashFrameWidth, qTexture.getHeight()));
         }
         qAnimation = new Animation(frameDuration, frames);
-    }
-
-    protected float getKeyFrameWidth(float stateTimer){
-        return qAnimation.getKeyFrame(stateTimer, false).getRegionWidth();
-    }
-    protected float getKeyFrameHeight(float stateTimer){
-        return qAnimation.getKeyFrame(stateTimer, false).getRegionHeight();
+        attackIcon = new Texture(qIconFilePath);
     }
 
     protected TextureRegion getKeyFrame(float stateTimer){
@@ -57,6 +52,15 @@ public class Q_AttackAnimation implements AttackAnimation{
     }
     public boolean isThirdSlash(float stateTimer){
         return stateTimer > firstSlashFrames * frameDuration && stateTimer <= (firstSlashFrames + secondSlashFrames + thirdSlashFrames) * frameDuration;
+    }
+
+    @Override
+    public float getKeyFrameWidth(float stateTimer){
+        return qAnimation.getKeyFrame(stateTimer, false).getRegionWidth();
+    }
+    @Override
+    public float getKeyFrameHeight(float stateTimer){
+        return qAnimation.getKeyFrame(stateTimer, false).getRegionHeight();
     }
 
     @Override

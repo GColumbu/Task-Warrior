@@ -13,29 +13,16 @@ public class Minion extends Enemy {
     private final static int MINION_MAX_SPEED = 175;
     private final static int MINION_MAX_FORCE = 50;
     private final static int MINION_HEALTH = 300;
+    private final static float MINION_DAMAGE = 0.2F;
 
-    //minion states
-    protected enum State {WALKING, ATTACK};
-
-    protected boolean isInRange = false;
-    protected State currentState;
-    protected State previousState;
-    protected float stateTimer;
-
-    //animations and textures
-
-    protected TextureRegion currentRegion;
-    protected TextureRegion idleTextureRegion;
-    protected WalkingAnimation walkingAnimation;
-    protected WalkingAnimation walkingDamageAnimation;
     public Minion(int x, int y) {
-        super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE, MINION_HEALTH);
+        super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE, MINION_HEALTH, MINION_DAMAGE);
         stateTimer = 0;
         currentState = State.WALKING;
-        idleTextureRegion = new TextureRegion(new Texture("minion_idle.png"));
+        idleTextureRegion = new TextureRegion(new Texture("assets/minion/minion_idle.png"));
         currentRegion = idleTextureRegion;
-        walkingAnimation = new WalkingAnimation("minion_walk.png", 0.1f);
-        walkingDamageAnimation = new WalkingAnimation("minion_walk_damage.png", 0.1f);
+        walkingAnimation = new WalkingAnimation("assets/minion/minion_walk.png", 0.1f);
+        walkingDamageAnimation = new WalkingAnimation("assets/minion/minion_walk_damage.png", 0.1f);
     }
 
     @Override
@@ -43,61 +30,10 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(flee(player.getPosition().cpy(), deltaTime));
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
-        setEnemyRectangle(new Rectangle(relativePosition.x, relativePosition.y, getSprite().getRegionWidth() / 2 , getSprite().getRegionHeight()));
-        moveAndRecognizeCollision(player, deltaTime);
+        setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34 , getSprite().getRegionHeight()));
+        moveAndRecognizeCollision(player, pursue(player, deltaTime));
         calculateDamage(player);
     }
-    @Override
-    public TextureRegion getSprite(){
-        return currentRegion;
-    }
 
-    public void setCurrentRegion(TextureRegion currentRegion) {
-        this.currentRegion = currentRegion;
-    }
-    protected Vector2 getWalkingRelativePosition() {
-        return new Vector2(position.x - walkingAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - walkingAnimation.getKeyFrameHeight(stateTimer) / 2);
-    }
-    protected TextureRegion getFrame(float deltaTime){
-        currentState = getState();
-        TextureRegion region;
-        switch(currentState) {
-            case ATTACK:
-                //TODO:: minion attack animation
-            case WALKING:
-            default:
-                if (isAttacked)
-                    region = walkingDamageAnimation.getKeyFrame(stateTimer);
-                else
-                    region = walkingAnimation.getKeyFrame(stateTimer);
-                relativePosition = getWalkingRelativePosition();
-                break;
-        }
-        if (previousState == currentState){
-            stateTimer += deltaTime;
-        } else
-            stateTimer = 0;
-        previousState = currentState;
-        return region;
-    }
-
-    private State getState(){
-        if(isInRange){
-            return State.ATTACK;
-        }
-        relativePosition = getWalkingRelativePosition();
-        return State.WALKING;
-    }
-
-    public void moveAndRecognizeCollision(PlayerChampion player, float deltaTime){
-        // apply steering behaviour if colision not detected
-        if(!enemyRectangle.overlaps(player.getPlayerRectangle())){
-            isInRange = false;
-            applySteeringBehaviour(pursue(player, deltaTime));
-        }else{
-            isInRange = true;
-            noOverlappingWithPlayer(player);
-        }
-    }
 
 }
