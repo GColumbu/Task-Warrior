@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.players.AttackAnimation;
 
 public class Garen_Q extends AttackAnimation {
+    private final float COOLDOWN = 7;
 
     protected Animation<TextureRegion> qAnimation;
     protected Texture qTexture;
@@ -20,6 +21,8 @@ public class Garen_Q extends AttackAnimation {
     protected float qAttackDamage;
 
     protected Garen_Q(String qTexture1, String qTexture2, String qIconFilePath, float frameDuration) {
+        cooldownDuration = COOLDOWN;
+        cooldownStateTimer = cooldownDuration;
         Array<TextureRegion> frames = new Array<>();
         firstSlashFrames = 12;
         secondSlashFrames = 5;

@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.players.AttackAnimation;
 
 public class Garen_W extends AttackAnimation {
+    private final float COOLDOWN = 10;
     private final int INVINCIBILITY_DURATION = 3;
         //BURST
     protected Animation<TextureRegion> wBurstAnimation;
@@ -26,6 +27,8 @@ public class Garen_W extends AttackAnimation {
     protected TextureRegion idleInvincibilityTextureRegion;
 
     protected Garen_W(String wBurstFilePath, String wWalkingFilePath, String wIdleTexture,  String wIconFilePath, float wBurstFrameDuration, float wWalkingFrameDuration) {
+        cooldownDuration = COOLDOWN;
+        cooldownStateTimer = cooldownDuration;
         wBurstFrames = 10;
         wWalkingFrames = 12;
         this.wBurstTexture = new Texture(wBurstFilePath);

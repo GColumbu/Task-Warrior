@@ -8,6 +8,7 @@ import com.mygdx.game.players.AttackAnimation;
 
 public class Garen_E extends AttackAnimation {
     private final int SPIN_DURATION = 3;
+    private final float COOLDOWN = 7;
     protected Texture eSpinTexture;
 
         //SWORD GRAB
@@ -27,6 +28,8 @@ public class Garen_E extends AttackAnimation {
     protected Garen_E(String eSpinPath, String eIconFilePath,  float eGrabFrameDuration, float eSpinFrameDuration) {
         eGrabFrames = 3;
         eSpinFrames = 6;
+        cooldownDuration = COOLDOWN;
+        cooldownStateTimer = cooldownDuration;
         this.eSpinTexture = new Texture(eSpinPath);
         int eSpinFrameWidth = eSpinTexture.getWidth() / 9;
         Array<TextureRegion> frames = new Array<>();

@@ -26,10 +26,13 @@ public abstract class PlayerChampion {
     protected State previousState;
     protected float stateTimer;
 
-    //textures
+    //textures and animations
     protected TextureRegion currentRegion;
     protected TextureRegion idleTextureRegion;
     protected WalkingAnimation walkingAnimation;
+    protected AttackAnimation qBasicAnimation;
+    protected AttackAnimation wBasicAnimation;
+    protected AttackAnimation eBasicAnimation;
 
     //collisions
     protected Rectangle playerRectangle;
@@ -185,13 +188,49 @@ public abstract class PlayerChampion {
         return region;
     }
 
-    public State getState(){
+    public State getState() {
+
+        //Q checking state
+        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q) || !qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q) {
+            if ((Gdx.input.isKeyPressed(Input.Keys.Q))){
+                qBasicAnimation.resetCooldown();
+            }
+            return State.Q;
+        }
+
+        // W checking state
+        if ((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W) || !wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W) {
+            if ((Gdx.input.isKeyPressed(Input.Keys.W))){
+                wBasicAnimation.resetCooldown();
+            }
+            return State.W;
+        }
+
+        //E checking state
+        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E) || !eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E) {
+            if ((Gdx.input.isKeyPressed(Input.Keys.E))){
+                eBasicAnimation.resetCooldown();
+            }
+            return State.E;
+        }
+
         //WALKING checking state
         if(isMoving()){
             return State.WALKING;
         }
+
         //IDLE checking state
         return State.STANDING;
+    }
+
+    public void updateCooldowns(float deltaTime){
+        // add delta time to ability stateTimer
+        if(qBasicAnimation.cooldownStateTimer < qBasicAnimation.cooldownDuration)
+            qBasicAnimation.cooldownStateTimer += deltaTime;
+        if(wBasicAnimation.cooldownStateTimer < wBasicAnimation.cooldownDuration)
+            wBasicAnimation.cooldownStateTimer += deltaTime;
+        if(eBasicAnimation.cooldownStateTimer < eBasicAnimation.cooldownDuration)
+            eBasicAnimation.cooldownStateTimer += deltaTime;
     }
 
     //update state functions
@@ -201,14 +240,14 @@ public abstract class PlayerChampion {
                 || (Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.RIGHT));
     }
 
-    protected boolean areAnimationsOngoing(State state){
+    protected boolean areAnimationsNotOngoingAndCooldownFinished(State state){
         switch(state){
             case W:
-                return currentState != State.Q && currentState != State.E;
+                return currentState != State.Q && currentState != State.E && wBasicAnimation.cooldownStateTimer >= wBasicAnimation.cooldownDuration;
             case Q:
-                return currentState != State.E && currentState != State.W;
+                return currentState != State.E && currentState != State.W && qBasicAnimation.cooldownStateTimer >= qBasicAnimation.cooldownDuration;
             case E:
-                return currentState != State.Q && currentState != State.W;
+                return currentState != State.Q && currentState != State.W && eBasicAnimation.cooldownStateTimer >= eBasicAnimation.cooldownDuration;
         }
         return true;
     }

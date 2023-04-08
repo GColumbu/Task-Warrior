@@ -19,16 +19,21 @@ public class Garen extends PlayerChampion {
         super(x, y, 500, 200);
         walkingAnimation = new WalkingAnimation("assets/garen/walk.png", 0.05f);
         wAnimation = new Garen_W("assets/garen/invincibility_burst.png", "assets/garen/invincibility_walk.png", "assets/garen/idle_w.png", "assets/garen/w_icon.png", 0.07f, 0.05f);
+        wBasicAnimation = wAnimation;
         qAnimation = new Garen_Q("assets/garen/slash_combo_part1.png", "assets/garen/slash_combo_part2.png", "assets/garen/q_icon.png",0.07f);
+        qBasicAnimation = qAnimation;
         eAnimation = new Garen_E("assets/garen/spin.png", "assets/garen/e_icon.png", 0.07f, 0.05f);
+        eBasicAnimation = eAnimation;
         idleTextureRegion = new TextureRegion(new Texture("assets/garen/idle.png"));
         currentRegion = idleTextureRegion;
         currentState = State.STANDING;
         stateTimer = 0;
+
     }
 
     @Override
     public void update(float deltaTime) {
+        updateCooldowns(deltaTime);
         setRelativePosition();
         setCurrentRegion(getCurrentFrame(deltaTime));
         setPlayerRectangle(new Rectangle(getIdleRelativePosition().x + 20, getIdleRelativePosition().y, getIdleTextureRegion().getRegionWidth() - 40, getIdleTextureRegion().getRegionHeight()));
@@ -118,7 +123,6 @@ public class Garen extends PlayerChampion {
     // gets the player texture frame based on the current state
     @Override
     protected TextureRegion getCurrentFrame(float deltaTime){
-        currentState = getState();
         TextureRegion region;
         switch(currentState){
             case Q:
@@ -152,34 +156,6 @@ public class Garen extends PlayerChampion {
             stateTimer = 0;
         previousState = currentState;
         return region;
-    }
-
-    // update state function
-    @Override
-    public State getState() {
-
-        //Q checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsOngoing(State.Q) || !qAnimation.isAnimationFinished(stateTimer) && previousState == State.Q) {
-            return State.Q;
-        }
-
-        // W checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsOngoing(State.W) || !wAnimation.isAnimationFinished(stateTimer) && previousState == State.W) {
-            return State.W;
-        }
-
-        //E checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsOngoing(State.E) || !eAnimation.isAnimationFinished(stateTimer) && previousState == State.E) {
-            return State.E;
-        }
-
-        //WALKING checking state
-        if(isMoving()){
-            return State.WALKING;
-        }
-
-        //IDLE checking state
-        return State.STANDING;
     }
 
     // Q spell methods
