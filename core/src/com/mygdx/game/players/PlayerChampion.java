@@ -2,81 +2,112 @@ package com.mygdx.game.players;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
 
 public abstract class PlayerChampion {
 
     //vectors
     protected Vector2 position;
+    protected Vector2 relativePosition;
+    protected Vector2 velocity;
+    protected Vector2 previousMovingVelocity;
+
+    // variables
     protected float previousX;
     protected float previousY;
-    protected Vector2 relativePosition;
     protected int speed;
-    protected Vector2 velocity;
-    protected Vector2 previousMovingVelocity = new Vector2(0, 0);
+    protected float health;
 
     //player states
-    public enum State {STANDING, WALKING, Q, E_GRAB, E_SPIN, W, W_WALKING, W_IDLE}
-    public State currentState;
-    public State previousState;
+    public enum State {STANDING, WALKING, Q, E, W}
+    protected State currentState;
+    protected State previousState;
     protected float stateTimer;
 
-    //animations and textures
+    //textures and animations
     protected TextureRegion currentRegion;
     protected TextureRegion idleTextureRegion;
-    protected TextureRegion idleInvincibilityTextureRegion;
     protected WalkingAnimation walkingAnimation;
-    protected W_AttackAnimation wAnimation;
-    protected Q_AttackAnimation qAnimation;
-    protected E_AttackAnimation eAnimation;
+    protected AttackAnimation qBasicAnimation;
+    protected AttackAnimation wBasicAnimation;
+    protected AttackAnimation eBasicAnimation;
 
     //collisions
     protected Rectangle playerRectangle;
 
-
-
-
     //constructor
-    public PlayerChampion(int x, int y, int speed){
+    public PlayerChampion(int x, int y, int speed, int health){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
         velocity = new Vector2(0, 0);
+        previousMovingVelocity = new Vector2(0, 0);
         this.speed = speed;
+        this.health = health;
     }
 
     public abstract void update(float deltaTime);
 
+    //setters
+    public void setCurrentRegion(TextureRegion currentRegion) {
+        this.currentRegion = currentRegion;
+    }
+    public void setPlayerRectangle(Rectangle playerRectangle) {
+        this.playerRectangle = playerRectangle;
+    }
+        // used not to let the player advance when hitting a minion
+    public void setPositionX(float position) {
+        this.position.x = position;
+    }
+    public void setPositionY(float position) {
+        this.position.y = position;
+    }
+
+    // calculates where the draw function should start
+    protected void setRelativePosition() {
+        currentState = getState();
+        switch (currentState) {
+            case WALKING:
+            case STANDING:
+                relativePosition = getIdleRelativePosition();
+                break;
+        }
+    }
+
     //getters
+    public abstract float getMaxHealth();
+    public float getHealth() {
+        return health;
+    }
+
+    public AttackAnimation getQBasicAnimation() {
+        return qBasicAnimation;
+    }
+
+    public AttackAnimation getWBasicAnimation() {
+        return wBasicAnimation;
+    }
+
+    public AttackAnimation getEBasicAnimation() {
+        return eBasicAnimation;
+    }
+
+    public void decrementHealth(float damage){
+        health -= damage;
+    }
+
     public Vector2 getPosition() {
         return position;
     }
 
-    protected Vector2 getIdleRelativePosition() {
-        return new Vector2(position.x - idleTextureRegion.getRegionWidth() / 2, position.y - idleTextureRegion.getRegionHeight() / 2);
-    }
-
-    protected Vector2 getWBurstRelativePosition() {
-        return new Vector2(position.x - wAnimation.getBurstKeyFrameWidth(stateTimer) / 2, position.y - wAnimation.getBurstKeyFrameHeight(stateTimer) / 2);
-    }
-
-    protected Vector2 getQSlashRelativePosition() {
-        return new Vector2(position.x - qAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - qAnimation.getKeyFrameHeight(stateTimer) / 2);
-    }
-
-    protected Vector2 getESpinRelativePosition() {
-        return new Vector2(position.x - eAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - eAnimation.getKeyFrameHeight(stateTimer) / 2);
+    public float getStateTimer(){
+        return stateTimer;
     }
 
     public TextureRegion getSprite() {
         return currentRegion;
     }
-
-    public TextureRegion getIdleTextureRegion() {return idleTextureRegion;}
 
     public Vector2 getRelativePosition() {
         return relativePosition;
@@ -97,6 +128,7 @@ public abstract class PlayerChampion {
         return playerRectangle;
     }
 
+    // get player angle/orientation
     public float getHeading(){
         if(!velocity.equals(Vector2.Zero))
             return velocity.angleDeg();
@@ -104,87 +136,64 @@ public abstract class PlayerChampion {
         return previousMovingVelocity.angleDeg();
     }
 
-    protected void movePlayer(float deltaTime){
+    protected TextureRegion getIdleTextureRegion() {return idleTextureRegion;}
 
-        //reset velocity vector
+    protected Vector2 getIdleRelativePosition() {
+        return new Vector2(position.x - idleTextureRegion.getRegionWidth() / 2, position.y - idleTextureRegion.getRegionHeight() / 2);
+    }
+
+    // movement function
+    protected void movePlayer(float deltaTime){
+        // reset velocity vector
         velocity = new Vector2(0, 0);
-        //movement on y axis
-        if(getState() != State.W) {
-            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                if (getIdleRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
-                    previousY = position.y;
-                    velocity.y = deltaTime * speed;
-                    if (getState() == State.Q) {
-                        velocity.y -= (deltaTime * speed) / 2;
-                    }
-                }
-            } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                if (getIdleRelativePosition().y > 0) {
-                    previousY = position.y;
-                    velocity.y = -deltaTime * speed;
-                    if (getState() == State.Q) {
-                        velocity.y += (deltaTime * speed) / 2;
-                    }
-                }
+        // movement on y axis
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            if (getIdleRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
+                velocity.y = deltaTime * speed;
             }
-            //movement on x axis
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                if (getIdleRelativePosition().x > 0) {
-                    previousX = position.x;
-                    velocity.x = -deltaTime * speed;
-                    if (getState() == State.Q) {
-                        velocity.x += (deltaTime * speed) / 2;
-                    }
-                }
-            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                if (getIdleRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
-                    previousX = position.x;
-                    velocity.x = deltaTime * speed;
-                    if (getState() == State.Q) {
-                        velocity.x -= (deltaTime * speed) / 2;
-                    }
-                }
+        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            if (getIdleRelativePosition().y > 0) {
+                velocity.y = -deltaTime * speed;
             }
         }
-        //if player is not moving record the last moving velocity
+        // movement on x axis
+         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            if (getIdleRelativePosition().x > 0) {
+                velocity.x = -deltaTime * speed;
+            }
+        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+             if (getIdleRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
+                 velocity.x = deltaTime * speed;
+             }
+         }
+
+        // if player is not moving record the last moving velocity
         if(!velocity.equals(Vector2.Zero)){
             previousMovingVelocity = velocity;
         }
+
+        // record previous position to check for collision towards the minion
+        previousX = position.x;
+        previousY = position.y;
+
+        // add velocity to position vector
         position.add(velocity);
     }
 
-
-    protected TextureRegion getFrame(float deltaTime){
+    // gets the player texture frame based on the current state
+    protected TextureRegion getCurrentFrame(float deltaTime){
         currentState = getState();
         TextureRegion region;
         switch(currentState){
-            case E_GRAB:
-                region = eAnimation.getGrabKeyFrame(stateTimer);
-                break;
-            case E_SPIN:
-                region = eAnimation.getSpinKeyFrame(stateTimer);
-                break;
             case WALKING:
                 region = walkingAnimation.getKeyFrame(stateTimer);
-                break;
-            case W:
-                region = wAnimation.getBurstKeyFrame(stateTimer);
-                break;
-            case W_WALKING:
-                region = wAnimation.getWalkingKeyFrame(stateTimer);
-                break;
-            case W_IDLE:
-                region = idleInvincibilityTextureRegion;
-                break;
-            case Q:
-                region = qAnimation.getKeyFrame(stateTimer);
                 break;
             default:
             case STANDING:
                 region = idleTextureRegion;
                 break;
         }
-        if (previousState == currentState || isPartOfWAnimation()){
+        if (previousState == currentState){
             stateTimer += deltaTime;
         } else
             stateTimer = 0;
@@ -192,105 +201,66 @@ public abstract class PlayerChampion {
         return region;
     }
 
-    public void setRelativePosition(){
-        currentState = getState();
-        switch(currentState){
-            case E_GRAB:
-            case E_SPIN:
-                relativePosition = getESpinRelativePosition();
-                break;
-            case W:
-                relativePosition = getWBurstRelativePosition();;
-                break;
-            case Q:
-                relativePosition = getQSlashRelativePosition();
-                break;
-            case WALKING:
-            case W_WALKING:
-            case W_IDLE:
-            case STANDING:
-                relativePosition = getIdleRelativePosition();
-                break;
-        }
-    }
-
-    private State getState(){
-        // W checking state
-            //BURST
-        if((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsFinished(qAnimation, eAnimation) && wAnimation.isWalkingFinished || !wAnimation.isBurstFinished) {
-            wAnimation.updateBurstAnimationFinished(stateTimer);
-            return State.W;
-        }
-            //WALKING-IDLE
-        if(previousState == State.W && wAnimation.isBurstFinished
-                || stateTimer < 3 && (previousState == State.W_WALKING || previousState == State.W_IDLE)){
-            wAnimation.isWalkingFinished = false;
-            if(isMoving()) {
-                return State.W_WALKING;
-            }
-            return State.W_IDLE;
-        }
-        if(stateTimer > 3 && (previousState == State.W_WALKING || previousState == State.W_IDLE))
-            wAnimation.isWalkingFinished = true;
-
-        //E checking state
-            //SWORD GRAB
-        if((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsFinished(qAnimation, wAnimation) && eAnimation.isESpinAnimationFinished || !eAnimation.isEGrabAnimationFinished) {
-            eAnimation.updateGrabAnimationFinished(stateTimer);
-            return State.E_GRAB;
-        }
-            //SPIN
-        if(previousState == State.E_GRAB && eAnimation.isEGrabAnimationFinished
-                || stateTimer < 3 && previousState == State.E_SPIN){
-            eAnimation.isESpinAnimationFinished = false;
-            return State.E_SPIN;
-        }
-        if(stateTimer > 3 && previousState == State.E_SPIN)
-            eAnimation.isESpinAnimationFinished = true;
+    public State getState() {
 
         //Q checking state
-        if((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsFinished(wAnimation, eAnimation) || !qAnimation.isQAnimationFinished) {
-            qAnimation.updateQAnimationFinished(stateTimer);
+        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q) || !qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q) {
+            if ((Gdx.input.isKeyPressed(Input.Keys.Q))){
+                qBasicAnimation.resetCooldown();
+            }
             return State.Q;
+        }
+
+        // W checking state
+        if ((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W) || !wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W) {
+            if ((Gdx.input.isKeyPressed(Input.Keys.W))){
+                wBasicAnimation.resetCooldown();
+            }
+            return State.W;
+        }
+
+        //E checking state
+        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E) || !eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E) {
+            if ((Gdx.input.isKeyPressed(Input.Keys.E))){
+                eBasicAnimation.resetCooldown();
+            }
+            return State.E;
         }
 
         //WALKING checking state
         if(isMoving()){
             return State.WALKING;
         }
+
         //IDLE checking state
         return State.STANDING;
     }
-    private boolean isPartOfWAnimation(){
-        return (previousState==State.W_WALKING && currentState==State.W_IDLE) || (previousState==State.W_IDLE && currentState==State.W_WALKING);
-    }
 
-    //setters
-    public void setCurrentRegion(TextureRegion currentRegion) {
-        this.currentRegion = currentRegion;
-    }
-    public void setPlayerRectangle(Rectangle playerRectangle) {
-        this.playerRectangle = playerRectangle;
-    }
-    public void setPositionX(float position) {
-        this.position.x = position;
-    }
-    public void setPositionY(float position) {
-        this.position.y = position;
+    public void updateCooldowns(float deltaTime){
+        // add delta time to ability stateTimer
+        if(qBasicAnimation.cooldownStateTimer < qBasicAnimation.cooldownDuration)
+            qBasicAnimation.cooldownStateTimer += deltaTime;
+        if(wBasicAnimation.cooldownStateTimer < wBasicAnimation.cooldownDuration)
+            wBasicAnimation.cooldownStateTimer += deltaTime;
+        if(eBasicAnimation.cooldownStateTimer < eBasicAnimation.cooldownDuration)
+            eBasicAnimation.cooldownStateTimer += deltaTime;
     }
 
     //update state functions
 
-    private boolean isMoving(){
+    protected boolean isMoving(){
         return (Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN))
                 || (Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.RIGHT));
     }
 
-    private boolean areAnimationsFinished(AttackAnimation ... animations){
-        for(AttackAnimation animation : animations){
-            if(!animation.isAnimationFinished()){
-                return false;
-            }
+    protected boolean areAnimationsNotOngoingAndCooldownFinished(State state){
+        switch(state){
+            case W:
+                return currentState != State.Q && currentState != State.E && wBasicAnimation.cooldownStateTimer >= wBasicAnimation.cooldownDuration;
+            case Q:
+                return currentState != State.E && currentState != State.W && qBasicAnimation.cooldownStateTimer >= qBasicAnimation.cooldownDuration;
+            case E:
+                return currentState != State.Q && currentState != State.W && eBasicAnimation.cooldownStateTimer >= eBasicAnimation.cooldownDuration;
         }
         return true;
     }

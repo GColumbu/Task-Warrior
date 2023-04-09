@@ -1,34 +1,45 @@
-package com.mygdx.game.states;
+package com.mygdx.game.states.PlayState;
 
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.Enemy;
 import com.mygdx.game.enemies.Minion;
-import com.mygdx.game.players.Player;
+import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
+import com.mygdx.game.states.GameStateManager;
+import com.mygdx.game.states.State;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayState extends State{
-    private static final int NR_OF_MINIONS = 2;
+public class PlayState extends State {
+    private static int NR_OF_MINIONS = 0;
     private static final float REPULSION_FACTOR = 0.5f;
     private List<Enemy> minions;
-    private PlayerChampion target;
+    private Garen target;
     private Texture background;
+    private UserInterface userInterface;
 
-    protected PlayState(GameStateManager gsm){
+    ShapeRenderer borderShapeRenderer;
+    public PlayState(GameStateManager gsm){
         super(gsm);
         background = new Texture("background.png");
         minions = new ArrayList<>();
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.add(new Minion(i * 100, i * 300));
         }
-        target = new Player(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
+        target = new Garen(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
         camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
+        borderShapeRenderer = new ShapeRenderer();
+        userInterface = new UserInterface("assets/UI bar.png", target);
     }
     @Override
     protected void handleInput() {
@@ -41,8 +52,13 @@ public class PlayState extends State{
         target.update(deltaTime);
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.get(i).update(target, deltaTime);
+            if(minions.get(i).getHealth() <= 0){
+                minions.remove(i);
+                NR_OF_MINIONS--;
+                i--;
+            }
         }
-        //avoidEnemyCollisions(minions, deltaTime);
+        showBorders();
         updateCamera(target);
     }
 
@@ -63,7 +79,9 @@ public class PlayState extends State{
                     minions.get(i).getSprite().getRegionHeight(), 1, 1,
                     minions.get(i).getHeading());
         }
+        userInterface.draw(batch, camera, target);
         batch.end();
+        borderShapeRenderer.end();
     }
 
     @Override
@@ -111,12 +129,51 @@ public class PlayState extends State{
             }
         }
     }
-
     private Vector2 calculateRepulsionVector(Enemy enemy1, Enemy enemy2, float deltaTime) {
         Vector2 enemy1ToEnemy2 = enemy2.getPosition().cpy().sub(enemy1.getPosition());
         float distance = enemy1ToEnemy2.len();
         Vector2 direction = enemy1ToEnemy2.nor();
         float repulsionMagnitude = deltaTime * REPULSION_FACTOR / (distance * distance);
         return direction.scl(repulsionMagnitude);
+    }
+
+    private void showBorders(){
+        borderShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        borderShapeRenderer.setProjectionMatrix(camera.combined);
+        // show borders for champions
+        if(target instanceof Garen)
+            showBordersForGaren(borderShapeRenderer, (Garen)target);
+        //  ... other champions ...
+
+        // show borders for minions
+        for(int i=0; i<NR_OF_MINIONS; i++){
+            Rectangle minionRect = minions.get(i).getEnemyRectangle();
+            borderShapeRenderer.rect(minionRect.getX(), minionRect.getY(), minionRect.getWidth(), minionRect.getHeight());
+        }
+    }
+
+    private void showBordersForGaren(ShapeRenderer shapeRenderer, Garen target){
+        // border for champion
+        shapeRenderer.rect(target.getPlayerRectangle().getX(), target.getPlayerRectangle().getY(), target.getPlayerRectangle().getWidth(), target.getPlayerRectangle().getHeight());
+
+        // border for champion ability
+        if(target.getState() == PlayerChampion.State.E){
+            shapeRenderer.circle(target.getEAttackRange().x, target.getEAttackRange().y, target.getEAttackRange().radius);
+        }
+        if(target.getState() == PlayerChampion.State.Q ){
+            if(target.getQAttackRange() instanceof Rectangle){
+                Rectangle rectangle = (Rectangle)target.getQAttackRange();
+                shapeRenderer.rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+            } else if(target.getQAttackRange() instanceof Polygon){
+                Polygon polygon = (Polygon)target.getQAttackRange();
+                shapeRenderer.polygon(polygon.getVertices());
+            } else if (target.getQAttackRange() instanceof Circle){
+                Circle circle = (Circle)target.getQAttackRange();
+                shapeRenderer.circle(circle.x, circle.y, circle.radius);
+            }
+        }
+        if(target.getState() == PlayerChampion.State.W && target.getW_Animation().isBurst(target.getStateTimer(), true)){
+            shapeRenderer.circle(target.getWAttackRange().x, target.getWAttackRange().y, target.getWAttackRange().radius);
+        }
     }
 }
