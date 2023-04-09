@@ -164,17 +164,21 @@ public class Garen extends PlayerChampion {
     }
 
     // Q spell methods
-    public Garen_Q getQ_Animation(){
-        return qAnimation;
-    }
     protected Vector2 getQSlashRelativePosition() {
         return new Vector2(position.x - qAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - qAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
 
+    @Override
+    public boolean isQAttackTiming(boolean forCollision){
+        return true;
+    }
+
+    @Override
     public float getQAttackDamage() {
         return qAnimation.qAttackDamage;
     }
 
+    @Override
     public Shape2D getQAttackRange(){
         //duration and limit of first slash
         if(qAnimation.isFirstSlash(stateTimer)){
@@ -292,27 +296,38 @@ public class Garen extends PlayerChampion {
         return new Vector2(position.x - wAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - wAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
 
+    @Override
+    public boolean isWAttackTiming(boolean forCollision){
+        return wAnimation.isBurst(stateTimer, forCollision);
+    }
+
+    @Override
     public float getWAttackDamage() {
         return wAnimation.wAttackDamage;
     }
 
+    @Override
     public Circle getWAttackRange(){
         return new Circle(position.x, position.y, 270);
     }
 
     // E spell
 
-    public Garen_E getE_Animation(){
-        return eAnimation;
-    }
     protected Vector2 getESpinRelativePosition() {
         return new Vector2(position.x - eAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - eAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
 
+    @Override
+    public boolean isEAttackTiming(boolean forCollision){
+        return true;
+    }
+
+    @Override
     public float getEAttackDamage() {
         return eAnimation.eSpinAttackDamage;
     }
 
+    @Override
     public Circle getEAttackRange(){
         return new Circle(position.x, position.y, 310);
     }
