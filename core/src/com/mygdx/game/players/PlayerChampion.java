@@ -81,17 +81,28 @@ public abstract class PlayerChampion {
         return health;
     }
 
-    public AttackAnimation getQBasicAnimation() {
-        return qBasicAnimation;
-    }
 
-    public AttackAnimation getWBasicAnimation() {
-        return wBasicAnimation;
-    }
+    // q ability methods
+    public AttackAnimation getQBasicAnimation() { return qBasicAnimation;}
+    public abstract Shape2D getQAttackRange();
+    public abstract float getQAttackDamage();
+    public abstract boolean isQAttackTiming(boolean forCollision);
 
+
+    // W ability methods
+    public AttackAnimation getWBasicAnimation() { return wBasicAnimation;}
+    public abstract Shape2D getWAttackRange();
+    public abstract float getWAttackDamage();
+    public abstract boolean isWAttackTiming(boolean forCollision);
+
+
+    // E ability methods
     public AttackAnimation getEBasicAnimation() {
         return eBasicAnimation;
     }
+    public abstract Shape2D getEAttackRange();
+    public abstract float getEAttackDamage();
+    public abstract boolean isEAttackTiming(boolean forCollision);
 
     public void decrementHealth(float damage){
         health -= damage;
@@ -181,25 +192,7 @@ public abstract class PlayerChampion {
     }
 
     // gets the player texture frame based on the current state
-    protected TextureRegion getCurrentFrame(float deltaTime){
-        currentState = getState();
-        TextureRegion region;
-        switch(currentState){
-            case WALKING:
-                region = walkingAnimation.getKeyFrame(stateTimer);
-                break;
-            default:
-            case STANDING:
-                region = idleTextureRegion;
-                break;
-        }
-        if (previousState == currentState){
-            stateTimer += deltaTime;
-        } else
-            stateTimer = 0;
-        previousState = currentState;
-        return region;
-    }
+    protected abstract TextureRegion getCurrentFrame(float deltaTime);
 
     public State getState() {
 
@@ -253,7 +246,7 @@ public abstract class PlayerChampion {
                 || (Gdx.input.isKeyPressed(Input.Keys.LEFT)) || (Gdx.input.isKeyPressed(Input.Keys.RIGHT));
     }
 
-    protected boolean areAnimationsNotOngoingAndCooldownFinished(State state){
+    private boolean areAnimationsNotOngoingAndCooldownFinished(State state){
         switch(state){
             case W:
                 return currentState != State.Q && currentState != State.E && wBasicAnimation.cooldownStateTimer >= wBasicAnimation.cooldownDuration;

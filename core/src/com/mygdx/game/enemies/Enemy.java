@@ -200,10 +200,22 @@ public abstract class Enemy {
 
     // player related behaviours
     protected void calculateDamage(PlayerChampion player) {
-        if(player instanceof Garen)
-            calculateDamageForGaren((Garen)player);
-        // ... other champions ...
         calculateDamageFromMinions(player);
+        // minion takes damage from E spell
+        if(player.getState() == PlayerChampion.State.E && player.isEAttackTiming(true) && isCollidingWithEnemy(player.getEAttackRange())) {
+            deductEnemyHealth(player.getEAttackDamage());
+        }
+        // minion takes damage from Q spell
+        else if (player.getState() == PlayerChampion.State.Q && player.isQAttackTiming(true) && isCollidingWithEnemy(player.getQAttackRange())) {
+            deductEnemyHealth(player.getQAttackDamage());
+        }
+        else if (player.getState() == PlayerChampion.State.W && player.isWAttackTiming(true) && isCollidingWithEnemy(player.getWAttackRange())) {
+            deductEnemyHealth(player.getWAttackDamage());
+        }
+        //minion doesn't take damage
+        else {
+            isAttacked = false;
+        }
     }
 
     // transforms Rectangle to Polygon
@@ -260,49 +272,6 @@ public abstract class Enemy {
         }
     }
 
-    // damage calculation based on champion abilities
-    private void calculateDamageForGaren(Garen player){
-        // minion takes damage from E spell
-        if(player.getState() == PlayerChampion.State.E && isCollision(player.getEAttackRange(), enemyRectangle)) {
-            deductEnemyHealth(player.getEAttackDamage());
-        }
-        // minion takes damage from Q spell
-        else if(player.getState() == PlayerChampion.State.Q){
-            // first slash (return Rectangle)
-            if(player.getQAttackRange() instanceof Rectangle){
-                Rectangle rectangle = (Rectangle)player.getQAttackRange();
-                if(rectangle.overlaps(enemyRectangle))
-                    deductEnemyHealth(player.getQAttackDamage());
-                else
-                    isAttacked = false;
-            }
-            //second slash (return Circle)
-            else if(player.getQAttackRange() instanceof Circle){
-                Circle circle = (Circle)player.getQAttackRange();
-                if(isCollision(circle, enemyRectangle))
-                    deductEnemyHealth(player.getQAttackDamage());
-                else
-                    isAttacked = false;
-            }
-            //third slash (return Polygon)
-            else if(player.getQAttackRange() instanceof Polygon){
-                Polygon polygon = (Polygon)player.getQAttackRange();
-                if(isCollision(polygon, enemyRectangle))
-                    deductEnemyHealth(player.getQAttackDamage());
-                else
-                    isAttacked = false;
-            }
-        }
-        // minion takes damage from W spell
-        else if(player.getState() == PlayerChampion.State.W && player.getW_Animation().isBurst(player.getStateTimer(), true) && isCollision(player.getWAttackRange(), enemyRectangle)){
-            deductEnemyHealth(player.getWAttackDamage());
-        }
-        //minion doesn't take damage
-        else {
-            isAttacked = false;
-        }
-    }
-
     private void calculateDamageFromMinions(PlayerChampion player){
         if(getState() == State.ATTACK){
             player.decrementHealth(damage);
@@ -314,6 +283,23 @@ public abstract class Enemy {
         isAttacked = true;
         //debug
         System.out.println(health);
+    }
+
+    private boolean isCollidingWithEnemy(Shape2D attackRange){
+        // attack range is Rectangle
+        if(attackRange instanceof Rectangle) {
+            Rectangle rectangle = (Rectangle) attackRange;
+            return rectangle.overlaps(enemyRectangle);
+        }
+        // attack range is Polygon
+        else if(attackRange instanceof Polygon) {
+            Polygon polygon = (Polygon) attackRange;
+            return isCollision(polygon, enemyRectangle);
+
+        }
+        // attack range is circle
+        Circle circle = (Circle) attackRange;
+        return isCollision(circle, enemyRectangle);
     }
 
 }

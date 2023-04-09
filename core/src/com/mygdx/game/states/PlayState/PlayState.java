@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State {
-    private static int NR_OF_MINIONS = 0;
+    private static int NR_OF_MINIONS = 2;
     private static final float REPULSION_FACTOR = 0.5f;
     private List<Enemy> minions;
     private Garen target;
