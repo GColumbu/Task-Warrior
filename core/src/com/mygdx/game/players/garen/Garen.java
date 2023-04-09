@@ -40,6 +40,11 @@ public class Garen extends PlayerChampion {
         movePlayer(deltaTime);
     }
 
+    @Override
+    public float getMaxHealth() {
+        return MAX_HEALTH;
+    }
+
     // calculates where the draw function should start
     @Override
     protected void setRelativePosition() {
@@ -311,4 +316,6 @@ public class Garen extends PlayerChampion {
     public Circle getEAttackRange(){
         return new Circle(position.x, position.y, 310);
     }
+
+    // other methods
 }

@@ -76,8 +76,21 @@ public abstract class PlayerChampion {
     }
 
     //getters
+    public abstract float getMaxHealth();
     public float getHealth() {
         return health;
+    }
+
+    public AttackAnimation getQBasicAnimation() {
+        return qBasicAnimation;
+    }
+
+    public AttackAnimation getWBasicAnimation() {
+        return wBasicAnimation;
+    }
+
+    public AttackAnimation getEBasicAnimation() {
+        return eBasicAnimation;
     }
 
     public void decrementHealth(float damage){

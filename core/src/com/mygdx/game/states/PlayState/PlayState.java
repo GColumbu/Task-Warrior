@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState extends State {
-    private static int NR_OF_MINIONS = 1;
+    private static int NR_OF_MINIONS = 0;
     private static final float REPULSION_FACTOR = 0.5f;
     private List<Enemy> minions;
     private Garen target;
@@ -39,7 +39,7 @@ public class PlayState extends State {
         target = new Garen(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
         camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
         borderShapeRenderer = new ShapeRenderer();
-        userInterface = new UserInterface("assets/UI bar.png", target.getQ_Animation().getAttackIcon(), target.getW_Animation().getAttackIcon(), target.getE_Animation().getAttackIcon(), target.MAX_HEALTH);
+        userInterface = new UserInterface("assets/UI bar.png", target);
     }
     @Override
     protected void handleInput() {
