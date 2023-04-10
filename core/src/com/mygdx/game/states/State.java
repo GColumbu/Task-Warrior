@@ -1,13 +1,17 @@
 package com.mygdx.game.states;
 
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
-public abstract class State {
+public abstract class State{
     protected OrthographicCamera camera;
     protected Vector3 mouse;
     protected GameStateManager gsm;
+
+    protected Viewport viewport;
 
     //constructor
     protected State(GameStateManager gsm){
@@ -26,5 +30,6 @@ public abstract class State {
     protected abstract void render(SpriteBatch batch);
 
     //dispose resources
-    protected abstract void dispose();
+    public abstract void dispose();
+
 }

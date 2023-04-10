@@ -10,8 +10,8 @@ import com.mygdx.game.states.MenuState;
 
 public class TaskWarrior extends ApplicationAdapter {
 	// window constants
-	public static final int WIDTH = 3000;
-	public static final int HEIGHT = 1000;
+	public static final int WIDTH = 5333;
+	public static final int HEIGHT = 3467;
 	public static final String TITLE = "Task Warrior";
 
 	GameStateManager gsm;

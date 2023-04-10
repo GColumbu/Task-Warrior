@@ -197,26 +197,35 @@ public abstract class PlayerChampion {
     public State getState() {
 
         //Q checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q) || !qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q) {
+        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q)) {
             if ((Gdx.input.isKeyPressed(Input.Keys.Q))){
                 qBasicAnimation.resetCooldown();
             }
             return State.Q;
         }
+        if(!qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q){
+            return State.Q;
+        }
 
         // W checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W) || !wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W) {
+        if ((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W)) {
             if ((Gdx.input.isKeyPressed(Input.Keys.W))){
                 wBasicAnimation.resetCooldown();
             }
             return State.W;
         }
+        if(!wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W){
+            return State.W;
+        }
 
         //E checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E) || !eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E) {
+        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E)){
             if ((Gdx.input.isKeyPressed(Input.Keys.E))){
                 eBasicAnimation.resetCooldown();
             }
+            return State.E;
+        }
+        if(!eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E){
             return State.E;
         }
 

@@ -1,14 +1,12 @@
 package com.mygdx.game.states.PlayState;
 
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.Enemy;
 import com.mygdx.game.enemies.Minion;
@@ -23,11 +21,11 @@ import java.util.List;
 public class PlayState extends State {
     private static int NR_OF_MINIONS = 2;
     private static final float REPULSION_FACTOR = 0.5f;
+    private MyInputProcessor myInputProcessor;
     private List<Enemy> minions;
     private Garen target;
     private Texture background;
     private UserInterface userInterface;
-
     ShapeRenderer borderShapeRenderer;
     public PlayState(GameStateManager gsm){
         super(gsm);
@@ -36,14 +34,16 @@ public class PlayState extends State {
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.add(new Minion(i * 100, i * 300));
         }
-        target = new Garen(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
+        target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
         camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
         borderShapeRenderer = new ShapeRenderer();
-        userInterface = new UserInterface("assets/UI bar.png", target);
+        userInterface = new UserInterface("assets/UI bar.png", target, camera);
+        viewport = new ScreenViewport(camera);
+        myInputProcessor = new MyInputProcessor(camera, target);
+        Gdx.input.setInputProcessor(myInputProcessor);
     }
     @Override
     protected void handleInput() {
-
     }
 
     @Override
@@ -59,6 +59,7 @@ public class PlayState extends State {
             }
         }
         showBorders();
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         updateCamera(target);
     }
 
@@ -85,7 +86,7 @@ public class PlayState extends State {
     }
 
     @Override
-    protected void dispose() {
+    public void dispose() {
         //dispose minions
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.get(i).getSprite().getTexture().dispose();
@@ -96,22 +97,21 @@ public class PlayState extends State {
 
     //update camera position based on background limits
     private void updateCamera(PlayerChampion target){
-        if((target.getRelativePosition().x + target.getSprite().getRegionWidth()/2) - camera.viewportWidth/2 > 0 && (target.getRelativePosition().x + target.getSprite().getRegionWidth()/2) + camera.viewportWidth/2 < TaskWarrior.WIDTH){
+        if(target.getPosition().x - camera.viewportWidth/2 * camera.zoom > 0 && target.getPosition().x + camera.viewportWidth/2 * camera.zoom < TaskWarrior.WIDTH){
             followPlayerX(target);
         }
-        if((target.getRelativePosition().y + target.getSprite().getRegionHeight()/2) - camera.viewportHeight/2 > 0 && (target.getRelativePosition().y + target.getSprite().getRegionHeight()/2) + camera.viewportHeight/2 < TaskWarrior.HEIGHT){
+        if(target.getPosition().y - camera.viewportHeight/2 * camera.zoom > 0 && target.getPosition().y + camera.viewportHeight/2 * camera.zoom< TaskWarrior.HEIGHT){
             followPlayerY(target);
         }
+        camera.update();
     }
 
     //update camera position based on the player and axis
     private void followPlayerX(PlayerChampion target){
-        camera.position.x = target.getRelativePosition().x + target.getSprite().getRegionWidth()/2;
-        camera.update();
+        camera.position.x = target.getPosition().x;
     }
     private void followPlayerY(PlayerChampion target){
-        camera.position.y = target.getRelativePosition().y + target.getSprite().getRegionHeight()/2;
-        camera.update();
+        camera.position.y = target.getPosition().y;
     }
 
     private void avoidEnemyCollisions(List<Enemy> enemies, float deltaTime) {
