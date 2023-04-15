@@ -1,38 +1,69 @@
 package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.states.PlayState.PlayState;
 
-public class MenuState extends State{
+public class MenuState implements Screen {
+    private TaskWarrior game;
     private Texture img;
-    public MenuState(GameStateManager gsm) {
-        super(gsm);
+    public MenuState(TaskWarrior game) {
+        this.game = game;
         img = new Texture("home_background.jpg");
     }
 
     @Override
-    protected void handleInput() {
-        if(Gdx.input.justTouched()){
-            gsm.push(new PlayState(gsm));
-        }
+    public void show() {
+
     }
 
     @Override
-    protected void update(float deltaTime) {
-        handleInput();
+    public void render(float deltaTime) {
+        update(deltaTime);
+        render();
     }
 
     @Override
-    protected void render(SpriteBatch batch) {
-        batch.begin();
-        batch.draw(img, 0, 0);
-        batch.end();
+    public void resize(int i, int i1) {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
     }
 
     @Override
     public void dispose() {
         img.dispose();
+    }
+
+    private void handleInput() {
+        if(Gdx.input.justTouched()){
+            game.setScreen( new PlayState(game));
+        }
+    }
+
+    private void update(float deltaTime){
+        handleInput();
+    }
+
+    private void render(){
+        game.batch.begin();
+        game.batch.draw(img, 0, 0);
+        game.batch.end();
     }
 }

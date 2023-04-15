@@ -1,11 +1,9 @@
-package com.mygdx.game.states.PlayState;
+package com.mygdx.game.states.PlayState.UI;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.mygdx.game.players.PlayerChampion;
 
 
@@ -28,7 +26,7 @@ public class UserInterface {
 
 
 
-    protected UserInterface(String userInterfaceFilePath,PlayerChampion player, OrthographicCamera camera){
+    public UserInterface(String userInterfaceFilePath,PlayerChampion player, OrthographicCamera camera){
         this.camera = camera;
         this.userInterface = new Texture(userInterfaceFilePath);
         this.firstAttack = new AttackIcon(player.getQBasicAnimation().getAttackIcon(), 19, 5);
@@ -44,7 +42,7 @@ public class UserInterface {
         return new Vector2(camera.position.x - (float)(userInterface.getWidth() / 2.0) * camera.zoom, camera.position.y - camera.viewportHeight/2 * camera.zoom);
     }
 
-    protected void draw(SpriteBatch spriteBatch, OrthographicCamera camera, PlayerChampion player){
+    public void draw(SpriteBatch spriteBatch, OrthographicCamera camera, PlayerChampion player){
         float x = getUIPosition(camera).x;
         float y = getUIPosition(camera).y;
         // draw template

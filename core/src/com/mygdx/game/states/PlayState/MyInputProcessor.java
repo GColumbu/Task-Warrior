@@ -7,7 +7,7 @@ import com.mygdx.game.players.PlayerChampion;
 
 public class MyInputProcessor implements InputProcessor {
 
-    private OrthographicCamera camera;
+    private final OrthographicCamera camera;
 
     private PlayerChampion player;
 

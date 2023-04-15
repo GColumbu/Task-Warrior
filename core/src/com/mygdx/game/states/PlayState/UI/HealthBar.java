@@ -1,4 +1,4 @@
-package com.mygdx.game.states.PlayState;
+package com.mygdx.game.states.PlayState.UI;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;

@@ -289,9 +289,6 @@ public class Garen extends PlayerChampion {
     }
 
     // W spell
-    public Garen_W getW_Animation(){
-        return wAnimation;
-    }
     protected Vector2 getWBurstRelativePosition() {
         return new Vector2(position.x - wAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - wAnimation.getKeyFrameHeight(stateTimer) / 2);
     }

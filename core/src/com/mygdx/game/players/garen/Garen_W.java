@@ -61,7 +61,7 @@ public class Garen_W extends AttackAnimation {
 
     public boolean isBurst(float stateTimer, boolean forCollision){
         if(forCollision)
-            return stateTimer> 6 * wBurstFrameDuration && stateTimer <= wBurstFrames * wBurstFrameDuration;
+            return stateTimer > 6 * wBurstFrameDuration && stateTimer <= wBurstFrames * wBurstFrameDuration;
         return stateTimer <= wBurstFrames * wBurstFrameDuration;
     }
 
