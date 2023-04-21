@@ -12,11 +12,6 @@ public abstract class PlayerChampion {
     protected Vector2 position;
     protected Vector2 relativePosition;
     protected Vector2 velocity;
-
-    public Vector2 getPreviousMovingVelocity() {
-        return previousMovingVelocity;
-    }
-
     protected Vector2 previousMovingVelocity;
 
     // variables
@@ -41,6 +36,7 @@ public abstract class PlayerChampion {
 
     //collisions
     protected Rectangle playerRectangle;
+    protected Circle minionDeSpawnRange;
 
     //constructor
     public PlayerChampion(int x, int y, int speed, int health){
@@ -60,6 +56,9 @@ public abstract class PlayerChampion {
     }
     public void setPlayerRectangle(Rectangle playerRectangle) {
         this.playerRectangle = playerRectangle;
+    }
+    public void setMinionDeSpawnRange(Circle minionDeSpawnRange) {
+        this.minionDeSpawnRange = minionDeSpawnRange;
     }
         // used not to let the player advance when hitting a minion
     public void setPositionX(float position) {
@@ -109,16 +108,13 @@ public abstract class PlayerChampion {
     public abstract float getEAttackDamage();
     public abstract boolean isEAttackTiming(boolean forCollision);
 
+    // getters
     public void decrementHealth(float damage){
         health -= damage;
     }
 
     public Vector2 getPosition() {
         return position;
-    }
-
-    public float getStateTimer(){
-        return stateTimer;
     }
 
     public TextureRegion getSprite() {
@@ -142,6 +138,9 @@ public abstract class PlayerChampion {
 
     public Rectangle getPlayerRectangle() {
         return playerRectangle;
+    }
+    public Circle getMinionDeSpawnRange() {
+        return minionDeSpawnRange;
     }
 
     // get player angle/orientation
@@ -203,34 +202,49 @@ public abstract class PlayerChampion {
 
         //Q checking state
         if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q)) {
+            // reset q cooldown
             if ((Gdx.input.isKeyPressed(Input.Keys.Q))){
                 qBasicAnimation.resetCooldown();
             }
             return State.Q;
         }
         if(!qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q){
+            // cancel q
+            if(Gdx.input.isKeyJustPressed(Input.Keys.Q)){
+                return State.STANDING;
+            }
             return State.Q;
         }
 
         // W checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W)) {
-            if ((Gdx.input.isKeyPressed(Input.Keys.W))){
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W)) {
+            // reset w cooldown
+            if ((Gdx.input.isKeyJustPressed(Input.Keys.W))){
                 wBasicAnimation.resetCooldown();
             }
             return State.W;
         }
         if(!wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W){
+            // cancel w
+            if(Gdx.input.isKeyJustPressed(Input.Keys.W)){
+                return State.STANDING;
+            }
             return State.W;
         }
 
         //E checking state
         if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E)){
+            // reset e cooldown
             if ((Gdx.input.isKeyPressed(Input.Keys.E))){
                 eBasicAnimation.resetCooldown();
             }
             return State.E;
         }
         if(!eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E){
+            // cancel e
+            if(Gdx.input.isKeyJustPressed(Input.Keys.E)){
+                return State.STANDING;
+            }
             return State.E;
         }
 
@@ -243,6 +257,8 @@ public abstract class PlayerChampion {
         return State.STANDING;
     }
 
+    // cooldowns/animation methods
+
     public void updateCooldowns(float deltaTime){
         // add delta time to ability stateTimer
         if(qBasicAnimation.cooldownStateTimer < qBasicAnimation.cooldownDuration)
@@ -252,8 +268,6 @@ public abstract class PlayerChampion {
         if(eBasicAnimation.cooldownStateTimer < eBasicAnimation.cooldownDuration)
             eBasicAnimation.cooldownStateTimer += deltaTime;
     }
-
-    //update state functions
 
     protected boolean isMoving(){
         return (Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN))

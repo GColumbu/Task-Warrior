@@ -37,6 +37,7 @@ public class Garen extends PlayerChampion {
         setRelativePosition();
         setCurrentRegion(getCurrentFrame(deltaTime));
         setPlayerRectangle(new Rectangle(getIdleRelativePosition().x + 20, getIdleRelativePosition().y, getIdleTextureRegion().getRegionWidth() - 40, getIdleTextureRegion().getRegionHeight()));
+        setMinionDeSpawnRange(new Circle(position.x, position.y, 400));
         movePlayer(deltaTime);
     }
 
@@ -86,7 +87,7 @@ public class Garen extends PlayerChampion {
                         velocity.y -= (deltaTime * speed) / 2;
                     }
                     if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.y += (deltaTime * speed) / 2;
+                        velocity.y += (deltaTime * speed) / 3;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
@@ -96,7 +97,7 @@ public class Garen extends PlayerChampion {
                         velocity.y += (deltaTime * speed) / 2;
                     }
                     if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.y -= (deltaTime * speed) / 2;
+                        velocity.y -= (deltaTime * speed) / 3;
                     }
                 }
             }
@@ -109,7 +110,7 @@ public class Garen extends PlayerChampion {
                         velocity.x += (deltaTime * speed) / 2;
                     }
                      if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.x -= (deltaTime * speed) / 2;
+                        velocity.x -= (deltaTime * speed) / 3;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
@@ -119,7 +120,7 @@ public class Garen extends PlayerChampion {
                         velocity.x -= (deltaTime * speed) / 2;
                     }
                     if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.x += (deltaTime * speed) / 2;
+                        velocity.x += (deltaTime * speed) / 3;
                     }
                 }
             }

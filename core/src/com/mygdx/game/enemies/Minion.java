@@ -1,19 +1,14 @@
 package com.mygdx.game.enemies;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
-
-import java.util.List;
 
 public class Minion extends Enemy {
     //constants TODO: maybe calculate them dynamically based on difficulty
-    private final static int MINION_MAX_SPEED = 175;
+    private final static int MINION_MAX_SPEED = 150;
     private final static int MINION_MAX_FORCE = 50;
     private final static int MINION_HEALTH = 300;
     private final static float MINION_DAMAGE = 0.2F;
@@ -37,7 +32,7 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
         setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34 , getSprite().getRegionHeight()));
-        setMinionVisibleRange(new Circle(position.x, position.y, 100));
+        setMinionSenseRange(new Circle(position.x, position.y, 100));
         calculateDamage(player);
     }
 

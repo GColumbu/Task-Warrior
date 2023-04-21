@@ -3,7 +3,6 @@ package com.mygdx.game.enemies;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
-import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
 
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public abstract class Enemy {
 
     //collisions
     protected Rectangle enemyRectangle;
-    protected Circle minionVisibleRange;
+    protected Circle minionSenseRange;
 
     //constructor
     public Enemy(int x, int y, float maxSpeed, float maxForce, float health, float damage){
@@ -126,8 +125,8 @@ public abstract class Enemy {
         return enemyRectangle;
     }
 
-    public Circle getMinionVisibleRange() {
-        return minionVisibleRange;
+    public Circle getMinionSenseRange() {
+        return minionSenseRange;
     }
 
     public float getHeading(){
@@ -142,8 +141,8 @@ public abstract class Enemy {
         this.enemyRectangle = enemyRectangle;
     }
 
-    public void setMinionVisibleRange(Circle minionVisibleRange) {
-        this.minionVisibleRange = minionVisibleRange;
+    public void setMinionSenseRange(Circle minionSenseRange) {
+        this.minionSenseRange = minionSenseRange;
     }
 
 
@@ -232,7 +231,7 @@ public abstract class Enemy {
     private List<Enemy> getNearbyEnemies(List<Enemy> minions) {
         List<Enemy> nearbyEnemies = new ArrayList<>();
         for (Enemy enemy : minions){ // allEnemies is a list of all enemies in the game
-            if (enemy != this && minionVisibleRange.contains(enemy.position)) {
+            if (enemy != this && minionSenseRange.contains(enemy.position)) {
                 nearbyEnemies.add(enemy); // add enemy to the list if it is within the minimum separation distance
             }
         }
