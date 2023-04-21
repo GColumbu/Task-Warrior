@@ -12,6 +12,11 @@ public abstract class PlayerChampion {
     protected Vector2 position;
     protected Vector2 relativePosition;
     protected Vector2 velocity;
+
+    public Vector2 getPreviousMovingVelocity() {
+        return previousMovingVelocity;
+    }
+
     protected Vector2 previousMovingVelocity;
 
     // variables

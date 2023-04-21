@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
@@ -23,8 +24,11 @@ public class Minion extends Enemy {
         currentState = State.WALKING;
         idleTextureRegion = new TextureRegion(new Texture("assets/minion/minion_idle.png"));
         currentRegion = idleTextureRegion;
-        walkingAnimation = new WalkingAnimation("assets/minion/minion_walk.png", 0.1f);
-        walkingDamageAnimation = new WalkingAnimation("assets/minion/minion_walk_damage.png", 0.1f);
+        walkingAnimation = new MinionAnimation("assets/minion/minion_walk.png", 0.1f, 12);
+        walkingDamageAnimation = new MinionAnimation("assets/minion/minion_walk_damage.png", 0.1f, 12);
+        attackAnimation = new MinionAnimation("assets/minion/minion_attack.png", 0.12f, 7);
+        attackDamageAnimation = new MinionAnimation("assets/minion/minion_attack_damage.png", 0.12f, 7);
+        dyingAnimation = new MinionAnimation("assets/minion/minion_death.png", 0.07f, 4);
     }
 
     @Override
@@ -33,6 +37,7 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
         setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34 , getSprite().getRegionHeight()));
+        setMinionVisibleRange(new Circle(position.x, position.y, 100));
         calculateDamage(player);
     }
 

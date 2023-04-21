@@ -10,12 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Enemy {
-    private static final int MIN_SEPARATION_DISTANCE = 50;
-
     //vectors
     protected Vector2 position;
     protected Vector2 relativePosition;
     protected Vector2 velocity;
+    protected Vector2 separation;
+
+    protected Vector2 orientation;
 
     //variables
     protected float maxSpeed;
@@ -25,7 +26,7 @@ public abstract class Enemy {
     protected boolean isAttacked;
 
     //minion states
-    protected enum State {WALKING, ATTACK};
+    protected enum State {WALKING, ATTACK, DEAD};
     protected boolean isInRange = false;
     protected State currentState;
     protected State previousState;
@@ -34,11 +35,16 @@ public abstract class Enemy {
     //animations and textures
     protected TextureRegion currentRegion;
     protected TextureRegion idleTextureRegion;
-    protected WalkingAnimation walkingAnimation;
-    protected WalkingAnimation walkingDamageAnimation;
+    protected MinionAnimation walkingAnimation;
+    protected MinionAnimation walkingDamageAnimation;
+    protected MinionAnimation attackAnimation;
+    protected MinionAnimation attackDamageAnimation;
+
+    protected MinionAnimation dyingAnimation;
 
     //collisions
     protected Rectangle enemyRectangle;
+    protected Circle minionVisibleRange;
 
     //constructor
     public Enemy(int x, int y, float maxSpeed, float maxForce, float health, float damage){
@@ -61,18 +67,33 @@ public abstract class Enemy {
     protected Vector2 getWalkingRelativePosition() {
         return new Vector2(position.x - walkingAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - walkingAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
+    protected Vector2 getAttackRelativePosition() {
+        return new Vector2(position.x - attackAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - attackAnimation.getKeyFrameHeight(stateTimer) / 2);
+    }
+    protected Vector2 getDeadRelativePosition() {
+        return new Vector2(position.x - dyingAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - dyingAnimation.getKeyFrameHeight(stateTimer) / 2);
+    }
     protected TextureRegion getFrame(float deltaTime){
         currentState = getState();
         TextureRegion region;
         switch(currentState) {
             case ATTACK:
-                //TODO:: minion attack animation
+                if (isAttacked)
+                    region = attackDamageAnimation.getKeyFrame(stateTimer, true);
+                else
+                    region = attackAnimation.getKeyFrame(stateTimer, true);
+                relativePosition = getAttackRelativePosition();
+                break;
+            case DEAD:
+                region = dyingAnimation.getKeyFrame(stateTimer, false);
+                relativePosition = getDeadRelativePosition();
+                break;
             case WALKING:
             default:
                 if (isAttacked)
-                    region = walkingDamageAnimation.getKeyFrame(stateTimer);
+                    region = walkingDamageAnimation.getKeyFrame(stateTimer, true);
                 else
-                    region = walkingAnimation.getKeyFrame(stateTimer);
+                    region = walkingAnimation.getKeyFrame(stateTimer, true);
                 relativePosition = getWalkingRelativePosition();
                 break;
         }
@@ -85,6 +106,9 @@ public abstract class Enemy {
     }
 
     private State getState(){
+        if(health <= 0){
+            return State.DEAD;
+        }
         if(isInRange){
             return State.ATTACK;
         }
@@ -102,6 +126,10 @@ public abstract class Enemy {
         return enemyRectangle;
     }
 
+    public Circle getMinionVisibleRange() {
+        return minionVisibleRange;
+    }
+
     public float getHeading(){
         return velocity.angleDeg();
     }
@@ -114,9 +142,10 @@ public abstract class Enemy {
         this.enemyRectangle = enemyRectangle;
     }
 
-    public Vector2 getVelocity() {
-        return velocity;
+    public void setMinionVisibleRange(Circle minionVisibleRange) {
+        this.minionVisibleRange = minionVisibleRange;
     }
+
 
     public float getHealth() {
         return health;
@@ -182,6 +211,7 @@ public abstract class Enemy {
     //applying steering behaviour
     protected void applySteeringBehaviour(Vector2 steering){
         velocity.add(steering);
+        velocity.add(separation);
         //make enemy recognize walls
         if(position.x > 0 && position.x < TaskWarrior.WIDTH - getSprite().getRegionWidth()) {
             position.x += velocity.x;
@@ -194,12 +224,15 @@ public abstract class Enemy {
         } else if(position.y <= 0 && isLooking("up") || position.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
             position.y += velocity.y;
         }
+
+        //substract the separation in order for the heading to be steady
+        velocity.sub(separation);
     }
 
     private List<Enemy> getNearbyEnemies(List<Enemy> minions) {
         List<Enemy> nearbyEnemies = new ArrayList<>();
         for (Enemy enemy : minions){ // allEnemies is a list of all enemies in the game
-            if (enemy != this && enemy.position.dst(this.position) < MIN_SEPARATION_DISTANCE) {
+            if (enemy != this && minionVisibleRange.contains(enemy.position)) {
                 nearbyEnemies.add(enemy); // add enemy to the list if it is within the minimum separation distance
             }
         }
@@ -207,26 +240,19 @@ public abstract class Enemy {
     }
 
     private void separation(List<Enemy> nearbyEnemies) {
+        separation = new Vector2(0,0);
         for (Enemy other : nearbyEnemies) {
-            if (other != this && this.enemyRectangle.overlaps(other.enemyRectangle)) {
-                Vector2 rejection = new Vector2(0, 0);
+            if (other != this) {
                 // Calculate separation vector
-                Vector2 separation = other.position.cpy().sub(position);
-                float overlapX = (this.currentRegion.getRegionWidth() + other.currentRegion.getRegionWidth()) / 2 + Math.abs(separation.x);
-                float overlapY = (this.currentRegion.getRegionHeight() + other.currentRegion.getRegionHeight()) / 2 + Math.abs(separation.y);
-                // Resolve collision
-                if (overlapX < overlapY) {
-                    rejection.x = overlapX / 2 * Math.signum(separation.x);
-                } else {
-                    rejection.y = overlapY / 2 * Math.signum(separation.y);
-                }
-                this.velocity.add(rejection.scl(0.1f));
-                other.velocity.sub(rejection.scl(0.1f));
+                Vector2 rejection = position.cpy().sub(other.position);
+                rejection.nor();
+                rejection.scl(2f);
+                separation.add(rejection);
             }
         }
     }
     protected void moveAndRecognizeCollision(PlayerChampion player, Vector2 steeringBehaviour){
-        // apply steering behaviour if colision not detected
+        // apply steering behaviour if collision not detected
         if(!enemyRectangle.overlaps(player.getPlayerRectangle())){
             isInRange = false;
             applySteeringBehaviour(steeringBehaviour);
@@ -341,6 +367,10 @@ public abstract class Enemy {
             return isCollision(circle, enemyRectangle);
         }
         return false;
+    }
+
+    public boolean isDyingAnimationFinished() {
+        return currentState == State.DEAD && dyingAnimation.animation.isAnimationFinished(stateTimer);
     }
 
 }

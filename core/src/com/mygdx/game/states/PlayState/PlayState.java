@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState implements Screen {
-    private static int NR_OF_MINIONS = 10;
+    private static int NR_OF_MINIONS = 5;
 
     // game utils
     private TaskWarrior game;
@@ -107,7 +107,7 @@ public class PlayState implements Screen {
         target.update(deltaTime);
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.get(i).update(target, deltaTime);
-            if(minions.get(i).getHealth() <= 0){
+            if(minions.get(i).getHealth() <= 0 && minions.get(i).isDyingAnimationFinished()){
                 minions.remove(i);
                 NR_OF_MINIONS--;
                 i--;
@@ -116,7 +116,7 @@ public class PlayState implements Screen {
         for(int i=0; i<NR_OF_MINIONS; i++){
             minions.get(i).move(target, minions, deltaTime);
         }
-        showBorders();
+        //showBorders();
     }
 
     private void render() {
@@ -179,7 +179,9 @@ public class PlayState implements Screen {
         // show borders for minions
         for(int i=0; i<NR_OF_MINIONS; i++){
             Rectangle minionRect = minions.get(i).getEnemyRectangle();
+            Circle minionRange = minions.get(i).getMinionVisibleRange();
             borderShapeRenderer.rect(minionRect.getX(), minionRect.getY(), minionRect.getWidth(), minionRect.getHeight());
+            borderShapeRenderer.circle(minionRange.x, minionRange.y, minionRange.radius);
         }
     }
 
