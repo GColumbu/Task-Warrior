@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.Enemy;
@@ -17,13 +16,12 @@ import com.mygdx.game.enemies.Minion;
 import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.states.PlayState.UI.UserInterface;
-import jdk.internal.org.jline.utils.ShutdownHooks;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PlayState implements Screen {
-    private static int NR_OF_MINIONS = 2;
+    private static int NR_OF_MINIONS = 10;
 
     // game utils
     private TaskWarrior game;
@@ -115,7 +113,10 @@ public class PlayState implements Screen {
                 i--;
             }
         }
-        //showBorders();
+        for(int i=0; i<NR_OF_MINIONS; i++){
+            minions.get(i).move(target, minions, deltaTime);
+        }
+        showBorders();
     }
 
     private void render() {
@@ -123,7 +124,7 @@ public class PlayState implements Screen {
         drawGameViewport();
 
         // minimap
-        minimap.draw(game.batch, target, minimapReference);
+        minimap.draw(game.batch, minimapReference, target, minions);
     }
 
     private void drawGameViewport(){

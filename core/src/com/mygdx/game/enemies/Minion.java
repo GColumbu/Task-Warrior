@@ -8,6 +8,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
 
+import java.util.List;
+
 public class Minion extends Enemy {
     //constants TODO: maybe calculate them dynamically based on difficulty
     private final static int MINION_MAX_SPEED = 175;
@@ -31,7 +33,6 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
         setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34 , getSprite().getRegionHeight()));
-        moveAndRecognizeCollision(player, pursue(player, deltaTime));
         calculateDamage(player);
     }
 

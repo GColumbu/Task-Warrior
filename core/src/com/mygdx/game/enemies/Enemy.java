@@ -6,7 +6,11 @@ import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Enemy {
+    private static final int MIN_SEPARATION_DISTANCE = 50;
 
     //vectors
     protected Vector2 position;
@@ -170,6 +174,11 @@ public abstract class Enemy {
         return flee(target, deltaTime);
     }
 
+    public void move(PlayerChampion player, List<Enemy> minions, float deltaTime){
+        separation(getNearbyEnemies(minions));
+        moveAndRecognizeCollision(player, pursue(player, deltaTime));
+    }
+
     //applying steering behaviour
     protected void applySteeringBehaviour(Vector2 steering){
         velocity.add(steering);
@@ -187,6 +196,35 @@ public abstract class Enemy {
         }
     }
 
+    private List<Enemy> getNearbyEnemies(List<Enemy> minions) {
+        List<Enemy> nearbyEnemies = new ArrayList<>();
+        for (Enemy enemy : minions){ // allEnemies is a list of all enemies in the game
+            if (enemy != this && enemy.position.dst(this.position) < MIN_SEPARATION_DISTANCE) {
+                nearbyEnemies.add(enemy); // add enemy to the list if it is within the minimum separation distance
+            }
+        }
+        return nearbyEnemies;
+    }
+
+    private void separation(List<Enemy> nearbyEnemies) {
+        for (Enemy other : nearbyEnemies) {
+            if (other != this && this.enemyRectangle.overlaps(other.enemyRectangle)) {
+                Vector2 rejection = new Vector2(0, 0);
+                // Calculate separation vector
+                Vector2 separation = other.position.cpy().sub(position);
+                float overlapX = (this.currentRegion.getRegionWidth() + other.currentRegion.getRegionWidth()) / 2 + Math.abs(separation.x);
+                float overlapY = (this.currentRegion.getRegionHeight() + other.currentRegion.getRegionHeight()) / 2 + Math.abs(separation.y);
+                // Resolve collision
+                if (overlapX < overlapY) {
+                    rejection.x = overlapX / 2 * Math.signum(separation.x);
+                } else {
+                    rejection.y = overlapY / 2 * Math.signum(separation.y);
+                }
+                this.velocity.add(rejection.scl(0.1f));
+                other.velocity.sub(rejection.scl(0.1f));
+            }
+        }
+    }
     protected void moveAndRecognizeCollision(PlayerChampion player, Vector2 steeringBehaviour){
         // apply steering behaviour if colision not detected
         if(!enemyRectangle.overlaps(player.getPlayerRectangle())){
@@ -298,8 +336,11 @@ public abstract class Enemy {
 
         }
         // attack range is circle
-        Circle circle = (Circle) attackRange;
-        return isCollision(circle, enemyRectangle);
+        else if(attackRange instanceof Circle) {
+            Circle circle = (Circle) attackRange;
+            return isCollision(circle, enemyRectangle);
+        }
+        return false;
     }
 
 }

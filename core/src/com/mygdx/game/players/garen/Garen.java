@@ -82,15 +82,21 @@ public class Garen extends PlayerChampion {
             if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 if (getIdleRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
                     velocity.y = deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.y -= (deltaTime * speed) / 2;
+                    }
+                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.y += (deltaTime * speed) / 2;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 if (getIdleRelativePosition().y > 0) {
                     velocity.y = -deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.y += (deltaTime * speed) / 2;
+                    }
+                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.y -= (deltaTime * speed) / 2;
                     }
                 }
             }
@@ -99,15 +105,21 @@ public class Garen extends PlayerChampion {
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 if (getIdleRelativePosition().x > 0) {
                     velocity.x = -deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.x += (deltaTime * speed) / 2;
+                    }
+                     if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.x -= (deltaTime * speed) / 2;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 if (getIdleRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
                     velocity.x = deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.x -= (deltaTime * speed) / 2;
+                    }
+                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.x += (deltaTime * speed) / 2;
                     }
                 }
             }

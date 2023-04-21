@@ -11,8 +11,6 @@ public class TaskWarrior extends Game {
 	public static final int WIDTH = 5333;
 	public static final int HEIGHT = 3467;
 	public static final String TITLE = "Task Warrior";
-
-	//private GameStateManager gsm;
 	public SpriteBatch batch;
 	
 	@Override
