@@ -33,6 +33,7 @@ public class PlayState implements Screen {
     protected Viewport minimapReference;
     private final OrthographicCamera camera;
     private float spawnTimer;
+    // INITIAL value of minions (after it increases by one every ENEMY_SPAWN_FREQUENCY seconds)
     private int nrOfMinions = 7;
 
     // game characters
@@ -50,9 +51,9 @@ public class PlayState implements Screen {
         spawnTimer = 0;
         background = new Texture("background.png");
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
+        camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         minions = new ArrayList<>();
-        for(int i = 0; i< nrOfMinions; i++){
+        for(int i = 0; i < nrOfMinions; i++){
             minions.add(new Minion(getRandomValue("x"), getRandomValue("y")));
         }
         target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
@@ -109,7 +110,7 @@ public class PlayState implements Screen {
         //dispose minimap
         minimap.dispose();
         //dispose minions
-        for(int i = 0; i< nrOfMinions; i++){
+        for(int i = 0; i < nrOfMinions; i++){
             minions.get(i).getSprite().getTexture().dispose();
         }
         //dispose player
@@ -124,6 +125,7 @@ public class PlayState implements Screen {
         for(int i = 0; i< nrOfMinions; i++){
             minions.get(i).update(target, deltaTime);
             if(minions.get(i).isDyingAnimationFinished()){
+                minions.get(i).getSprite().getTexture().dispose();
                 minions.remove(i);
                 nrOfMinions--;
                 i--;
