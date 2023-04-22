@@ -26,7 +26,7 @@ public class Minimap {
     // red square - enemy;
     TextureRegion enemy;
 
-    private OrthographicCamera minimapCamera;
+    private final OrthographicCamera minimapCamera;
 
     private final Viewport minimapViewport;
 
@@ -39,7 +39,7 @@ public class Minimap {
         Texture texture = new Texture(Gdx.files.internal("green_circle.png"));
         player = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 10, 10);
 
-         texture = new Texture(Gdx.files.internal("red_circle.png"));
+        texture = new Texture(Gdx.files.internal("red_circle.png"));
         enemy = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 10, 10);
     }
 
@@ -75,5 +75,10 @@ public class Minimap {
 
     private void drawCharacter(TextureRegion square, SpriteBatch spriteBatch, float x, float y){
         spriteBatch.draw(square, x, y);
+    }
+
+    protected void dispose(){
+        enemy.getTexture().dispose();
+        player.getTexture().dispose();
     }
 }

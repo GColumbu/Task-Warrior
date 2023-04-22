@@ -20,7 +20,7 @@ public class HealthBar {
     private final float sixtyPercentPlayerHealth;
     private final float thirtyPercentPlayerHealth;
 
-    private ProgressBar.ProgressBarStyle progressBarStyle;
+    private final ProgressBar.ProgressBarStyle progressBarStyle;
     private ProgressBar progressBar;
 
     float playerMaxHealth;

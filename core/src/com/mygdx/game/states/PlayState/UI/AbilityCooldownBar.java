@@ -17,13 +17,10 @@ public class AbilityCooldownBar {
     private final int offsetY;
 
     // camera zoom
-
     private float cameraZoom;
 
     private ProgressBar.ProgressBarStyle progressBarStyle;
-
     private ProgressBar progressBar;
-
     private final int progressBarWidth;
     private final float cooldown;
 

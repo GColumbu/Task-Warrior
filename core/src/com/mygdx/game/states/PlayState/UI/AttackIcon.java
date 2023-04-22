@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 
 public class AttackIcon {
-    //attack icon
+    // attack icon
     protected Texture attackIconTexture;
     protected int xOffset;
     protected int yOffset;
@@ -13,5 +13,9 @@ public class AttackIcon {
         this.attackIconTexture = attackIconTexture;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
+    }
+
+    protected void dispose(){
+        attackIconTexture.dispose();
     }
 }

@@ -8,26 +8,27 @@ import com.mygdx.game.players.PlayerChampion;
 
 
 public class UserInterface {
-    // camera
-    private OrthographicCamera camera;
-    // ui template
+    // UI template
     private final Texture userInterface;
-    //health bar
-    private HealthBar healthBar;
-    //first attack icon
+
+    // health bar
+    private final HealthBar healthBar;
+
+    // first attack utils
     private final AttackIcon firstAttack;
     private final AbilityCooldownBar firstAbilityCooldown;
-    //second attack icon
+
+    // second attack utils
     private final AttackIcon secondAttack;
     private final AbilityCooldownBar secondAbilityCooldown;
-    //third attack icon
+
+    // third attack utils
     private final AttackIcon thirdAttack;
     private final AbilityCooldownBar thirdAbilityCooldown;
 
 
 
     public UserInterface(String userInterfaceFilePath,PlayerChampion player, OrthographicCamera camera){
-        this.camera = camera;
         this.userInterface = new Texture(userInterfaceFilePath);
         this.firstAttack = new AttackIcon(player.getQBasicAnimation().getAttackIcon(), 19, 5);
         this.firstAbilityCooldown = new AbilityCooldownBar(player.getQBasicAnimation().getCooldownDuration(), 19, player.getQBasicAnimation().getAttackIcon().getHeight() + 7, player.getQBasicAnimation().getAttackIcon().getWidth());
@@ -60,6 +61,13 @@ public class UserInterface {
         spriteBatch.draw(thirdAttack.attackIconTexture, x + thirdAttack.xOffset * camera.zoom, y + thirdAttack.yOffset * camera.zoom, thirdAttack.attackIconTexture.getWidth() * camera.zoom, thirdAttack.attackIconTexture.getHeight() * camera.zoom);
         thirdAbilityCooldown.draw(spriteBatch, x, y, player.getEBasicAnimation().getCooldownStateTimer(), camera.zoom);
         healthBar.draw(spriteBatch, x, y, player.getHealth(), camera.zoom);
+    }
+
+    public void dispose(){
+        userInterface.dispose();
+        firstAttack.dispose();
+        secondAttack.dispose();
+        thirdAttack.dispose();
     }
 
 }

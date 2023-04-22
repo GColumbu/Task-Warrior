@@ -27,20 +27,24 @@ public class PlayState implements Screen {
     private static final int ENEMY_SPAWN_FREQUENCY = 2;
 
     // game utils
-    private TaskWarrior game;
+    private final TaskWarrior game;
     private final Texture background;
     protected Viewport viewport;
     protected Viewport minimapReference;
-    private  OrthographicCamera camera;
+    private final OrthographicCamera camera;
     private float spawnTimer;
     private int nrOfMinions = 7;
 
     // game characters
-    private List<Enemy> minions;
+    private final List<Enemy> minions;
     private final PlayerChampion target;
     private final UserInterface userInterface;
     private final Minimap minimap;
+
+    // shape renderer for debug purposes
     ShapeRenderer shapeRenderer;
+
+    // constructor
     public PlayState(TaskWarrior game){
         this.game = game;
         spawnTimer = 0;
@@ -61,7 +65,7 @@ public class PlayState implements Screen {
         Gdx.input.setInputProcessor(myInputProcessor);
     }
 
-    // override methods
+    // OVERRIDE STATE METHODS
 
     @Override
     public void show() {
@@ -98,6 +102,12 @@ public class PlayState implements Screen {
 
     @Override
     public void dispose() {
+        //dispose background
+        background.dispose();
+        //dispose UI
+        userInterface.dispose();
+        //dispose minimap
+        minimap.dispose();
         //dispose minions
         for(int i = 0; i< nrOfMinions; i++){
             minions.get(i).getSprite().getTexture().dispose();
@@ -113,7 +123,7 @@ public class PlayState implements Screen {
         target.update(deltaTime);
         for(int i = 0; i< nrOfMinions; i++){
             minions.get(i).update(target, deltaTime);
-            if(minions.get(i).getHealth() <= 0 && minions.get(i).isDyingAnimationFinished()){
+            if(minions.get(i).isDyingAnimationFinished()){
                 minions.remove(i);
                 nrOfMinions--;
                 i--;
@@ -134,6 +144,7 @@ public class PlayState implements Screen {
         minimap.draw(game.batch, minimapReference, target, minions);
     }
 
+    // draw method for game objects
     private void drawGameViewport(){
         viewport.apply();
         viewport.getCamera().viewportWidth = Gdx.graphics.getWidth();
@@ -159,7 +170,36 @@ public class PlayState implements Screen {
         game.batch.end();
     }
 
-    //update camera position based on background limits
+    // ENEMY SPAWNING METHODS
+    private int getRandomValue(String axis){
+        Random rand  = new Random();
+        if(axis.equals("x")){
+            return rand.nextInt(TaskWarrior.WIDTH);
+        }
+        else if(axis.equals("y")){
+            return rand.nextInt(TaskWarrior.HEIGHT);
+        }
+        return 1;
+    }
+
+    // adds minion at random value (except for player range)
+    private void addMinion(PlayerChampion player, float deltaTime){
+        if(spawnTimer >= ENEMY_SPAWN_FREQUENCY){
+            Vector2 newPosition;
+            // don't allow minions to spawn near player
+            do{
+                newPosition = new Vector2(getRandomValue("x"), getRandomValue("y"));
+            }while(player.getForbiddenMinionSpawnRange().contains(newPosition));
+            minions.add(new Minion((int)newPosition.x, (int)newPosition.y));
+            spawnTimer = 0;
+            nrOfMinions++;
+        } else
+            spawnTimer += deltaTime;
+    }
+
+    // UPDATE CAMERA METHODS
+
+    // update camera position based on background limits
     private void updateCamera(PlayerChampion target){
         if(target.getPosition().x - camera.viewportWidth/2 * camera.zoom > 0 && target.getPosition().x + camera.viewportWidth/2 * camera.zoom < TaskWarrior.WIDTH){
             followPlayerX(target);
@@ -170,7 +210,7 @@ public class PlayState implements Screen {
         camera.update();
     }
 
-    //update camera position based on the player and axis
+    // update camera position based on the player and axis
     private void followPlayerX(PlayerChampion target){
         camera.position.x = target.getPosition().x;
     }
@@ -178,6 +218,7 @@ public class PlayState implements Screen {
         camera.position.y = target.getPosition().y;
     }
 
+    // SHOW BORDER METHODS (for debug purposes)
     private void showBorders(){
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
@@ -213,7 +254,7 @@ public class PlayState implements Screen {
 
         // border for minion spawn
         shapeRenderer.setColor(Color.GREEN);
-        shapeRenderer.circle(target.getMinionDeSpawnRange().x, target.getMinionDeSpawnRange().y, target.getMinionDeSpawnRange().radius);
+        shapeRenderer.circle(target.getForbiddenMinionSpawnRange().x, target.getForbiddenMinionSpawnRange().y, target.getForbiddenMinionSpawnRange().radius);
     }
 
     private void drawShape(Shape2D shape, ShapeRenderer shapeRenderer){
@@ -227,32 +268,6 @@ public class PlayState implements Screen {
             Circle circle = (Circle)shape;
             shapeRenderer.circle(circle.x, circle.y, circle.radius);
         }
-    }
-
-    // enemy spawing methods
-    private int getRandomValue(String axis){
-        Random rand  = new Random();
-        if(axis.equals("x")){
-            return rand.nextInt(TaskWarrior.WIDTH);
-        }
-        else if(axis.equals("y")){
-            return rand.nextInt(TaskWarrior.HEIGHT);
-        }
-        return 1;
-    }
-
-    private void addMinion(PlayerChampion player, float deltaTime){
-        if(spawnTimer >= ENEMY_SPAWN_FREQUENCY){
-            Vector2 newPosition;
-            // don't allow minions to spawn near player
-            do{
-                newPosition = new Vector2(getRandomValue("x"), getRandomValue("y"));
-            }while(player.getMinionDeSpawnRange().contains(newPosition));
-            minions.add(new Minion((int)newPosition.x, (int)newPosition.y));
-            spawnTimer = 0;
-            nrOfMinions++;
-        } else
-            spawnTimer += deltaTime;
     }
 
 }
