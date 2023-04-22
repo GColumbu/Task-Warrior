@@ -8,7 +8,7 @@ import com.mygdx.game.TaskWarrior;
 
 public abstract class PlayerChampion {
 
-    //vectors
+    // vectors
     protected Vector2 position;
     protected Vector2 relativePosition;
     protected Vector2 velocity;
@@ -20,13 +20,13 @@ public abstract class PlayerChampion {
     protected int speed;
     protected float health;
 
-    //player states
+    // player states
     public enum State {STANDING, WALKING, Q, E, W}
     protected State currentState;
     protected State previousState;
     protected float stateTimer;
 
-    //textures and animations
+    // textures and animations
     protected TextureRegion currentRegion;
     protected TextureRegion idleTextureRegion;
     protected WalkingAnimation walkingAnimation;
@@ -34,10 +34,11 @@ public abstract class PlayerChampion {
     protected AttackAnimation wBasicAnimation;
     protected AttackAnimation eBasicAnimation;
 
-    //collisions
+    // collisions
     protected Rectangle playerRectangle;
+    protected Circle forbiddenMinionSpawnRange;
 
-    //constructor
+    // constructor
     public PlayerChampion(int x, int y, int speed, int health){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
@@ -49,12 +50,15 @@ public abstract class PlayerChampion {
 
     public abstract void update(float deltaTime);
 
-    //setters
+    // setters
     public void setCurrentRegion(TextureRegion currentRegion) {
         this.currentRegion = currentRegion;
     }
     public void setPlayerRectangle(Rectangle playerRectangle) {
         this.playerRectangle = playerRectangle;
+    }
+    public void setForbiddenMinionSpawnRange(Circle forbiddenMinionSpawnRange) {
+        this.forbiddenMinionSpawnRange = forbiddenMinionSpawnRange;
     }
         // used not to let the player advance when hitting a minion
     public void setPositionX(float position) {
@@ -74,13 +78,6 @@ public abstract class PlayerChampion {
                 break;
         }
     }
-
-    //getters
-    public abstract float getMaxHealth();
-    public float getHealth() {
-        return health;
-    }
-
 
     // q ability methods
     public AttackAnimation getQBasicAnimation() { return qBasicAnimation;}
@@ -104,56 +101,53 @@ public abstract class PlayerChampion {
     public abstract float getEAttackDamage();
     public abstract boolean isEAttackTiming(boolean forCollision);
 
+    // getters
     public void decrementHealth(float damage){
         health -= damage;
     }
-
+    public abstract float getMaxHealth();
+    public float getHealth() {
+        return health;
+    }
     public Vector2 getPosition() {
         return position;
     }
-
-    public float getStateTimer(){
-        return stateTimer;
-    }
-
     public TextureRegion getSprite() {
         return currentRegion;
     }
-
     public Vector2 getRelativePosition() {
         return relativePosition;
     }
-
     public Vector2 getVelocity() {
         return velocity;
     }
-
     public float getPreviousX() {
         return previousX;
     }
     public float getPreviousY() {
         return previousY;
     }
-
     public Rectangle getPlayerRectangle() {
         return playerRectangle;
     }
-
+    public Circle getForbiddenMinionSpawnRange() {
+        return forbiddenMinionSpawnRange;
+    }
     // get player angle/orientation
     public float getHeading(){
         if(!velocity.equals(Vector2.Zero))
             return velocity.angleDeg();
-        //if player not moving use the last velocity to keep the player oriented in the last direction
+        // if player not moving use the last velocity to keep the player oriented in the last direction
         return previousMovingVelocity.angleDeg();
     }
-
+    // gets the player current texture frame based on the current state
+    protected abstract TextureRegion getCurrentFrame(float deltaTime);
     protected TextureRegion getIdleTextureRegion() {return idleTextureRegion;}
-
     protected Vector2 getIdleRelativePosition() {
         return new Vector2(position.x - idleTextureRegion.getRegionWidth() / 2, position.y - idleTextureRegion.getRegionHeight() / 2);
     }
 
-    // movement function
+    // MOVEMENT METHODS
     protected void movePlayer(float deltaTime){
         // reset velocity vector
         velocity = new Vector2(0, 0);
@@ -191,43 +185,67 @@ public abstract class PlayerChampion {
         position.add(velocity);
     }
 
-    // gets the player texture frame based on the current state
-    protected abstract TextureRegion getCurrentFrame(float deltaTime);
-
+    // gets current state based on player decisions
     public State getState() {
 
-        //Q checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q) || !qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q) {
+        // Q checking state
+        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q)) {
+            // reset q cooldown
             if ((Gdx.input.isKeyPressed(Input.Keys.Q))){
                 qBasicAnimation.resetCooldown();
             }
             return State.Q;
         }
+        if(!qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q){
+            // cancel q
+            if(Gdx.input.isKeyJustPressed(Input.Keys.Q)){
+                return State.STANDING;
+            }
+            return State.Q;
+        }
 
         // W checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W) || !wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W) {
-            if ((Gdx.input.isKeyPressed(Input.Keys.W))){
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W)) {
+            // reset w cooldown
+            if ((Gdx.input.isKeyJustPressed(Input.Keys.W))){
                 wBasicAnimation.resetCooldown();
             }
             return State.W;
         }
+        if(!wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W){
+            // cancel w
+            if(Gdx.input.isKeyJustPressed(Input.Keys.W)){
+                return State.STANDING;
+            }
+            return State.W;
+        }
 
-        //E checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E) || !eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E) {
+        // E checking state
+        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E)){
+            // reset e cooldown
             if ((Gdx.input.isKeyPressed(Input.Keys.E))){
                 eBasicAnimation.resetCooldown();
             }
             return State.E;
         }
+        if(!eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E){
+            // cancel e
+            if(Gdx.input.isKeyJustPressed(Input.Keys.E)){
+                return State.STANDING;
+            }
+            return State.E;
+        }
 
-        //WALKING checking state
+        // WALKING checking state
         if(isMoving()){
             return State.WALKING;
         }
 
-        //IDLE checking state
+        // IDLE checking state
         return State.STANDING;
     }
+
+    // COOLDOWN/ANIMATION METHODS
 
     public void updateCooldowns(float deltaTime){
         // add delta time to ability stateTimer
@@ -238,8 +256,6 @@ public abstract class PlayerChampion {
         if(eBasicAnimation.cooldownStateTimer < eBasicAnimation.cooldownDuration)
             eBasicAnimation.cooldownStateTimer += deltaTime;
     }
-
-    //update state functions
 
     protected boolean isMoving(){
         return (Gdx.input.isKeyPressed(Input.Keys.UP)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN))

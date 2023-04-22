@@ -1,179 +1,275 @@
 package com.mygdx.game.states.PlayState;
 
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.Enemy;
 import com.mygdx.game.enemies.Minion;
 import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
-import com.mygdx.game.states.GameStateManager;
-import com.mygdx.game.states.State;
+import com.mygdx.game.states.PlayState.UI.UserInterface;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-public class PlayState extends State {
-    private static int NR_OF_MINIONS = 2;
-    private static final float REPULSION_FACTOR = 0.5f;
-    private List<Enemy> minions;
-    private Garen target;
-    private Texture background;
-    private UserInterface userInterface;
+public class PlayState implements Screen {
 
-    ShapeRenderer borderShapeRenderer;
-    public PlayState(GameStateManager gsm){
-        super(gsm);
+    private static final int ENEMY_SPAWN_FREQUENCY = 2;
+
+    // game utils
+    private final TaskWarrior game;
+    private final Texture background;
+    protected Viewport viewport;
+    protected Viewport minimapReference;
+    private final OrthographicCamera camera;
+    private float spawnTimer;
+    // INITIAL value of minions (after it increases by one every ENEMY_SPAWN_FREQUENCY seconds)
+    private int nrOfMinions = 7;
+
+    // game characters
+    private final List<Enemy> minions;
+    private final PlayerChampion target;
+    private final UserInterface userInterface;
+    private final Minimap minimap;
+
+    // shape renderer for debug purposes
+    ShapeRenderer shapeRenderer;
+
+    // constructor
+    public PlayState(TaskWarrior game){
+        this.game = game;
+        spawnTimer = 0;
         background = new Texture("background.png");
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         minions = new ArrayList<>();
-        for(int i=0; i<NR_OF_MINIONS; i++){
-            minions.add(new Minion(i * 100, i * 300));
+        for(int i = 0; i < nrOfMinions; i++){
+            minions.add(new Minion(getRandomValue("x"), getRandomValue("y")));
         }
-        target = new Garen(TaskWarrior.WIDTH/4, TaskWarrior.HEIGHT/2);
-        camera.setToOrtho(false, TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT);
-        borderShapeRenderer = new ShapeRenderer();
-        userInterface = new UserInterface("assets/UI bar.png", target);
+        target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
+        shapeRenderer = new ShapeRenderer();
+        userInterface = new UserInterface("assets/UI bar.png", target, camera);
+        viewport = new ExtendViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT, camera);
+        minimapReference = new FitViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
+        minimap = new Minimap(new Texture("minimap.png"));
+        MyInputProcessor myInputProcessor = new MyInputProcessor(camera, target);
+        Gdx.input.setInputProcessor(myInputProcessor);
     }
+
+    // OVERRIDE STATE METHODS
+
     @Override
-    protected void handleInput() {
+    public void show() {
 
     }
 
     @Override
-    protected void update(float deltaTime) {
-        handleInput();
-        target.update(deltaTime);
-        for(int i=0; i<NR_OF_MINIONS; i++){
-            minions.get(i).update(target, deltaTime);
-            if(minions.get(i).getHealth() <= 0){
-                minions.remove(i);
-                NR_OF_MINIONS--;
-                i--;
-            }
-        }
-        showBorders();
-        updateCamera(target);
+    public void render(float deltaTime) {
+        update(deltaTime);
+        render();
     }
 
     @Override
-    protected void render(SpriteBatch batch) {
-        batch.setProjectionMatrix(camera.combined);
-        batch.begin();
-        batch.draw(background, 0, 0);
-        batch.draw(target.getSprite(), target.getRelativePosition().x, target.getRelativePosition().y,
-                target.getSprite().getRegionWidth() / 2,
-                target.getSprite().getRegionHeight() / 2, target.getSprite().getRegionWidth(),
-                target.getSprite().getRegionHeight(), 1, 1,
-                target.getHeading());
-        for(int i=0; i<NR_OF_MINIONS; i++) {
-            batch.draw(minions.get(i).getSprite(), minions.get(i).getRelativePosition().x, minions.get(i).getRelativePosition().y,
-                    minions.get(i).getSprite().getRegionWidth()/ 2,
-                    minions.get(i).getSprite().getRegionHeight() / 2, minions.get(i).getSprite().getRegionWidth(),
-                    minions.get(i).getSprite().getRegionHeight(), 1, 1,
-                    minions.get(i).getHeading());
-        }
-        userInterface.draw(batch, camera, target);
-        batch.end();
-        borderShapeRenderer.end();
+    public void resize(int width, int height) {
+        viewport.update(width, height);
+        minimapReference.update(width, height, true);
+        minimap.update();
     }
 
     @Override
-    protected void dispose() {
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+        //dispose background
+        background.dispose();
+        //dispose UI
+        userInterface.dispose();
+        //dispose minimap
+        minimap.dispose();
         //dispose minions
-        for(int i=0; i<NR_OF_MINIONS; i++){
+        for(int i = 0; i < nrOfMinions; i++){
             minions.get(i).getSprite().getTexture().dispose();
         }
         //dispose player
         target.getSprite().getTexture().dispose();
     }
 
-    //update camera position based on background limits
-    private void updateCamera(PlayerChampion target){
-        if((target.getRelativePosition().x + target.getSprite().getRegionWidth()/2) - camera.viewportWidth/2 > 0 && (target.getRelativePosition().x + target.getSprite().getRegionWidth()/2) + camera.viewportWidth/2 < TaskWarrior.WIDTH){
-            followPlayerX(target);
-        }
-        if((target.getRelativePosition().y + target.getSprite().getRegionHeight()/2) - camera.viewportHeight/2 > 0 && (target.getRelativePosition().y + target.getSprite().getRegionHeight()/2) + camera.viewportHeight/2 < TaskWarrior.HEIGHT){
-            followPlayerY(target);
-        }
-    }
 
-    //update camera position based on the player and axis
-    private void followPlayerX(PlayerChampion target){
-        camera.position.x = target.getRelativePosition().x + target.getSprite().getRegionWidth()/2;
-        camera.update();
-    }
-    private void followPlayerY(PlayerChampion target){
-        camera.position.y = target.getRelativePosition().y + target.getSprite().getRegionHeight()/2;
-        camera.update();
-    }
+    // methods utils
 
-    private void avoidEnemyCollisions(List<Enemy> enemies, float deltaTime) {
-        for (int i = 0; i < enemies.size(); i++) {
-            for (int j = i + 1; j < enemies.size(); j++) {
-                Enemy enemy1 = enemies.get(i);
-                Enemy enemy2 = enemies.get(j);
-                if (enemy1.getEnemyRectangle().overlaps(enemy2.getEnemyRectangle())) {
-                    Vector2 repulsionVector = calculateRepulsionVector(enemy1, enemy2, deltaTime);
-                    Vector2 enemy1Velocity = enemy1.getVelocity().cpy().add(repulsionVector);
-                    Vector2 enemy2Velocity = enemy2.getVelocity().cpy().sub(repulsionVector);
-                    enemy1.getPosition().add(enemy1Velocity);
-                    enemy2.getPosition().add(enemy2Velocity);
-                }
+    private void update(float deltaTime) {
+        target.update(deltaTime);
+        for(int i = 0; i< nrOfMinions; i++){
+            minions.get(i).update(target, deltaTime);
+            if(minions.get(i).isDyingAnimationFinished()){
+                minions.get(i).getSprite().getTexture().dispose();
+                minions.remove(i);
+                nrOfMinions--;
+                i--;
             }
         }
-    }
-    private Vector2 calculateRepulsionVector(Enemy enemy1, Enemy enemy2, float deltaTime) {
-        Vector2 enemy1ToEnemy2 = enemy2.getPosition().cpy().sub(enemy1.getPosition());
-        float distance = enemy1ToEnemy2.len();
-        Vector2 direction = enemy1ToEnemy2.nor();
-        float repulsionMagnitude = deltaTime * REPULSION_FACTOR / (distance * distance);
-        return direction.scl(repulsionMagnitude);
+        for(int i = 0; i< nrOfMinions; i++){
+            minions.get(i).move(target, minions, deltaTime);
+        }
+        showBorders();
+        addMinion(target, deltaTime);
     }
 
+    private void render() {
+        // game objects
+        drawGameViewport();
+
+        // minimap
+        minimap.draw(game.batch, minimapReference, target, minions);
+    }
+
+    // draw method for game objects
+    private void drawGameViewport(){
+        viewport.apply();
+        viewport.getCamera().viewportWidth = Gdx.graphics.getWidth();
+        viewport.getCamera().viewportHeight = Gdx.graphics.getHeight();
+        updateCamera(target);
+        game.batch.setProjectionMatrix(viewport.getCamera().combined);
+        game.batch.begin();
+        game.batch.draw(background, 0, 0);
+        game.batch.draw(target.getSprite(), target.getRelativePosition().x, target.getRelativePosition().y,
+                target.getSprite().getRegionWidth() / 2,
+                target.getSprite().getRegionHeight() / 2, target.getSprite().getRegionWidth(),
+                target.getSprite().getRegionHeight(), 1, 1,
+                target.getHeading());
+        for(int i = 0; i< nrOfMinions; i++) {
+            game.batch.draw(minions.get(i).getSprite(), minions.get(i).getRelativePosition().x, minions.get(i).getRelativePosition().y,
+                    minions.get(i).getSprite().getRegionWidth()/ 2,
+                    minions.get(i).getSprite().getRegionHeight() / 2, minions.get(i).getSprite().getRegionWidth(),
+                    minions.get(i).getSprite().getRegionHeight(), 1, 1,
+                    minions.get(i).getHeading());
+        }
+        userInterface.draw(game.batch, camera, target);
+        shapeRenderer.end();
+        game.batch.end();
+    }
+
+    // ENEMY SPAWNING METHODS
+    private int getRandomValue(String axis){
+        Random rand  = new Random();
+        if(axis.equals("x")){
+            return rand.nextInt(TaskWarrior.WIDTH);
+        }
+        else if(axis.equals("y")){
+            return rand.nextInt(TaskWarrior.HEIGHT);
+        }
+        return 1;
+    }
+
+    // adds minion at random value (except for player range)
+    private void addMinion(PlayerChampion player, float deltaTime){
+        if(spawnTimer >= ENEMY_SPAWN_FREQUENCY){
+            Vector2 newPosition;
+            // don't allow minions to spawn near player
+            do{
+                newPosition = new Vector2(getRandomValue("x"), getRandomValue("y"));
+            }while(player.getForbiddenMinionSpawnRange().contains(newPosition));
+            minions.add(new Minion((int)newPosition.x, (int)newPosition.y));
+            spawnTimer = 0;
+            nrOfMinions++;
+        } else
+            spawnTimer += deltaTime;
+    }
+
+    // UPDATE CAMERA METHODS
+
+    // update camera position based on background limits
+    private void updateCamera(PlayerChampion target){
+        if(target.getPosition().x - camera.viewportWidth/2 * camera.zoom > 0 && target.getPosition().x + camera.viewportWidth/2 * camera.zoom < TaskWarrior.WIDTH){
+            followPlayerX(target);
+        }
+        if(target.getPosition().y - camera.viewportHeight/2 * camera.zoom > 0 && target.getPosition().y + camera.viewportHeight/2 * camera.zoom< TaskWarrior.HEIGHT){
+            followPlayerY(target);
+        }
+        camera.update();
+    }
+
+    // update camera position based on the player and axis
+    private void followPlayerX(PlayerChampion target){
+        camera.position.x = target.getPosition().x;
+    }
+    private void followPlayerY(PlayerChampion target){
+        camera.position.y = target.getPosition().y;
+    }
+
+    // SHOW BORDER METHODS (for debug purposes)
     private void showBorders(){
-        borderShapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        borderShapeRenderer.setProjectionMatrix(camera.combined);
-        // show borders for champions
-        if(target instanceof Garen)
-            showBordersForGaren(borderShapeRenderer, (Garen)target);
-        //  ... other champions ...
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+        showBordersForChampion(shapeRenderer, target);
 
         // show borders for minions
-        for(int i=0; i<NR_OF_MINIONS; i++){
+        for(int i = 0; i < nrOfMinions; i++){
             Rectangle minionRect = minions.get(i).getEnemyRectangle();
-            borderShapeRenderer.rect(minionRect.getX(), minionRect.getY(), minionRect.getWidth(), minionRect.getHeight());
+            Circle minionRange = minions.get(i).getMinionSenseRange();
+            shapeRenderer.setColor(Color.WHITE);
+            shapeRenderer.rect(minionRect.getX(), minionRect.getY(), minionRect.getWidth(), minionRect.getHeight());
+            shapeRenderer.setColor(Color.YELLOW);
+            shapeRenderer.circle(minionRange.x, minionRange.y, minionRange.radius);
         }
     }
 
-    private void showBordersForGaren(ShapeRenderer shapeRenderer, Garen target){
+    private void showBordersForChampion(ShapeRenderer shapeRenderer, PlayerChampion target){
         // border for champion
+        shapeRenderer.setColor(Color.WHITE);
         shapeRenderer.rect(target.getPlayerRectangle().getX(), target.getPlayerRectangle().getY(), target.getPlayerRectangle().getWidth(), target.getPlayerRectangle().getHeight());
 
         // border for champion ability
-        if(target.getState() == PlayerChampion.State.E){
-            shapeRenderer.circle(target.getEAttackRange().x, target.getEAttackRange().y, target.getEAttackRange().radius);
+        shapeRenderer.setColor(Color.RED);
+        if(target.getState() == PlayerChampion.State.E && target.isEAttackTiming(true)){
+            drawShape(target.getEAttackRange(), shapeRenderer);
         }
-        if(target.getState() == PlayerChampion.State.Q ){
-            if(target.getQAttackRange() instanceof Rectangle){
-                Rectangle rectangle = (Rectangle)target.getQAttackRange();
-                shapeRenderer.rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
-            } else if(target.getQAttackRange() instanceof Polygon){
-                Polygon polygon = (Polygon)target.getQAttackRange();
-                shapeRenderer.polygon(polygon.getVertices());
-            } else if (target.getQAttackRange() instanceof Circle){
-                Circle circle = (Circle)target.getQAttackRange();
-                shapeRenderer.circle(circle.x, circle.y, circle.radius);
-            }
+        if(target.getState() == PlayerChampion.State.Q && target.isQAttackTiming(true)){
+            drawShape(target.getQAttackRange(), shapeRenderer);
         }
-        if(target.getState() == PlayerChampion.State.W && target.getW_Animation().isBurst(target.getStateTimer(), true)){
-            shapeRenderer.circle(target.getWAttackRange().x, target.getWAttackRange().y, target.getWAttackRange().radius);
+        if(target.getState() == PlayerChampion.State.W && target.isWAttackTiming(true)){
+            drawShape(target.getWAttackRange(), shapeRenderer);
+        }
+
+        // border for minion spawn
+        shapeRenderer.setColor(Color.GREEN);
+        shapeRenderer.circle(target.getForbiddenMinionSpawnRange().x, target.getForbiddenMinionSpawnRange().y, target.getForbiddenMinionSpawnRange().radius);
+    }
+
+    private void drawShape(Shape2D shape, ShapeRenderer shapeRenderer){
+        if(shape instanceof Rectangle){
+            Rectangle rectangle = (Rectangle)shape;
+            shapeRenderer.rect(rectangle.getX(), rectangle.getY(), rectangle.getWidth(), rectangle.getHeight());
+        } else if(shape instanceof Polygon){
+            Polygon polygon = (Polygon)shape;
+            shapeRenderer.polygon(polygon.getVertices());
+        } else if (shape instanceof Circle){
+            Circle circle = (Circle)shape;
+            shapeRenderer.circle(circle.x, circle.y, circle.radius);
         }
     }
+
 }

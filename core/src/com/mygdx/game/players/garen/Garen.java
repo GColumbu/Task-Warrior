@@ -37,6 +37,7 @@ public class Garen extends PlayerChampion {
         setRelativePosition();
         setCurrentRegion(getCurrentFrame(deltaTime));
         setPlayerRectangle(new Rectangle(getIdleRelativePosition().x + 20, getIdleRelativePosition().y, getIdleTextureRegion().getRegionWidth() - 40, getIdleTextureRegion().getRegionHeight()));
+        setForbiddenMinionSpawnRange(new Circle(position.x, position.y, 400));
         movePlayer(deltaTime);
     }
 
@@ -45,7 +46,7 @@ public class Garen extends PlayerChampion {
         return MAX_HEALTH;
     }
 
-    // calculates where the draw function should start
+    // calculates where the draw function should start based on the current state
     @Override
     protected void setRelativePosition() {
         currentState = getState();
@@ -69,7 +70,7 @@ public class Garen extends PlayerChampion {
         }
     }
 
-    // movement function
+    // MOVEMENT METHODS
     @Override
     protected void movePlayer(float deltaTime){
         // reset velocity vector
@@ -82,15 +83,21 @@ public class Garen extends PlayerChampion {
             if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 if (getIdleRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
                     velocity.y = deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.y -= (deltaTime * speed) / 2;
+                    }
+                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.y += (deltaTime * speed) / 3;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 if (getIdleRelativePosition().y > 0) {
                     velocity.y = -deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.y += (deltaTime * speed) / 2;
+                    }
+                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.y -= (deltaTime * speed) / 3;
                     }
                 }
             }
@@ -99,15 +106,21 @@ public class Garen extends PlayerChampion {
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 if (getIdleRelativePosition().x > 0) {
                     velocity.x = -deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.x += (deltaTime * speed) / 2;
+                    }
+                     if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.x -= (deltaTime * speed) / 3;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 if (getIdleRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
                     velocity.x = deltaTime * speed;
-                    if (getState() == State.Q) {
+                    if (currentState == State.Q) {
                         velocity.x -= (deltaTime * speed) / 2;
+                    }
+                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
+                        velocity.x += (deltaTime * speed) / 3;
                     }
                 }
             }
@@ -125,7 +138,7 @@ public class Garen extends PlayerChampion {
         position.add(velocity);
     }
 
-    // gets the player texture frame based on the current state
+    // gets the player current texture frame based on the current state
     @Override
     protected TextureRegion getCurrentFrame(float deltaTime){
         TextureRegion region;
@@ -167,30 +180,27 @@ public class Garen extends PlayerChampion {
     protected Vector2 getQSlashRelativePosition() {
         return new Vector2(position.x - qAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - qAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
-
     @Override
     public boolean isQAttackTiming(boolean forCollision){
         return true;
     }
-
     @Override
     public float getQAttackDamage() {
         return qAnimation.qAttackDamage;
     }
-
     @Override
     public Shape2D getQAttackRange(){
-        //duration and limit of first slash
+        // duration and limit of first slash
         if(qAnimation.isFirstSlash(stateTimer)){
             qAnimation.qAttackDamage = 1;
             return getQFirstPartAttackRange();
         }
-        //duration and limit of the second (rotative) slash
+        // duration and limit of the second (rotative) slash
         else if (qAnimation.isSecondSlash(stateTimer)){
             qAnimation.qAttackDamage = 2;
             return getQSecondPartAttackRange();
         }
-        //duration and limit of third slash
+        // duration and limit of third slash
         else if (qAnimation.isThirdSlash(stateTimer)) {
             qAnimation.qAttackDamage = 3;
             return getQThirdPartAttackRange();
@@ -289,23 +299,17 @@ public class Garen extends PlayerChampion {
     }
 
     // W spell
-    public Garen_W getW_Animation(){
-        return wAnimation;
-    }
     protected Vector2 getWBurstRelativePosition() {
         return new Vector2(position.x - wAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - wAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
-
     @Override
     public boolean isWAttackTiming(boolean forCollision){
         return wAnimation.isBurst(stateTimer, forCollision);
     }
-
     @Override
     public float getWAttackDamage() {
         return wAnimation.wAttackDamage;
     }
-
     @Override
     public Circle getWAttackRange(){
         return new Circle(position.x, position.y, 270);
@@ -316,21 +320,16 @@ public class Garen extends PlayerChampion {
     protected Vector2 getESpinRelativePosition() {
         return new Vector2(position.x - eAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - eAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
-
     @Override
     public boolean isEAttackTiming(boolean forCollision){
         return true;
     }
-
     @Override
     public float getEAttackDamage() {
         return eAnimation.eSpinAttackDamage;
     }
-
     @Override
     public Circle getEAttackRange(){
         return new Circle(position.x, position.y, 310);
     }
-
-    // other methods
 }
