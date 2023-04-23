@@ -39,7 +39,7 @@ public abstract class PlayerChampion {
     protected Circle forbiddenMinionSpawnRange;
 
     // constructor
-    public PlayerChampion(int x, int y, int speed, int health){
+    public PlayerChampion(int x, int y, int speed, float health){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
         velocity = new Vector2(0, 0);

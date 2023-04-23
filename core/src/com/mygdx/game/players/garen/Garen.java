@@ -10,7 +10,7 @@ import com.mygdx.game.players.*;
 
 
 public class Garen extends PlayerChampion {
-    public final float MAX_HEALTH = 200; // TO MATCH WITH THE ONE IN CONSTRUCTOR
+    public final float MAX_HEALTH = 200f; // TO MATCH WITH THE ONE IN CONSTRUCTOR
     protected Garen_W wAnimation;
     protected Garen_Q qAnimation;
     protected Garen_E eAnimation;
@@ -22,7 +22,7 @@ public class Garen extends PlayerChampion {
         wBasicAnimation = wAnimation;
         qAnimation = new Garen_Q("assets/garen/slash_combo_part1.png", "assets/garen/slash_combo_part2.png", "assets/garen/q_icon.png",0.07f);
         qBasicAnimation = qAnimation;
-        eAnimation = new Garen_E("assets/garen/spin.png", "assets/garen/e_icon.png", 0.07f, 0.05f);
+        eAnimation = new Garen_E("assets/garen/spin.png", "assets/garen/e_icon.png", 0.1f, 0.05f);
         eBasicAnimation = eAnimation;
         idleTextureRegion = new TextureRegion(new Texture("assets/garen/idle.png"));
         currentRegion = idleTextureRegion;
@@ -182,7 +182,11 @@ public class Garen extends PlayerChampion {
     }
     @Override
     public boolean isQAttackTiming(boolean forCollision){
-        return true;
+        int index = qAnimation.getKeyFrameIndex(stateTimer);
+        return index >=0 && index <=3 //first slash
+               || index >=7 && index <=9 //second slash
+               || index >=12 && index <=15 //third slash
+               || index >=17; //fourth slash
     }
     @Override
     public float getQAttackDamage() {
@@ -322,7 +326,8 @@ public class Garen extends PlayerChampion {
     }
     @Override
     public boolean isEAttackTiming(boolean forCollision){
-        return true;
+        int index = eAnimation.getSpinKeyFrameIndex(stateTimer);
+        return  index >=0 && index <=2;
     }
     @Override
     public float getEAttackDamage() {

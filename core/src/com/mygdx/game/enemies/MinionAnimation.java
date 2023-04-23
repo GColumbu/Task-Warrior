@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import org.w3c.dom.Text;
 
 public class MinionAnimation {
     protected Animation<TextureRegion> animation;
@@ -18,6 +17,7 @@ public class MinionAnimation {
             frames.add(new TextureRegion(texture, i*walkingFrameWidth, 0, walkingFrameWidth, texture.getHeight()));
         }
         animation = new Animation(frameDuration, frames);
+        animation.setPlayMode(Animation.PlayMode.LOOP);
     }
 
     protected float getKeyFrameWidth(float stateTimer){
@@ -30,6 +30,9 @@ public class MinionAnimation {
 
     protected TextureRegion getKeyFrame(float stateTimer, boolean looping){
         return animation.getKeyFrame(stateTimer, looping);
+    }
+    protected int getKeyFrameIndex(float stateTimer){
+        return animation.getKeyFrameIndex(stateTimer);
     }
 
 }

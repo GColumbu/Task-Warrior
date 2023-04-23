@@ -43,6 +43,7 @@ public class Garen_E extends AttackAnimation {
             frames.add(new TextureRegion(eSpinTexture, i*eSpinFrameWidth, 0, eSpinFrameWidth, eSpinTexture.getHeight()));
         }
         eSpinAnimation = new Animation(eSpinFrameDuration, frames);
+        eSpinAnimation.setPlayMode(Animation.PlayMode.LOOP);
         this.eSpinFrameDuration = eSpinFrameDuration;
         attackIcon = new Texture(eIconFilePath);
     }
@@ -57,6 +58,10 @@ public class Garen_E extends AttackAnimation {
 
     public boolean isSwordGrab(float stateTimer){
         return stateTimer <= eGrabFrames * eGrabFrameDuration;
+    }
+
+    public int getSpinKeyFrameIndex(float stateTimer){
+        return eSpinAnimation.getKeyFrameIndex(stateTimer);
     }
 
     @Override

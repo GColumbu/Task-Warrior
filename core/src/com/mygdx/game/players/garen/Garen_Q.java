@@ -57,6 +57,10 @@ public class Garen_Q extends AttackAnimation {
         return stateTimer > firstSlashFrames * frameDuration && stateTimer <= (firstSlashFrames + secondSlashFrames + thirdSlashFrames) * frameDuration;
     }
 
+    protected int getKeyFrameIndex(float stateTimer){
+        return qAnimation.getKeyFrameIndex(stateTimer);
+    }
+
     @Override
     public float getKeyFrameWidth(float stateTimer){
         return qAnimation.getKeyFrame(stateTimer, false).getRegionWidth();

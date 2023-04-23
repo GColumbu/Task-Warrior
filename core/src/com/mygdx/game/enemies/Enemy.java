@@ -36,7 +36,6 @@ public abstract class Enemy {
     protected MinionAnimation walkingDamageAnimation;
     protected MinionAnimation attackAnimation;
     protected MinionAnimation attackDamageAnimation;
-
     protected MinionAnimation dyingAnimation;
 
     // collisions

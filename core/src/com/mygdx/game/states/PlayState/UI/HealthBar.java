@@ -35,7 +35,7 @@ public class HealthBar {
         updateProgressBar(playerHealth, cameraZoom);
         progressBar.setScale(cameraZoom);
         progressBar.setValue(playerHealth);
-        progressBar.setAnimateDuration(0.05f);
+        progressBar.setAnimateDuration(0.02f);
         progressBar.setPosition(posX + (OFFSET_X * cameraZoom), posY + (OFFSET_Y * cameraZoom));
         progressBar.setWidth(HEALTH_BAR_WIDTH * cameraZoom);
         progressBar.setHeight(HEALTH_BAR_HEIGHT * cameraZoom);
@@ -66,7 +66,7 @@ public class HealthBar {
         progressBarStyle.knobBefore = drawable;
 
         // creates the progress bar
-        progressBar = new ProgressBar(0, playerMaxHealth, 5, false, progressBarStyle);
+        progressBar = new ProgressBar(0, playerMaxHealth, 1, false, progressBarStyle);
 
     }
     private void changePixmapColor(Pixmap pixmap, float playerHealth){
