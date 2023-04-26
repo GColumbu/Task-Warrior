@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.players.PlayerChampion;
-import com.mygdx.game.players.garen.Garen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +13,7 @@ public abstract class Enemy {
     protected Vector2 position;
     protected Vector2 relativePosition;
     protected Vector2 velocity;
+    protected Vector2 previousMovingVelocity;
     protected Vector2 separation;
     protected Vector2 currentSteeringBehavior;
 
@@ -34,11 +34,11 @@ public abstract class Enemy {
     // animations and textures
     protected TextureRegion currentRegion;
     protected TextureRegion idleTextureRegion;
-    protected MinionAnimation walkingAnimation;
-    protected MinionAnimation walkingDamageAnimation;
-    protected MinionAnimation attackAnimation;
-    protected MinionAnimation attackDamageAnimation;
-    protected MinionAnimation dyingAnimation;
+    protected EnemyAnimation walkingAnimation;
+    protected EnemyAnimation walkingDamageAnimation;
+    protected EnemyAnimation attackAnimation;
+    protected EnemyAnimation attackDamageAnimation;
+    protected EnemyAnimation dyingAnimation;
 
     // collisions
     protected Rectangle enemyRectangle;
@@ -49,6 +49,7 @@ public abstract class Enemy {
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
         velocity = new Vector2(0, 0);
+        previousMovingVelocity = new Vector2(0, 0);
         this.maxSpeed = maxSpeed;
         this.maxForce = maxForce;
         this.health = health;
@@ -125,7 +126,10 @@ public abstract class Enemy {
         return minionSenseRange;
     }
     public float getHeading(){
-        return velocity.angleDeg();
+        if(!velocity.equals(Vector2.Zero))
+            return velocity.angleDeg();
+        // if player not moving use the last velocity to keep the player oriented in the last direction
+        return previousMovingVelocity.angleDeg();
     }
     public Vector2 getRelativePosition() {
         return relativePosition;
@@ -135,9 +139,6 @@ public abstract class Enemy {
     }
     public void setMinionSenseRange(Circle minionSenseRange) {
         this.minionSenseRange = minionSenseRange;
-    }
-    public float getHealth() {
-        return health;
     }
 
     // orientation
@@ -194,12 +195,19 @@ public abstract class Enemy {
 
     // separation
         // get nearby enemies
-    protected List<Enemy> getNearbyEnemies(List<Enemy> minions) {
+    protected List<Enemy> getNearbyEnemies(List<Enemy> minions, boolean onlyRunners) {
         List<Enemy> nearbyEnemies = new ArrayList<>();
         for (Enemy enemy : minions){ // allEnemies is a list of all enemies in the game
+            if(onlyRunners)
+                minionSenseRange.radius = 200;
             if (enemy != this && minionSenseRange.contains(enemy.position)) {
-                nearbyEnemies.add(enemy); // add enemy to the list if it is within the minimum separation distance
+                // add enemy to the list if it is within the minimum separation distance
+                if(onlyRunners && enemy instanceof Runner)
+                    nearbyEnemies.add(enemy);
+                else if (!onlyRunners)
+                    nearbyEnemies.add(enemy);
             }
+            minionSenseRange.radius = 100;
         }
         return nearbyEnemies;
     }
@@ -232,15 +240,15 @@ public abstract class Enemy {
 
     // make enemy recognize walls for steering behaviors
     protected void applyVelocityAndRecognizeWalls(Vector2 velocity){
-        if(position.x > 0 && position.x < TaskWarrior.WIDTH - getSprite().getRegionWidth()) {
+        if(relativePosition.x > 0 && relativePosition.x < TaskWarrior.WIDTH - getSprite().getRegionWidth()) {
             position.x += velocity.x;
-        } else if(position.x <= 0 && isLooking("right") || position.x >= TaskWarrior.WIDTH - getSprite().getRegionWidth() && isLooking("left")){
+        } else if(relativePosition.x <= 0 && isLooking("right") || relativePosition.x >= TaskWarrior.WIDTH - getSprite().getRegionWidth() && isLooking("left")){
             position.x += velocity.x;
         }
 
-        if(position.y > 0 && position.y < TaskWarrior.HEIGHT - getSprite().getRegionHeight()){
+        if(relativePosition.y > 0 && relativePosition.y < TaskWarrior.HEIGHT - getSprite().getRegionHeight()){
             position.y += velocity.y;
-        } else if(position.y <= 0 && isLooking("up") || position.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
+        } else if(relativePosition.y <= 0 && isLooking("up") || relativePosition.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
             position.y += velocity.y;
         }
     }
@@ -269,7 +277,7 @@ public abstract class Enemy {
     }
 
     private void calculateDamageFromMinions(PlayerChampion player){
-        if(getState() == State.ATTACK){
+        if(currentState == State.ATTACK){
             player.decrementHealth(damage);
         }
     }
@@ -300,7 +308,7 @@ public abstract class Enemy {
     // COLLISION METHODS
 
     // transforms Rectangle to Polygon
-    private Polygon rectToPolygon(Rectangle r) {
+    private static Polygon rectToPolygon(Rectangle r) {
         Polygon rPoly = new Polygon(new float[] { 0, 0, r.width, 0, r.width,
                 r.height, 0, r.height });
         rPoly.setPosition(r.x, r.y);
@@ -334,7 +342,7 @@ public abstract class Enemy {
     }
 
     // check if Circle intersects Rectangle
-    protected boolean isCollision(Circle circ, Rectangle rect) {
+    protected static boolean isCollision(Circle circ, Rectangle rect) {
         Polygon p = rectToPolygon(rect);
         float[] vertices = p.getTransformedVertices();
         Vector2 center = new Vector2(circ.x, circ.y);

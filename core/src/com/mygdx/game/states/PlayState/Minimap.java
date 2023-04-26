@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.enemies.Enemy;
 import com.mygdx.game.enemies.Minion;
+import com.mygdx.game.enemies.Runner;
 import com.mygdx.game.players.PlayerChampion;
 
 import java.util.List;
@@ -25,8 +26,11 @@ public class Minimap {
     // green square - player
     TextureRegion player;
 
-    // red square - enemy;
+    // red square - minion/troll
     TextureRegion enemy;
+
+    // gold square - runner
+    TextureRegion runner;
 
     private final OrthographicCamera minimapCamera;
 
@@ -44,9 +48,12 @@ public class Minimap {
 
         texture = new Texture(Gdx.files.internal("red_circle.png"));
         enemy = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 7, 7);
+
+        texture = new Texture(Gdx.files.internal("gold_circle.png"));
+        runner = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 7, 7);
     }
 
-    protected void draw(SpriteBatch spriteBatch, Viewport gameViewport, PlayerChampion player, List<Enemy> minions){
+    protected void draw(SpriteBatch spriteBatch, Viewport gameViewport, PlayerChampion player, List<Enemy> enemies){
         minimapViewport.apply();
         spriteBatch.setProjectionMatrix(minimapCamera.combined);
         spriteBatch.begin();
@@ -57,9 +64,14 @@ public class Minimap {
         drawCharacter(this.player, spriteBatch, playerWorldPosition.x, minimapHeight - playerWorldPosition.y);
 
         // calculate position and draw minions
-        for (Enemy minion : minions) {
-            Vector3 enemyWorldPosition = transformCoordinates(minion.getPosition(), gameViewport);
-            drawCharacter(this.enemy, spriteBatch, enemyWorldPosition.x, minimapHeight - enemyWorldPosition.y);
+        for (Enemy enemy : enemies) {
+            Vector3 enemyWorldPosition = transformCoordinates(enemy.getPosition(), gameViewport);
+            if(enemy instanceof Minion) {
+                drawCharacter(this.enemy, spriteBatch, enemyWorldPosition.x, minimapHeight - enemyWorldPosition.y);
+            } else if (enemy instanceof Runner) {
+                drawCharacter(this.runner, spriteBatch, enemyWorldPosition.x, minimapHeight - enemyWorldPosition.y);
+            }
+
         }
         spriteBatch.end();
     }

@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 
-public class MinionAnimation {
+public class EnemyAnimation {
     protected Animation<TextureRegion> animation;
     protected Texture texture;
 
-    protected MinionAnimation(String walkingTexturePath, float frameDuration, int nrOfFrames) {
+    protected EnemyAnimation(String walkingTexturePath, float frameDuration, int nrOfFrames) {
         this.texture = new Texture(walkingTexturePath);
         Array<TextureRegion> frames = new Array<>();
         int walkingFrameWidth = texture.getWidth() / nrOfFrames;

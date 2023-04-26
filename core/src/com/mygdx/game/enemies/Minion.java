@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.players.garen.Garen;
 
@@ -23,11 +22,11 @@ public class Minion extends Enemy {
         currentState = State.WALKING;
         idleTextureRegion = new TextureRegion(new Texture("assets/minion/minion_idle.png"));
         currentRegion = idleTextureRegion;
-        walkingAnimation = new MinionAnimation("assets/minion/minion_walk.png", 0.1f, 12);
-        walkingDamageAnimation = new MinionAnimation("assets/minion/minion_walk_damage.png", 0.1f, 12);
-        attackAnimation = new MinionAnimation("assets/minion/minion_attack.png", 0.12f, 7);
-        attackDamageAnimation = new MinionAnimation("assets/minion/minion_attack_damage.png", 0.12f, 7);
-        dyingAnimation = new MinionAnimation("assets/minion/minion_death.png", 0.07f, 4);
+        walkingAnimation = new EnemyAnimation("assets/minion/minion_walk.png", 0.1f, 12);
+        walkingDamageAnimation = new EnemyAnimation("assets/minion/minion_walk_damage.png", 0.1f, 12);
+        attackAnimation = new EnemyAnimation("assets/minion/minion_attack.png", 0.12f, 7);
+        attackDamageAnimation = new EnemyAnimation("assets/minion/minion_attack_damage.png", 0.12f, 7);
+        dyingAnimation = new EnemyAnimation("assets/minion/minion_death.png", 0.07f, 4);
     }
 
     @Override
@@ -42,7 +41,8 @@ public class Minion extends Enemy {
 
     @Override
     public void move(PlayerChampion player, List<Enemy> minions, float deltaTime) {
-        separation(getNearbyEnemies(minions));
+        separation(getNearbyEnemies(minions, false));
+        avoidRunner(getNearbyEnemies(minions, true), deltaTime);
         addBehavior(player, deltaTime);
     }
 
@@ -54,7 +54,7 @@ public class Minion extends Enemy {
             // apply flee steering behaviour if is W Invincibility
             if (garen.getState() == PlayerChampion.State.W && !garen.getWAnimation().isBurst(garen.getStateTimer(), false) && isCollision(garen.getInvincibilityRange(), enemyRectangle)) {
                 isInRange = false;
-                maxSpeed = 300;
+                maxSpeed = 450;
                 currentSteeringBehavior = flee(player.getPosition().cpy(), deltaTime);
                 maxSpeed = 150;
                 applySteeringBehaviour(currentSteeringBehavior);
@@ -79,6 +79,13 @@ public class Minion extends Enemy {
         if (enemyRectangle.overlaps(player.getPlayerRectangle())) {
             isInRange = true;
             noOverlappingWithPlayer(player);
+        }
+    }
+
+    private void avoidRunner(List<Enemy> runners, float deltaTime){
+        for(Enemy runner : runners){
+            currentSteeringBehavior = flee(runner.position.cpy(), deltaTime);
+            applySteeringBehaviour(currentSteeringBehavior);
         }
     }
 }

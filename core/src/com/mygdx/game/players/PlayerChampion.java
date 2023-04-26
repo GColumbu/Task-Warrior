@@ -37,6 +37,7 @@ public abstract class PlayerChampion {
     // collisions
     protected Rectangle playerRectangle;
     protected Circle forbiddenMinionSpawnRange;
+    protected Circle runnerBehaviorRange;
 
     // constructor
     public PlayerChampion(int x, int y, int speed, float health){
@@ -59,6 +60,9 @@ public abstract class PlayerChampion {
     }
     public void setForbiddenMinionSpawnRange(Circle forbiddenMinionSpawnRange) {
         this.forbiddenMinionSpawnRange = forbiddenMinionSpawnRange;
+    }
+    public void setRunnerBehaviorRange(Circle runnerBehaviorRange) {
+        this.runnerBehaviorRange = runnerBehaviorRange;
     }
         // used not to let the player advance when hitting a minion
     public void setPositionX(float position) {
@@ -135,6 +139,9 @@ public abstract class PlayerChampion {
     }
     public Circle getForbiddenMinionSpawnRange() {
         return forbiddenMinionSpawnRange;
+    }
+    public Circle getRunnerBehaviorRange() {
+        return runnerBehaviorRange;
     }
     // get player angle/orientation
     public float getHeading(){

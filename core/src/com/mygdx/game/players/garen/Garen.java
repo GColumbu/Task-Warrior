@@ -38,7 +38,9 @@ public class Garen extends PlayerChampion {
         setCurrentRegion(getCurrentFrame(deltaTime));
         setPlayerRectangle(new Rectangle(getIdleRelativePosition().x + 20, getIdleRelativePosition().y, getIdleTextureRegion().getRegionWidth() - 40, getIdleTextureRegion().getRegionHeight()));
         setForbiddenMinionSpawnRange(new Circle(position.x, position.y, 400));
-        wAnimation.setInvincibilityRange(new Circle(position.x, position.y, 275));
+        if(currentState == PlayerChampion.State.W && !wAnimation.isBurst(stateTimer,false))
+            wAnimation.setInvincibilityRange(new Circle(position.x, position.y, 275));
+        setRunnerBehaviorRange(new Circle(position.x, position.y, 800));
         movePlayer(deltaTime);
     }
 

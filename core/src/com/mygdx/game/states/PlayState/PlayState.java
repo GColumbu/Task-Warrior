@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.Enemy;
 import com.mygdx.game.enemies.Minion;
+import com.mygdx.game.enemies.Runner;
 import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.states.PlayState.UI.UserInterface;
@@ -21,6 +22,7 @@ import com.mygdx.game.states.PlayState.UI.UserInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.SplittableRandom;
 
 public class PlayState implements Screen {
 
@@ -37,7 +39,7 @@ public class PlayState implements Screen {
     private int nrOfMinions = 7;
 
     // game characters
-    private final List<Enemy> minions;
+    private final List<Enemy> enemies;
     private final PlayerChampion target;
     private final UserInterface userInterface;
     private final Minimap minimap;
@@ -52,9 +54,9 @@ public class PlayState implements Screen {
         background = new Texture("background.png");
         camera = new OrthographicCamera();
         camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
-        minions = new ArrayList<>();
+        enemies = new ArrayList<>();
         for(int i = 0; i < nrOfMinions; i++){
-            minions.add(new Minion(getRandomValue("x"), getRandomValue("y")));
+            enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
         target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
         shapeRenderer = new ShapeRenderer();
@@ -111,7 +113,7 @@ public class PlayState implements Screen {
         minimap.dispose();
         //dispose minions
         for(int i = 0; i < nrOfMinions; i++){
-            minions.get(i).getSprite().getTexture().dispose();
+            enemies.get(i).getSprite().getTexture().dispose();
         }
         //dispose player
         target.getSprite().getTexture().dispose();
@@ -123,16 +125,16 @@ public class PlayState implements Screen {
     private void update(float deltaTime) {
         target.update(deltaTime);
         for(int i = 0; i< nrOfMinions; i++){
-            minions.get(i).update(target, deltaTime);
-            if(minions.get(i).isDyingAnimationFinished()){
-                minions.get(i).getSprite().getTexture().dispose();
-                minions.remove(i);
+            enemies.get(i).update(target, deltaTime);
+            if(enemies.get(i).isDyingAnimationFinished()){
+                enemies.get(i).getSprite().getTexture().dispose();
+                enemies.remove(i);
                 nrOfMinions--;
                 i--;
             }
         }
         for(int i = 0; i< nrOfMinions; i++){
-            minions.get(i).move(target, minions, deltaTime);
+            enemies.get(i).move(target, enemies, deltaTime);
         }
         //showBorders();
         addMinion(target, deltaTime);
@@ -143,7 +145,7 @@ public class PlayState implements Screen {
         drawGameViewport();
 
         // minimap
-        minimap.draw(game.batch, minimapReference, target, minions);
+        minimap.draw(game.batch, minimapReference, target, enemies);
     }
 
     // draw method for game objects
@@ -161,11 +163,11 @@ public class PlayState implements Screen {
                 target.getSprite().getRegionHeight(), 1, 1,
                 target.getHeading());
         for(int i = 0; i< nrOfMinions; i++) {
-            game.batch.draw(minions.get(i).getSprite(), minions.get(i).getRelativePosition().x, minions.get(i).getRelativePosition().y,
-                    minions.get(i).getSprite().getRegionWidth()/ 2,
-                    minions.get(i).getSprite().getRegionHeight() / 2, minions.get(i).getSprite().getRegionWidth(),
-                    minions.get(i).getSprite().getRegionHeight(), 1, 1,
-                    minions.get(i).getHeading());
+            game.batch.draw(enemies.get(i).getSprite(), enemies.get(i).getRelativePosition().x, enemies.get(i).getRelativePosition().y,
+                    enemies.get(i).getSprite().getRegionWidth()/ 2,
+                    enemies.get(i).getSprite().getRegionHeight() / 2, enemies.get(i).getSprite().getRegionWidth(),
+                    enemies.get(i).getSprite().getRegionHeight(), 1, 1,
+                    enemies.get(i).getHeading());
         }
         userInterface.draw(game.batch, camera, target);
         shapeRenderer.end();
@@ -173,6 +175,16 @@ public class PlayState implements Screen {
     }
 
     // ENEMY SPAWNING METHODS
+    private Enemy getEnemy(int x, int y){
+        Random rand  = new Random();
+        int probability = rand.nextInt(1, 100);
+        if(probability >= 0 && probability < 80){
+            return new Minion(x, y);
+        } else if (probability >= 80){
+            return new Runner(x, y);
+        }
+        return null;
+    }
     private int getRandomValue(String axis){
         Random rand  = new Random();
         if(axis.equals("x")){
@@ -192,7 +204,7 @@ public class PlayState implements Screen {
             do{
                 newPosition = new Vector2(getRandomValue("x"), getRandomValue("y"));
             }while(player.getForbiddenMinionSpawnRange().contains(newPosition));
-            minions.add(new Minion((int)newPosition.x, (int)newPosition.y));
+            enemies.add(getEnemy((int)newPosition.x, (int)newPosition.y));
             spawnTimer = 0;
             nrOfMinions++;
         } else
@@ -228,8 +240,8 @@ public class PlayState implements Screen {
 
         // show borders for minions
         for(int i = 0; i < nrOfMinions; i++){
-            Rectangle minionRect = minions.get(i).getEnemyRectangle();
-            Circle minionRange = minions.get(i).getMinionSenseRange();
+            Rectangle minionRect = enemies.get(i).getEnemyRectangle();
+            Circle minionRange = enemies.get(i).getMinionSenseRange();
             shapeRenderer.setColor(Color.WHITE);
             shapeRenderer.rect(minionRect.getX(), minionRect.getY(), minionRect.getWidth(), minionRect.getHeight());
             shapeRenderer.setColor(Color.YELLOW);
@@ -258,6 +270,10 @@ public class PlayState implements Screen {
         // border for minion spawn
         shapeRenderer.setColor(Color.GREEN);
         shapeRenderer.circle(target.getForbiddenMinionSpawnRange().x, target.getForbiddenMinionSpawnRange().y, target.getForbiddenMinionSpawnRange().radius);
+
+        // border for runner behavior
+        shapeRenderer.setColor(Color.GOLD);
+        shapeRenderer.circle(target.getRunnerBehaviorRange().x, target.getRunnerBehaviorRange().y, target.getRunnerBehaviorRange().radius);
 
         if(target instanceof Garen){
             Garen garen = (Garen) target;
