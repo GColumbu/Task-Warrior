@@ -134,7 +134,7 @@ public class PlayState implements Screen {
         for(int i = 0; i< nrOfMinions; i++){
             minions.get(i).move(target, minions, deltaTime);
         }
-        showBorders();
+        //showBorders();
         addMinion(target, deltaTime);
     }
 
@@ -242,6 +242,7 @@ public class PlayState implements Screen {
         shapeRenderer.setColor(Color.WHITE);
         shapeRenderer.rect(target.getPlayerRectangle().getX(), target.getPlayerRectangle().getY(), target.getPlayerRectangle().getWidth(), target.getPlayerRectangle().getHeight());
 
+
         // border for champion ability
         shapeRenderer.setColor(Color.RED);
         if(target.getState() == PlayerChampion.State.E && target.isEAttackTiming(true)){
@@ -257,6 +258,14 @@ public class PlayState implements Screen {
         // border for minion spawn
         shapeRenderer.setColor(Color.GREEN);
         shapeRenderer.circle(target.getForbiddenMinionSpawnRange().x, target.getForbiddenMinionSpawnRange().y, target.getForbiddenMinionSpawnRange().radius);
+
+        if(target instanceof Garen){
+            Garen garen = (Garen) target;
+            if(garen.getState() == PlayerChampion.State.W && !garen.getWAnimation().isBurst(garen.getStateTimer(),false)){
+                shapeRenderer.setColor(Color.BLUE);
+                shapeRenderer.circle(garen.getInvincibilityRange().x, garen.getInvincibilityRange().y, garen.getInvincibilityRange().radius);
+            }
+        }
     }
 
     private void drawShape(Shape2D shape, ShapeRenderer shapeRenderer){

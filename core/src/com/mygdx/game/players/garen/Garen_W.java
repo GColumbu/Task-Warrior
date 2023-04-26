@@ -3,6 +3,7 @@ package com.mygdx.game.players.garen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.players.AttackAnimation;
 
@@ -25,6 +26,7 @@ public class Garen_W extends AttackAnimation {
     protected float wWalkingFrameDuration;
         //IDLE
     protected TextureRegion idleInvincibilityTextureRegion;
+    protected Circle invincibilityRange;
 
     protected Garen_W(String wBurstFilePath, String wWalkingFilePath, String wIdleTexture,  String wIconFilePath, float wBurstFrameDuration, float wWalkingFrameDuration) {
         cooldownDuration = COOLDOWN;
@@ -51,7 +53,7 @@ public class Garen_W extends AttackAnimation {
         attackIcon = new Texture(wIconFilePath);
         burstDuration = wBurstAnimation.getAnimationDuration();
     }
-
+    // GETTERS
     protected TextureRegion getBurstKeyFrame(float stateTimer){
         return wBurstAnimation.getKeyFrame(stateTimer, false);
     }
@@ -59,12 +61,19 @@ public class Garen_W extends AttackAnimation {
         return wWalkingAnimation.getKeyFrame(stateTimer, true);
     }
 
-    public boolean isBurst(float stateTimer, boolean forCollision){
-        if(forCollision)
+    public void setInvincibilityRange(Circle invincibilityRange) {
+        this.invincibilityRange = invincibilityRange;
+    }
+
+    // TIMING METHODS
+
+    public boolean isBurst(float stateTimer, boolean forDamage){
+        if(forDamage)
             return stateTimer > 6 * wBurstFrameDuration && stateTimer <= wBurstFrames * wBurstFrameDuration;
         return stateTimer <= wBurstFrames * wBurstFrameDuration;
     }
 
+    // OVERRIDE METHODS
     @Override
     public float getKeyFrameWidth(float stateTimer){
         return wBurstAnimation.getKeyFrame(stateTimer, false).getRegionWidth();

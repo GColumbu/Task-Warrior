@@ -38,6 +38,7 @@ public class Garen extends PlayerChampion {
         setCurrentRegion(getCurrentFrame(deltaTime));
         setPlayerRectangle(new Rectangle(getIdleRelativePosition().x + 20, getIdleRelativePosition().y, getIdleTextureRegion().getRegionWidth() - 40, getIdleTextureRegion().getRegionHeight()));
         setForbiddenMinionSpawnRange(new Circle(position.x, position.y, 400));
+        wAnimation.setInvincibilityRange(new Circle(position.x, position.y, 275));
         movePlayer(deltaTime);
     }
 
@@ -196,17 +197,17 @@ public class Garen extends PlayerChampion {
     public Shape2D getQAttackRange(){
         // duration and limit of first slash
         if(qAnimation.isFirstSlash(stateTimer)){
-            qAnimation.qAttackDamage = 1;
+            qAnimation.qAttackDamage = 5;
             return getQFirstPartAttackRange();
         }
         // duration and limit of the second (rotative) slash
         else if (qAnimation.isSecondSlash(stateTimer)){
-            qAnimation.qAttackDamage = 2;
+            qAnimation.qAttackDamage = 3;
             return getQSecondPartAttackRange();
         }
         // duration and limit of third slash
         else if (qAnimation.isThirdSlash(stateTimer)) {
-            qAnimation.qAttackDamage = 3;
+            qAnimation.qAttackDamage = 1.5f;
             return getQThirdPartAttackRange();
         }
         return null;
@@ -305,6 +306,12 @@ public class Garen extends PlayerChampion {
     // W spell
     protected Vector2 getWBurstRelativePosition() {
         return new Vector2(position.x - wAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - wAnimation.getKeyFrameHeight(stateTimer) / 2);
+    }
+    public Garen_W getWAnimation() {
+        return wAnimation;
+    }
+    public Circle getInvincibilityRange(){
+        return  wAnimation.invincibilityRange;
     }
     @Override
     public boolean isWAttackTiming(boolean forCollision){

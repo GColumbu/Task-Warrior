@@ -127,6 +127,9 @@ public abstract class PlayerChampion {
     public float getPreviousY() {
         return previousY;
     }
+    public float getStateTimer() {
+        return stateTimer;
+    }
     public Rectangle getPlayerRectangle() {
         return playerRectangle;
     }

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.players.PlayerChampion;
+import com.mygdx.game.players.garen.Garen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public abstract class Enemy {
     protected Vector2 relativePosition;
     protected Vector2 velocity;
     protected Vector2 separation;
+    protected Vector2 currentSteeringBehavior;
 
     // variables
     protected float maxSpeed;
@@ -192,7 +194,7 @@ public abstract class Enemy {
 
     // separation
         // get nearby enemies
-    private List<Enemy> getNearbyEnemies(List<Enemy> minions) {
+    protected List<Enemy> getNearbyEnemies(List<Enemy> minions) {
         List<Enemy> nearbyEnemies = new ArrayList<>();
         for (Enemy enemy : minions){ // allEnemies is a list of all enemies in the game
             if (enemy != this && minionSenseRange.contains(enemy.position)) {
@@ -202,7 +204,7 @@ public abstract class Enemy {
         return nearbyEnemies;
     }
         // add separation vectors for nearby enemies
-    private void separation(List<Enemy> nearbyEnemies) {
+    protected void separation(List<Enemy> nearbyEnemies) {
         separation = new Vector2(0,0);
         for (Enemy other : nearbyEnemies) {
             if (other != this) {
@@ -216,23 +218,9 @@ public abstract class Enemy {
     }
 
     // MOVEMENT METHODS
-    protected void moveAndRecognizeCollision(PlayerChampion player, Vector2 steeringBehaviour){
-        // apply steering behaviour if collision not detected
-        if(!enemyRectangle.overlaps(player.getPlayerRectangle())){
-            isInRange = false;
-            applySteeringBehaviour(steeringBehaviour);
-        }else{
-            isInRange = true;
-            noOverlappingWithPlayer(player);
-        }
-    }
-
     // move method called in update AFTER all the enemyRectangles are set
-    public void move(PlayerChampion player, List<Enemy> minions, float deltaTime){
-        separation(getNearbyEnemies(minions));
-        moveAndRecognizeCollision(player, pursue(player, deltaTime));
-    }
-
+    public abstract void move(PlayerChampion player, List<Enemy> minions, float deltaTime);
+    protected abstract void addBehavior(PlayerChampion player, float deltaTime);
     // applying steering behaviour
     protected void applySteeringBehaviour(Vector2 steering){
         velocity.add(steering);
@@ -240,6 +228,21 @@ public abstract class Enemy {
         applyVelocityAndRecognizeWalls(velocity);
         //subtract the separation in order for the heading to be steady
         velocity.sub(separation);
+    }
+
+    // make enemy recognize walls for steering behaviors
+    protected void applyVelocityAndRecognizeWalls(Vector2 velocity){
+        if(position.x > 0 && position.x < TaskWarrior.WIDTH - getSprite().getRegionWidth()) {
+            position.x += velocity.x;
+        } else if(position.x <= 0 && isLooking("right") || position.x >= TaskWarrior.WIDTH - getSprite().getRegionWidth() && isLooking("left")){
+            position.x += velocity.x;
+        }
+
+        if(position.y > 0 && position.y < TaskWarrior.HEIGHT - getSprite().getRegionHeight()){
+            position.y += velocity.y;
+        } else if(position.y <= 0 && isLooking("up") || position.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
+            position.y += velocity.y;
+        }
     }
 
     // don't allow player texture to go over the minion texture and push minion
@@ -256,21 +259,6 @@ public abstract class Enemy {
 
         if(yDifference < yDifferencePrevious){
             player.setPositionY(player.getPreviousY());
-        }
-    }
-
-    // make enemy recognize walls for steering behaviors
-    protected void applyVelocityAndRecognizeWalls(Vector2 velocity){
-        if(position.x > 0 && position.x < TaskWarrior.WIDTH - getSprite().getRegionWidth()) {
-            position.x += velocity.x;
-        } else if(position.x <= 0 && isLooking("right") || position.x >= TaskWarrior.WIDTH - getSprite().getRegionWidth() && isLooking("left")){
-            position.x += velocity.x;
-        }
-
-        if(position.y > 0 && position.y < TaskWarrior.HEIGHT - getSprite().getRegionHeight()){
-            position.y += velocity.y;
-        } else if(position.y <= 0 && isLooking("up") || position.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
-            position.y += velocity.y;
         }
     }
 
@@ -340,13 +328,13 @@ public abstract class Enemy {
     }
 
     // check if Polygon intersects Rectangle
-    private boolean isCollision(Polygon p, Rectangle r) {
+    protected boolean isCollision(Polygon p, Rectangle r) {
         Polygon rPoly = rectToPolygon(r);
         return Intersector.overlapConvexPolygons(rPoly, p);
     }
 
     // check if Circle intersects Rectangle
-    private boolean isCollision(Circle circ, Rectangle rect) {
+    protected boolean isCollision(Circle circ, Rectangle rect) {
         Polygon p = rectToPolygon(rect);
         float[] vertices = p.getTransformedVertices();
         Vector2 center = new Vector2(circ.x, circ.y);

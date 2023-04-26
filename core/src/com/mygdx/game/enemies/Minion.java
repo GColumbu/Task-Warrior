@@ -4,7 +4,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
+import com.mygdx.game.players.garen.Garen;
+
+import java.util.List;
 
 public class Minion extends Enemy {
     //constants TODO: maybe calculate them dynamically based on difficulty
@@ -31,10 +35,50 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(flee(player.getPosition().cpy(), deltaTime));
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
-        setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34 , getSprite().getRegionHeight()));
+        setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34, getSprite().getRegionHeight()));
         setMinionSenseRange(new Circle(position.x, position.y, 100));
         calculateDamage(player);
     }
 
+    @Override
+    public void move(PlayerChampion player, List<Enemy> minions, float deltaTime) {
+        separation(getNearbyEnemies(minions));
+        addBehavior(player, deltaTime);
+    }
 
+    @Override
+    protected void addBehavior(PlayerChampion player, float deltaTime) {
+        // garen custom behavior
+        if (player instanceof Garen) {
+            Garen garen = (Garen) player;
+            // apply flee steering behaviour if is W Invincibility
+            if (garen.getState() == PlayerChampion.State.W && !garen.getWAnimation().isBurst(garen.getStateTimer(), false) && isCollision(garen.getInvincibilityRange(), enemyRectangle)) {
+                isInRange = false;
+                maxSpeed = 300;
+                currentSteeringBehavior = flee(player.getPosition().cpy(), deltaTime);
+                maxSpeed = 150;
+                applySteeringBehaviour(currentSteeringBehavior);
+            }
+            // apply seek steering behaviour if collision not detected and is not W Invincibility
+            else if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {
+                isInRange = false;
+                currentSteeringBehavior = seek(player.getPosition().cpy(), deltaTime);
+                applySteeringBehaviour(currentSteeringBehavior);
+            }
+        }
+        else {
+            // apply seek steering behaviour if collision not detected
+            if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {
+                isInRange = false;
+                currentSteeringBehavior = seek(player.getPosition().cpy(), deltaTime);
+                applySteeringBehaviour(currentSteeringBehavior);
+            }
+        }
+
+        // don't let player overlap minion
+        if (enemyRectangle.overlaps(player.getPlayerRectangle())) {
+            isInRange = true;
+            noOverlappingWithPlayer(player);
+        }
+    }
 }
