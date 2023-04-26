@@ -22,11 +22,10 @@ import com.mygdx.game.states.PlayState.UI.UserInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.SplittableRandom;
 
 public class PlayState implements Screen {
 
-    private static final int ENEMY_SPAWN_FREQUENCY = 2;
+    private static final int ENEMY_SPAWN_FREQUENCY = 3;
 
     // game utils
     private final TaskWarrior game;
@@ -36,7 +35,7 @@ public class PlayState implements Screen {
     private final OrthographicCamera camera;
     private float spawnTimer;
     // INITIAL value of minions (after it increases by one every ENEMY_SPAWN_FREQUENCY seconds)
-    private int nrOfMinions = 7;
+    private int nrOfMinions = 5;
 
     // game characters
     private final List<Enemy> enemies;
@@ -51,7 +50,7 @@ public class PlayState implements Screen {
     public PlayState(TaskWarrior game){
         this.game = game;
         spawnTimer = 0;
-        background = new Texture("background.png");
+        background = new Texture("assets/play screen/background.png");
         camera = new OrthographicCamera();
         camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         enemies = new ArrayList<>();
@@ -60,10 +59,10 @@ public class PlayState implements Screen {
         }
         target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
         shapeRenderer = new ShapeRenderer();
-        userInterface = new UserInterface("assets/UI bar.png", target, camera);
+        userInterface = new UserInterface("assets/play screen/UI_template.png", target, camera);
         viewport = new ExtendViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT, camera);
         minimapReference = new FitViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
-        minimap = new Minimap(new Texture("minimap.png"));
+        minimap = new Minimap(new Texture("assets/play screen/minimap/minimap.png"));
         MyInputProcessor myInputProcessor = new MyInputProcessor(camera, target);
         Gdx.input.setInputProcessor(myInputProcessor);
     }

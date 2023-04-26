@@ -43,13 +43,13 @@ public class Minimap {
         minimapCamera = new OrthographicCamera(minimapWidth, minimapHeight);
         this.minimapViewport = new ScreenViewport(minimapCamera);
 
-        Texture texture = new Texture(Gdx.files.internal("green_circle.png"));
+        Texture texture = new Texture(Gdx.files.internal("assets/play screen/minimap/green_circle.png"));
         player = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 10, 10);
 
-        texture = new Texture(Gdx.files.internal("red_circle.png"));
+        texture = new Texture(Gdx.files.internal("assets/play screen/minimap/red_circle.png"));
         enemy = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 7, 7);
 
-        texture = new Texture(Gdx.files.internal("gold_circle.png"));
+        texture = new Texture(Gdx.files.internal("assets/play screen/minimap/gold_circle.png"));
         runner = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 7, 7);
     }
 

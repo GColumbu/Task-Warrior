@@ -17,14 +17,14 @@ public class Garen extends PlayerChampion {
 
     public Garen(int x, int y){
         super(x, y, 500, 200);
-        walkingAnimation = new WalkingAnimation("assets/garen/walk.png", 0.05f);
-        wAnimation = new Garen_W("assets/garen/invincibility_burst.png", "assets/garen/invincibility_walk.png", "assets/garen/idle_w.png", "assets/garen/w_icon.png", 0.07f, 0.05f);
+        walkingAnimation = new WalkingAnimation("assets/play screen/garen/walk.png", 0.05f);
+        wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f);
         wBasicAnimation = wAnimation;
-        qAnimation = new Garen_Q("assets/garen/slash_combo_part1.png", "assets/garen/slash_combo_part2.png", "assets/garen/q_icon.png",0.07f);
+        qAnimation = new Garen_Q("assets/play screen/garen/slash_combo_part1.png", "assets/play screen/garen/slash_combo_part2.png", "assets/play screen/garen/q_icon.png",0.07f);
         qBasicAnimation = qAnimation;
-        eAnimation = new Garen_E("assets/garen/spin.png", "assets/garen/e_icon.png", 0.1f, 0.05f);
+        eAnimation = new Garen_E("assets/play screen/garen/spin.png", "assets/play screen/garen/e_icon.png", 0.1f, 0.05f);
         eBasicAnimation = eAnimation;
-        idleTextureRegion = new TextureRegion(new Texture("assets/garen/idle.png"));
+        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/garen/idle.png"));
         currentRegion = idleTextureRegion;
         currentState = State.STANDING;
         stateTimer = 0;

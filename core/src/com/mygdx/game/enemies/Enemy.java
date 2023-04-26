@@ -271,13 +271,13 @@ public abstract class Enemy {
     }
 
     // DAMAGE METHODS
-    protected void calculateDamage(PlayerChampion player) {
-        calculateDamageFromMinions(player);
+    protected void calculateDamage(PlayerChampion player, int damageFrame) {
+        calculateDamageFromMinions(player, damageFrame);
         calculateDamageToMinions(player);
     }
 
-    private void calculateDamageFromMinions(PlayerChampion player){
-        if(currentState == State.ATTACK){
+    private void calculateDamageFromMinions(PlayerChampion player, int damageFrame){
+        if(currentState == State.ATTACK && attackAnimation.getKeyFrameIndex(stateTimer) == damageFrame){
             player.decrementHealth(damage);
         }
     }
