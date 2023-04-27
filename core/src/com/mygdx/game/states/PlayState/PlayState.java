@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.Enemy;
 import com.mygdx.game.enemies.Minion;
+import com.mygdx.game.enemies.Potion;
 import com.mygdx.game.enemies.Runner;
 import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
@@ -34,14 +35,13 @@ public class PlayState implements Screen {
     protected Viewport minimapReference;
     private final OrthographicCamera camera;
     private float spawnTimer;
-    // INITIAL value of minions (after it increases by one every ENEMY_SPAWN_FREQUENCY seconds)
-    private int nrOfMinions = 5;
 
     // game characters
-    private final List<Enemy> enemies;
+    private List<Enemy> enemies;
+    private List<Potion> potions;
     private final PlayerChampion target;
-    private final UserInterface userInterface;
-    private final Minimap minimap;
+    private UserInterface userInterface;
+    private Minimap minimap;
 
     // shape renderer for debug purposes
     ShapeRenderer shapeRenderer;
@@ -54,9 +54,10 @@ public class PlayState implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         enemies = new ArrayList<>();
-        for(int i = 0; i < nrOfMinions; i++){
+        for(int i = 0; i < 5; i++){
             enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
+        potions = new ArrayList<>();
         target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
         shapeRenderer = new ShapeRenderer();
         userInterface = new UserInterface("assets/play screen/UI_template.png", target, camera);
@@ -111,7 +112,7 @@ public class PlayState implements Screen {
         //dispose minimap
         minimap.dispose();
         //dispose minions
-        for(int i = 0; i < nrOfMinions; i++){
+        for(int i = 0; i < enemies.size(); i++){
             enemies.get(i).getSprite().getTexture().dispose();
         }
         //dispose player
@@ -123,17 +124,28 @@ public class PlayState implements Screen {
 
     private void update(float deltaTime) {
         target.update(deltaTime);
-        for(int i = 0; i< nrOfMinions; i++){
+        for(int i = 0; i< enemies.size(); i++){
             enemies.get(i).update(target, deltaTime);
             if(enemies.get(i).isDyingAnimationFinished()){
                 enemies.get(i).getSprite().getTexture().dispose();
+                if(enemies.get(i) instanceof Runner) {
+                    Random rd = new Random();
+                    potions.add(new Potion(rd.nextBoolean(), enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15));
+                }
                 enemies.remove(i);
-                nrOfMinions--;
                 i--;
             }
         }
-        for(int i = 0; i< nrOfMinions; i++){
+        for(int i = 0; i< enemies.size(); i++){
             enemies.get(i).move(target, enemies, deltaTime);
+        }
+        for(int i = 0; i< potions.size(); i++) {
+            if (target.getPlayerRectangle().overlaps(potions.get(i).getBounds())){
+                if(!potions.get(i).isArmor()){
+                    target.incrementHealth(potions.get(i).getHealing());
+                }
+                potions.remove(i);
+            }
         }
         //showBorders();
         addMinion(target, deltaTime);
@@ -161,12 +173,15 @@ public class PlayState implements Screen {
                 target.getSprite().getRegionHeight() / 2, target.getSprite().getRegionWidth(),
                 target.getSprite().getRegionHeight(), 1, 1,
                 target.getHeading());
-        for(int i = 0; i< nrOfMinions; i++) {
+        for(int i = 0; i< enemies.size(); i++) {
             game.batch.draw(enemies.get(i).getSprite(), enemies.get(i).getRelativePosition().x, enemies.get(i).getRelativePosition().y,
                     enemies.get(i).getSprite().getRegionWidth()/ 2,
                     enemies.get(i).getSprite().getRegionHeight() / 2, enemies.get(i).getSprite().getRegionWidth(),
                     enemies.get(i).getSprite().getRegionHeight(), 1, 1,
                     enemies.get(i).getHeading());
+        }
+        for(int i = 0; i< potions.size(); i++){
+            potions.get(i).draw(game.batch);
         }
         userInterface.draw(game.batch, camera, target);
         shapeRenderer.end();
@@ -205,7 +220,6 @@ public class PlayState implements Screen {
             }while(player.getForbiddenMinionSpawnRange().contains(newPosition));
             enemies.add(getEnemy((int)newPosition.x, (int)newPosition.y));
             spawnTimer = 0;
-            nrOfMinions++;
         } else
             spawnTimer += deltaTime;
     }
@@ -238,7 +252,7 @@ public class PlayState implements Screen {
         showBordersForChampion(shapeRenderer, target);
 
         // show borders for minions
-        for(int i = 0; i < nrOfMinions; i++){
+        for(int i = 0; i < enemies.size(); i++){
             Rectangle minionRect = enemies.get(i).getEnemyRectangle();
             Circle minionRange = enemies.get(i).getMinionSenseRange();
             shapeRenderer.setColor(Color.WHITE);
