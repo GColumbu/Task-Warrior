@@ -54,7 +54,8 @@ public class PlayState implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         enemies = new ArrayList<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 1; i++){
+            //enemies.add(new Runner(getRandomValue("x"), getRandomValue("y")));
             enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
         potions = new ArrayList<>();
@@ -147,7 +148,7 @@ public class PlayState implements Screen {
                 potions.remove(i);
             }
         }
-        //showBorders();
+        showBorders();
         addMinion(target, deltaTime);
     }
 
@@ -173,15 +174,15 @@ public class PlayState implements Screen {
                 target.getSprite().getRegionHeight() / 2, target.getSprite().getRegionWidth(),
                 target.getSprite().getRegionHeight(), 1, 1,
                 target.getHeading());
+        for(int i = 0; i< potions.size(); i++){
+            potions.get(i).draw(game.batch);
+        }
         for(int i = 0; i< enemies.size(); i++) {
             game.batch.draw(enemies.get(i).getSprite(), enemies.get(i).getRelativePosition().x, enemies.get(i).getRelativePosition().y,
                     enemies.get(i).getSprite().getRegionWidth()/ 2,
                     enemies.get(i).getSprite().getRegionHeight() / 2, enemies.get(i).getSprite().getRegionWidth(),
                     enemies.get(i).getSprite().getRegionHeight(), 1, 1,
                     enemies.get(i).getHeading());
-        }
-        for(int i = 0; i< potions.size(); i++){
-            potions.get(i).draw(game.batch);
         }
         userInterface.draw(game.batch, camera, target);
         shapeRenderer.end();

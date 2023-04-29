@@ -8,6 +8,9 @@ import com.mygdx.game.players.PlayerChampion;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 public abstract class Enemy {
     // vectors
     protected Vector2 position;
@@ -191,6 +194,21 @@ public abstract class Enemy {
         float predictionLength = position.dst(target);
         target.add(velocity.scl(predictionLength*deltaTime)); //make prediction based on distance
         return flee(target, deltaTime);
+    }
+
+    //wander
+    protected Vector2 wander(float deltaTime){
+        Vector2 wanderPoint = velocity.cpy();
+        wanderPoint.limit(100);
+        wanderPoint.add(position);
+        float theta = (float)Math.PI/4 + velocity.angleDeg();
+        int wanderRadius = 50;
+        double x = wanderRadius * cos(theta);
+        double y = wanderRadius * sin(theta);
+        wanderPoint.add((float)x, (float)y);
+        Vector2 steering = wanderPoint.sub(position);
+        steering.limit(1);
+        return steering;
     }
 
     // separation

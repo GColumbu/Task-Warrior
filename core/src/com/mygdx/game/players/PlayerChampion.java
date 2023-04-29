@@ -111,7 +111,7 @@ public abstract class PlayerChampion {
     }
     public void incrementHealth(float healing){
         if(health != getMaxHealth())
-        health += healing;
+            health += healing;
     }
     public abstract float getMaxHealth();
     public float getHealth() {

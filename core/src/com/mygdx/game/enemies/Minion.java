@@ -24,8 +24,8 @@ public class Minion extends Enemy {
         currentRegion = idleTextureRegion;
         walkingAnimation = new EnemyAnimation("assets/play screen/minion/minion_walk.png", 0.1f, 12);
         walkingDamageAnimation = new EnemyAnimation("assets/play screen/minion/minion_walk_damage.png", 0.1f, 12);
-        attackAnimation = new EnemyAnimation("assets/play screen/minion/minion_attack.png", 0.12f, 7);
-        attackDamageAnimation = new EnemyAnimation("assets/play screen/minion/minion_attack_damage.png", 0.12f, 7);
+        attackAnimation = new EnemyAnimation("assets/play screen/minion/minion_attack.png", 0.08f, 7);
+        attackDamageAnimation = new EnemyAnimation("assets/play screen/minion/minion_attack_damage.png", 0.08f, 7);
         dyingAnimation = new EnemyAnimation("assets/play screen/minion/minion_death.png", 0.07f, 4);
     }
 
