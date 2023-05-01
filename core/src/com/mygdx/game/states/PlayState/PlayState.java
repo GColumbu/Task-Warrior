@@ -26,7 +26,7 @@ import java.util.Random;
 
 public class PlayState implements Screen {
 
-    private static final int ENEMY_SPAWN_FREQUENCY = 3;
+    private static final int ENEMY_SPAWN_FREQUENCY = 2;
 
     // game utils
     private final TaskWarrior game;
@@ -54,8 +54,7 @@ public class PlayState implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         enemies = new ArrayList<>();
-        for(int i = 0; i < 1; i++){
-            //enemies.add(new Runner(getRandomValue("x"), getRandomValue("y")));
+        for(int i = 0; i < 6; i++){
             enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
         potions = new ArrayList<>();
@@ -148,7 +147,7 @@ public class PlayState implements Screen {
                 potions.remove(i);
             }
         }
-        showBorders();
+        //showBorders();
         addMinion(target, deltaTime);
     }
 

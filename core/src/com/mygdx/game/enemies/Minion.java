@@ -1,5 +1,6 @@
 package com.mygdx.game.enemies;
 
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
@@ -56,14 +57,14 @@ public class Minion extends Enemy {
                 isInRange = false;
                 maxSpeed = 450;
                 currentSteeringBehavior = flee(player.getPosition().cpy(), deltaTime);
+                applySteeringBehaviour(currentSteeringBehavior, deltaTime);
                 maxSpeed = 150;
-                applySteeringBehaviour(currentSteeringBehavior);
             }
             // apply seek steering behaviour if collision not detected and is not W Invincibility
             else if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {
                 isInRange = false;
                 currentSteeringBehavior = seek(player.getPosition().cpy(), deltaTime);
-                applySteeringBehaviour(currentSteeringBehavior);
+                applySteeringBehaviour(currentSteeringBehavior, deltaTime);
             }
         }
         else {
@@ -71,7 +72,7 @@ public class Minion extends Enemy {
             if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {
                 isInRange = false;
                 currentSteeringBehavior = seek(player.getPosition().cpy(), deltaTime);
-                applySteeringBehaviour(currentSteeringBehavior);
+                applySteeringBehaviour(currentSteeringBehavior, deltaTime);
             }
         }
 
@@ -85,7 +86,7 @@ public class Minion extends Enemy {
     private void avoidRunner(List<Enemy> runners, float deltaTime){
         for(Enemy runner : runners){
             currentSteeringBehavior = flee(runner.position.cpy(), deltaTime);
-            applySteeringBehaviour(currentSteeringBehavior);
+            applySteeringBehaviour(currentSteeringBehavior, deltaTime);
         }
     }
 }

@@ -7,16 +7,13 @@ import com.mygdx.game.players.PlayerChampion;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
+import java.util.Random;
 
 public abstract class Enemy {
     // vectors
     protected Vector2 position;
     protected Vector2 relativePosition;
     protected Vector2 velocity;
-    protected Vector2 previousMovingVelocity;
     protected Vector2 separation;
     protected Vector2 currentSteeringBehavior;
 
@@ -26,6 +23,7 @@ public abstract class Enemy {
     protected float health;
     protected float damage;
     protected boolean isAttacked;
+    protected float wanderAngle;
 
     // minion states
     protected enum State {WALKING, ATTACK, DEAD};
@@ -51,13 +49,13 @@ public abstract class Enemy {
     public Enemy(int x, int y, float maxSpeed, float maxForce, float health, float damage){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
-        velocity = new Vector2(0, 0);
-        previousMovingVelocity = new Vector2(0, 0);
+        velocity = new Vector2(1, 0);
         this.maxSpeed = maxSpeed;
         this.maxForce = maxForce;
         this.health = health;
         this.isAttacked = false;
         this.damage = damage;
+        this.wanderAngle = 0f;
     }
 
     public abstract void update(PlayerChampion player, float deltaTime);
@@ -129,10 +127,7 @@ public abstract class Enemy {
         return minionSenseRange;
     }
     public float getHeading(){
-        if(!velocity.equals(Vector2.Zero))
-            return velocity.angleDeg();
-        // if player not moving use the last velocity to keep the player oriented in the last direction
-        return previousMovingVelocity.angleDeg();
+        return velocity.angleDeg();
     }
     public Vector2 getRelativePosition() {
         return relativePosition;
@@ -196,18 +191,30 @@ public abstract class Enemy {
         return flee(target, deltaTime);
     }
 
-    //wander
+    // wander
+        // get random number in range
+    private float getRandom(float range){
+        return (float)(Math.random() * 2 * range) - range;
+    }
     protected Vector2 wander(float deltaTime){
-        Vector2 wanderPoint = velocity.cpy();
-        wanderPoint.limit(100);
-        wanderPoint.add(position);
-        float theta = (float)Math.PI/4 + velocity.angleDeg();
         int wanderRadius = 50;
-        double x = wanderRadius * cos(theta);
-        double y = wanderRadius * sin(theta);
-        wanderPoint.add((float)x, (float)y);
+        double theta = Math.toRadians(wanderAngle) + Math.toRadians(velocity.angleDeg());
+        //project the velocity
+        Vector2 wanderPoint = velocity.cpy();
+        wanderPoint.setLength(100);
+        wanderPoint.add(position);
+
+        // calculate coordinates constrained in the wanderRadius radius circle
+        float x = wanderRadius * (float)Math.cos(theta);
+        float y = wanderRadius * (float)Math.sin(theta);
+        wanderPoint.add(x, y);
+
+        // calculate the steering force
         Vector2 steering = wanderPoint.sub(position);
-        steering.limit(1);
+        steering.setLength(deltaTime* maxForce);
+
+        // adding to the wander angle
+        wanderAngle += getRandom(15);
         return steering;
     }
 
@@ -248,8 +255,9 @@ public abstract class Enemy {
     public abstract void move(PlayerChampion player, List<Enemy> minions, float deltaTime);
     protected abstract void addBehavior(PlayerChampion player, float deltaTime);
     // applying steering behaviour
-    protected void applySteeringBehaviour(Vector2 steering){
+    protected void applySteeringBehaviour(Vector2 steering, float deltaTime){
         velocity.add(steering);
+        velocity.limit(maxSpeed * deltaTime);
         velocity.add(separation);
         applyVelocityAndRecognizeWalls(velocity);
         //subtract the separation in order for the heading to be steady

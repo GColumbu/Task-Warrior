@@ -4,14 +4,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
 
 import java.util.List;
 
 public class Runner extends Enemy{
     private final static int RUNNER_MAX_SPEED = 300;
-    private final static int RUNNER_MAX_FORCE = 100;
+    private final static int RUNNER_MAX_FORCE = 20;
     private final static int RUNNER_HEALTH = 300;
     private final static float RUNNER_DAMAGE = 0F;
     public Runner(int x, int y){
@@ -36,11 +35,6 @@ public class Runner extends Enemy{
     public void move(PlayerChampion player, List<Enemy> minions, float deltaTime) {
         separation(getNearbyEnemies(minions, false));
         addBehavior(player, deltaTime);
-
-        // if runner is not moving record the last moving velocity
-        if(!velocity.equals(Vector2.Zero)){
-            previousMovingVelocity = velocity;
-        }
     }
 
     @Override
@@ -51,8 +45,7 @@ public class Runner extends Enemy{
             if(isCollision(player.getRunnerBehaviorRange(), enemyRectangle))
                 currentSteeringBehavior = flee(player.getPosition().cpy(), deltaTime);
             else {
-                velocity = new Vector2(0, 0);
-                currentSteeringBehavior = new Vector2(0, 0);
+                currentSteeringBehavior = wander(deltaTime);
             }
             isInRange = false;
         }
@@ -61,6 +54,6 @@ public class Runner extends Enemy{
             isInRange = false;
             noOverlappingWithPlayer(player);
         }
-        applySteeringBehaviour(currentSteeringBehavior);
+        applySteeringBehaviour(currentSteeringBehavior, deltaTime);
     }
 }
