@@ -18,7 +18,16 @@ public abstract class PlayerChampion {
     protected float previousX;
     protected float previousY;
     protected int speed;
+
+        // health and armor variables
     protected float health;
+    protected float maxHealth;
+    protected float armor;
+    protected float maxArmor;
+    protected float armorEffectiveness;
+    protected float armorStateTimer;
+    protected float armorDuration;
+    protected float armorIncreaseRate;
 
     // player states
     public enum State {STANDING, WALKING, Q, E, W}
@@ -40,13 +49,20 @@ public abstract class PlayerChampion {
     protected Circle runnerBehaviorRange;
 
     // constructor
-    public PlayerChampion(int x, int y, int speed, float health){
+    public PlayerChampion(int x, int y, int speed, float maxHealth, float maxArmor, float armorEffectiveness, float armorDuration, float armorIncreaseRate){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
         velocity = new Vector2(0, 0);
         previousMovingVelocity = new Vector2(0, 0);
         this.speed = speed;
-        this.health = health;
+        this.maxHealth = maxHealth;
+        this.health = this.maxHealth;
+        this.maxArmor = maxArmor;
+        this.armor = this.maxArmor;
+        this.armorEffectiveness = armorEffectiveness;
+        this.armorStateTimer = 0;
+        this.armorDuration = armorDuration;
+        this.armorIncreaseRate = armorIncreaseRate;
     }
 
     public abstract void update(float deltaTime);
@@ -106,16 +122,13 @@ public abstract class PlayerChampion {
     public abstract boolean isEAttackTiming(boolean forCollision);
 
     // getters
-    public void decrementHealth(float damage){
-        health -= damage;
-    }
-    public void incrementHealth(float healing){
-        if(health != getMaxHealth())
-            health += healing;
-    }
-    public abstract float getMaxHealth();
+    public float getMaxHealth(){return maxHealth; }
+    public float getMaxArmor(){return maxArmor; }
     public float getHealth() {
         return health;
+    }
+    public float getArmor() {
+        return armor;
     }
     public Vector2 getPosition() {
         return position;
@@ -287,4 +300,38 @@ public abstract class PlayerChampion {
         }
         return true;
     }
+
+    // HEALTH/ARMOR METHODS
+    public void incrementHealth(float healing){
+        if(health != maxHealth)
+            health += healing;
+    }
+
+    public void incrementArmor(float healing){
+        if(armor != maxArmor)
+            armor += healing;
+    }
+
+    public void calculateDamage(float totalDamage){
+        float armorDamage = (armorEffectiveness/100) * totalDamage;
+        float healthDamage = totalDamage - armorDamage;
+        armor -= armorDamage;
+        health -= healthDamage;
+    }
+
+    protected void updateArmor(float deltaTime){
+        // update "armorStateTimer" based on if the player is taking damage or not
+        if(armorStateTimer < armorDuration)
+            armorStateTimer += deltaTime;
+
+        // increase armor if player didn't take damage for more than "armorDuration" seconds
+        if(armorStateTimer >= armorDuration && armor < maxArmor){
+            armor += armorIncreaseRate;
+        }
+    }
+
+    public void resetArmorStateTimer(){
+        armorStateTimer = 0;
+    }
+
 }

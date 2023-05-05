@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -13,6 +11,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.enemies.Enemy;
 import com.mygdx.game.enemies.Minion;
 import com.mygdx.game.enemies.Runner;
+import com.mygdx.game.enemies.Troll;
 import com.mygdx.game.players.PlayerChampion;
 
 import java.util.List;
@@ -26,8 +25,11 @@ public class Minimap {
     // green square - player
     TextureRegion player;
 
-    // red square - minion/troll
-    TextureRegion enemy;
+    // red square - minion - 7 x 7
+    TextureRegion minion;
+
+    // red square - troll - 10 x 10
+    TextureRegion troll;
 
     // gold square - runner
     TextureRegion runner;
@@ -47,7 +49,8 @@ public class Minimap {
         player = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 10, 10);
 
         texture = new Texture(Gdx.files.internal("assets/play screen/minimap/red_circle.png"));
-        enemy = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 7, 7);
+        minion = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 7, 7);
+        troll = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 10, 10);
 
         texture = new Texture(Gdx.files.internal("assets/play screen/minimap/gold_circle.png"));
         runner = new TextureRegion(texture, texture.getWidth()/2, texture.getHeight()/2, 7, 7);
@@ -67,11 +70,12 @@ public class Minimap {
         for (Enemy enemy : enemies) {
             Vector3 enemyWorldPosition = transformCoordinates(enemy.getPosition(), gameViewport);
             if(enemy instanceof Minion) {
-                drawCharacter(this.enemy, spriteBatch, enemyWorldPosition.x, minimapHeight - enemyWorldPosition.y);
+                drawCharacter(this.minion, spriteBatch, enemyWorldPosition.x, minimapHeight - enemyWorldPosition.y);
             } else if (enemy instanceof Runner) {
                 drawCharacter(this.runner, spriteBatch, enemyWorldPosition.x, minimapHeight - enemyWorldPosition.y);
+            } else if (enemy instanceof Troll) {
+                drawCharacter(this.troll, spriteBatch, enemyWorldPosition.x, minimapHeight - enemyWorldPosition.y);
             }
-
         }
         spriteBatch.end();
     }
@@ -95,7 +99,7 @@ public class Minimap {
 
     protected void dispose(){
         minimap.dispose();
-        enemy.getTexture().dispose();
+        minion.getTexture().dispose();
         player.getTexture().dispose();
     }
 }

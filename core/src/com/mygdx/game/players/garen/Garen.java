@@ -10,13 +10,12 @@ import com.mygdx.game.players.*;
 
 
 public class Garen extends PlayerChampion {
-    public final float MAX_HEALTH = 200f; // TO MATCH WITH THE ONE IN CONSTRUCTOR
     protected Garen_W wAnimation;
     protected Garen_Q qAnimation;
     protected Garen_E eAnimation;
 
     public Garen(int x, int y){
-        super(x, y, 500, 200);
+        super(x, y, 500, 200, 100, 50, 3, 0.05f);
         walkingAnimation = new WalkingAnimation("assets/play screen/garen/walk.png", 0.05f);
         wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f);
         wBasicAnimation = wAnimation;
@@ -42,11 +41,7 @@ public class Garen extends PlayerChampion {
             wAnimation.setInvincibilityRange(new Circle(position.x, position.y, 275));
         setRunnerBehaviorRange(new Circle(position.x, position.y, 450));
         movePlayer(deltaTime);
-    }
-
-    @Override
-    public float getMaxHealth() {
-        return MAX_HEALTH;
+        updateArmor(deltaTime);
     }
 
     // calculates where the draw function should start based on the current state

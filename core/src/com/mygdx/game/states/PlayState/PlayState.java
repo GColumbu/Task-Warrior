@@ -12,10 +12,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.TaskWarrior;
-import com.mygdx.game.enemies.Enemy;
-import com.mygdx.game.enemies.Minion;
-import com.mygdx.game.enemies.Potion;
-import com.mygdx.game.enemies.Runner;
+import com.mygdx.game.enemies.*;
 import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.states.PlayState.UI.UserInterface;
@@ -54,7 +51,8 @@ public class PlayState implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         enemies = new ArrayList<>();
-        for(int i = 0; i < 6; i++){
+        for(int i = 0; i < 5; i++){
+            //enemies.add(new Troll(getRandomValue("x"), getRandomValue("y")));
             enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
         potions = new ArrayList<>();
@@ -143,6 +141,8 @@ public class PlayState implements Screen {
             if (target.getPlayerRectangle().overlaps(potions.get(i).getBounds())){
                 if(!potions.get(i).isArmor()){
                     target.incrementHealth(potions.get(i).getHealing());
+                } else {
+                    target.incrementArmor(potions.get(i).getHealing());
                 }
                 potions.remove(i);
             }
@@ -176,7 +176,7 @@ public class PlayState implements Screen {
         for(int i = 0; i< potions.size(); i++){
             potions.get(i).draw(game.batch);
         }
-        for(int i = 0; i< enemies.size(); i++) {
+        for(int i = 0; i < enemies.size(); i++) {
             game.batch.draw(enemies.get(i).getSprite(), enemies.get(i).getRelativePosition().x, enemies.get(i).getRelativePosition().y,
                     enemies.get(i).getSprite().getRegionWidth()/ 2,
                     enemies.get(i).getSprite().getRegionHeight() / 2, enemies.get(i).getSprite().getRegionWidth(),
@@ -253,12 +253,34 @@ public class PlayState implements Screen {
 
         // show borders for minions
         for(int i = 0; i < enemies.size(); i++){
-            Rectangle minionRect = enemies.get(i).getEnemyRectangle();
-            Circle minionRange = enemies.get(i).getMinionSenseRange();
-            shapeRenderer.setColor(Color.WHITE);
-            shapeRenderer.rect(minionRect.getX(), minionRect.getY(), minionRect.getWidth(), minionRect.getHeight());
+            Rectangle enemyRect = enemies.get(i).getEnemyRectangle();
+            Circle enemyRange = enemies.get(i).getEnemySenseRange();
+            Shape2D enemyAttack = enemies.get(i).getAttackRange();
+            if(enemies.get(i).getCurrentState() != Enemy.State.ATTACK) {
+                shapeRenderer.setColor(Color.WHITE);
+                shapeRenderer.rect(enemyRect.getX(), enemyRect.getY(), enemyRect.getWidth(), enemyRect.getHeight());
+            }
+            if (enemies.get(i).getCurrentState() == Enemy.State.ATTACK){
+                shapeRenderer.setColor(Color.RED);
+                drawShape(enemyAttack, shapeRenderer);
+            }
             shapeRenderer.setColor(Color.YELLOW);
-            shapeRenderer.circle(minionRange.x, minionRange.y, minionRange.radius);
+            shapeRenderer.circle(enemyRange.x, enemyRange.y, enemyRange.radius);
+
+            // troll specific behavior
+            if(enemies.get(i) instanceof Troll){
+                Circle trollCharge = ((Troll) enemies.get(i)).getTrollChargeRange();
+                shapeRenderer.setColor(Color.FIREBRICK);
+                shapeRenderer.circle(trollCharge.x, trollCharge.y, trollCharge.radius);
+            }
+        }
+
+        // show border for potions
+        for(int i = 0; i < potions.size(); i++){
+            Rectangle potionRect = potions.get(i).getBounds();
+            shapeRenderer.setColor(Color.WHITE);
+            shapeRenderer.rect(potionRect.getX(), potionRect.getY(), potionRect.getWidth(), potionRect.getHeight());
+
         }
     }
 

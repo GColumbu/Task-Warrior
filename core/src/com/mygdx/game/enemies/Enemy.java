@@ -7,7 +7,6 @@ import com.mygdx.game.players.PlayerChampion;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public abstract class Enemy {
     // vectors
@@ -26,7 +25,7 @@ public abstract class Enemy {
     protected float wanderAngle;
 
     // minion states
-    protected enum State {WALKING, ATTACK, DEAD};
+    public enum State {WALKING, ATTACK, DEAD};
     protected boolean isInRange = false;
     protected State currentState;
     protected State previousState;
@@ -41,12 +40,16 @@ public abstract class Enemy {
     protected EnemyAnimation attackDamageAnimation;
     protected EnemyAnimation dyingAnimation;
 
+    // attack cooldown
+    protected float cooldownStateTimer;
+    protected float cooldownDuration;
+
     // collisions
     protected Rectangle enemyRectangle;
-    protected Circle minionSenseRange;
+    protected Circle enemySenseRange;
 
     // constructor
-    public Enemy(int x, int y, float maxSpeed, float maxForce, float health, float damage){
+    public Enemy(int x, int y, float maxSpeed, float maxForce, float health, float damage, float cooldownDuration){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
         velocity = new Vector2(1, 0);
@@ -56,6 +59,8 @@ public abstract class Enemy {
         this.isAttacked = false;
         this.damage = damage;
         this.wanderAngle = 0f;
+        this.cooldownDuration = cooldownDuration;
+        this.cooldownStateTimer = this.cooldownDuration;
     }
 
     public abstract void update(PlayerChampion player, float deltaTime);
@@ -74,7 +79,6 @@ public abstract class Enemy {
         return new Vector2(position.x - dyingAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - dyingAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
     protected TextureRegion getFrame(float deltaTime){
-        currentState = getState();
         TextureRegion region;
         switch(currentState) {
             case ATTACK:
@@ -97,6 +101,16 @@ public abstract class Enemy {
                 relativePosition = getWalkingRelativePosition();
                 break;
         }
+
+        // add cooldown logic
+        if(previousState != State.ATTACK && currentState == State.ATTACK) {
+            cooldownStateTimer = 0;
+        }
+        else {
+            if(cooldownStateTimer < cooldownDuration)
+                cooldownStateTimer += deltaTime;
+        }
+
         if (previousState == currentState){
             stateTimer += deltaTime;
         } else
@@ -104,27 +118,20 @@ public abstract class Enemy {
         previousState = currentState;
         return region;
     }
-    private State getState(){
-        if(health <= 0){
-            return State.DEAD;
-        }
-        if(isInRange){
-            return State.ATTACK;
-        }
-        relativePosition = getWalkingRelativePosition();
-        return State.WALKING;
-    }
     public Vector2 getPosition() {
         return position;
     }
     public TextureRegion getSprite(){
         return currentRegion;
     }
+    public State getCurrentState() {
+        return currentState;
+    }
     public Rectangle getEnemyRectangle() {
         return enemyRectangle;
     }
-    public Circle getMinionSenseRange() {
-        return minionSenseRange;
+    public Circle getEnemySenseRange() {
+        return enemySenseRange;
     }
     public float getHeading(){
         return velocity.angleDeg();
@@ -135,8 +142,8 @@ public abstract class Enemy {
     public void setEnemyRectangle(Rectangle enemyRectangle) {
         this.enemyRectangle = enemyRectangle;
     }
-    public void setMinionSenseRange(Circle minionSenseRange) {
-        this.minionSenseRange = minionSenseRange;
+    public void setEnemySenseRange(Circle enemySenseRange) {
+        this.enemySenseRange = enemySenseRange;
     }
 
     // orientation
@@ -224,15 +231,15 @@ public abstract class Enemy {
         List<Enemy> nearbyEnemies = new ArrayList<>();
         for (Enemy enemy : minions){ // allEnemies is a list of all enemies in the game
             if(onlyRunners)
-                minionSenseRange.radius = 200;
-            if (enemy != this && minionSenseRange.contains(enemy.position)) {
+                enemySenseRange.radius = 200;
+            if (enemy != this && enemySenseRange.contains(enemy.position)) {
                 // add enemy to the list if it is within the minimum separation distance
                 if(onlyRunners && enemy instanceof Runner)
                     nearbyEnemies.add(enemy);
                 else if (!onlyRunners)
                     nearbyEnemies.add(enemy);
             }
-            minionSenseRange.radius = 100;
+            enemySenseRange.radius = 100;
         }
         return nearbyEnemies;
     }
@@ -297,27 +304,31 @@ public abstract class Enemy {
     }
 
     // DAMAGE METHODS
+    public abstract Shape2D getAttackRange();
     protected void calculateDamage(PlayerChampion player, int damageFrame) {
         calculateDamageFromMinions(player, damageFrame);
-        calculateDamageToMinions(player);
+        calculateDamageToEnemies(player);
     }
 
     private void calculateDamageFromMinions(PlayerChampion player, int damageFrame){
-        if(currentState == State.ATTACK && attackAnimation.getKeyFrameIndex(stateTimer) == damageFrame){
-            player.decrementHealth(damage);
+        if(currentState == State.ATTACK
+                && isCollidingWithAttackRange(getAttackRange(), player.getPlayerRectangle())
+                && attackAnimation.getKeyFrameIndex(stateTimer) == damageFrame){
+            player.resetArmorStateTimer();
+            player.calculateDamage(damage);
         }
     }
 
-    private void calculateDamageToMinions(PlayerChampion player){
+    private void calculateDamageToEnemies(PlayerChampion player){
         // minion takes damage from E spell
-        if(player.getState() == PlayerChampion.State.E && player.isEAttackTiming(true) && isCollidingWithEnemyAttackRange(player.getEAttackRange())) {
+        if(player.getState() == PlayerChampion.State.E && player.isEAttackTiming(true) && isCollidingWithAttackRange(player.getEAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getEAttackDamage());
         }
         // minion takes damage from Q spell
-        else if (player.getState() == PlayerChampion.State.Q && player.isQAttackTiming(true) && isCollidingWithEnemyAttackRange(player.getQAttackRange())) {
+        else if (player.getState() == PlayerChampion.State.Q && player.isQAttackTiming(true) && isCollidingWithAttackRange(player.getQAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getQAttackDamage());
         }
-        else if (player.getState() == PlayerChampion.State.W && player.isWAttackTiming(true) && isCollidingWithEnemyAttackRange(player.getWAttackRange())) {
+        else if (player.getState() == PlayerChampion.State.W && player.isWAttackTiming(true) && isCollidingWithAttackRange(player.getWAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getWAttackDamage());
         }
         // minion doesn't take damage
@@ -328,6 +339,7 @@ public abstract class Enemy {
 
     private void deductEnemyHealth(float damage){
         health -= damage;
+        System.out.println(health);
         isAttacked = true;
     }
 
@@ -341,22 +353,22 @@ public abstract class Enemy {
         return rPoly;
     }
 
-    private boolean isCollidingWithEnemyAttackRange(Shape2D attackRange){
+    protected boolean isCollidingWithAttackRange(Shape2D attackRange, Rectangle rect){
         // attack range is Rectangle
         if(attackRange instanceof Rectangle) {
             Rectangle rectangle = (Rectangle) attackRange;
-            return rectangle.overlaps(enemyRectangle);
+            return rectangle.overlaps(rect);
         }
         // attack range is Polygon
         else if(attackRange instanceof Polygon) {
             Polygon polygon = (Polygon) attackRange;
-            return isCollision(polygon, enemyRectangle);
+            return isCollision(polygon, rect);
 
         }
         // attack range is circle
         else if(attackRange instanceof Circle) {
             Circle circle = (Circle) attackRange;
-            return isCollision(circle, enemyRectangle);
+            return isCollision(circle, rect);
         }
         return false;
     }

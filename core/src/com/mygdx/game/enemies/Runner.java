@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Shape2D;
 import com.mygdx.game.players.PlayerChampion;
 
 import java.util.List;
@@ -13,8 +14,9 @@ public class Runner extends Enemy{
     private final static int RUNNER_MAX_FORCE = 20;
     private final static int RUNNER_HEALTH = 300;
     private final static float RUNNER_DAMAGE = 0F;
+    private final static float ATTACK_COOLDOWN = 0F;
     public Runner(int x, int y){
-        super(x, y, RUNNER_MAX_SPEED, RUNNER_MAX_FORCE, RUNNER_HEALTH, RUNNER_DAMAGE);
+        super(x, y, RUNNER_MAX_SPEED, RUNNER_MAX_FORCE, RUNNER_HEALTH, RUNNER_DAMAGE, ATTACK_COOLDOWN);
         stateTimer = 0;
         currentState = State.WALKING;
         idleTextureRegion = new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png")); //TODO: change with runner idle
@@ -27,7 +29,7 @@ public class Runner extends Enemy{
     public void update(PlayerChampion player, float deltaTime) {
         setCurrentRegion(getFrame(deltaTime));
         setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34, getSprite().getRegionHeight()));
-        setMinionSenseRange(new Circle(position.x, position.y, 200));
+        setEnemySenseRange(new Circle(position.x, position.y, 200));
         calculateDamage(player, 0);
     }
 
@@ -38,22 +40,30 @@ public class Runner extends Enemy{
     }
 
     @Override
+    public Shape2D getAttackRange() {
+        return null;
+    }
+
+    @Override
     protected void addBehavior(PlayerChampion player, float deltaTime) {
         // apply flee steering behaviour if collision not detected
         if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {
             // make runner apply flee steering behavior only if it's inside a predefined circle
-            if(isCollision(player.getRunnerBehaviorRange(), enemyRectangle))
+            if (isCollision(player.getRunnerBehaviorRange(), enemyRectangle))
                 currentSteeringBehavior = flee(player.getPosition().cpy(), deltaTime);
             else {
                 currentSteeringBehavior = wander(deltaTime);
             }
-            isInRange = false;
         }
         // don't let player overlap minion
-        else if (enemyRectangle.overlaps(player.getPlayerRectangle())){
+        else if (enemyRectangle.overlaps(player.getPlayerRectangle())) {
             isInRange = false;
             noOverlappingWithPlayer(player);
         }
+        currentState = State.WALKING;
         applySteeringBehaviour(currentSteeringBehavior, deltaTime);
+
+        if (health <= 0)
+            currentState = State.DEAD;
     }
 }

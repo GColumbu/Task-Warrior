@@ -14,6 +14,10 @@ public class UserInterface {
     // health bar
     private final HealthBar healthBar;
 
+    // armor bar
+
+    private final ArmorBar armorBar;
+
     // first attack utils
     private final AttackIcon firstAttack;
     private final AbilityCooldownBar firstAbilityCooldown;
@@ -37,6 +41,7 @@ public class UserInterface {
         this.thirdAttack = new AttackIcon(player.getEBasicAnimation().getAttackIcon(), 99, 5);
         this.thirdAbilityCooldown = new AbilityCooldownBar(player.getEBasicAnimation().getCooldownDuration(), 99, player.getQBasicAnimation().getAttackIcon().getHeight() + 7, player.getEBasicAnimation().getAttackIcon().getWidth());
         this.healthBar = new HealthBar(player.getMaxHealth());
+        this.armorBar = new ArmorBar(player.getMaxArmor());
     }
 
     protected Vector2 getUIPosition(OrthographicCamera camera){
@@ -60,7 +65,10 @@ public class UserInterface {
         // draw E ability icon and cooldown
         spriteBatch.draw(thirdAttack.attackIconTexture, x + thirdAttack.xOffset * camera.zoom, y + thirdAttack.yOffset * camera.zoom, thirdAttack.attackIconTexture.getWidth() * camera.zoom, thirdAttack.attackIconTexture.getHeight() * camera.zoom);
         thirdAbilityCooldown.draw(spriteBatch, x, y, player.getEBasicAnimation().getCooldownStateTimer(), camera.zoom);
+
+        // draw health and armor bar
         healthBar.draw(spriteBatch, x, y, player.getHealth(), camera.zoom);
+        armorBar.draw(spriteBatch, x, y, player.getArmor(), camera.zoom);
     }
 
     public void dispose(){
