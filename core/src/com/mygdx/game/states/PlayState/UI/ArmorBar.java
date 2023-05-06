@@ -59,13 +59,13 @@ public class ArmorBar {
 
         // creates the knob before
         pixmap = new Pixmap(HEALTH_BAR_WIDTH, (int)(HEALTH_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.BLUE);
+        pixmap.setColor(Color.NAVY);
         pixmap.fill();
         drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
         pixmap.dispose();
         progressBarStyle.knobBefore = drawable;
 
         // creates the progress bar
-        progressBar = new ProgressBar(0, playerMaxArmor, 1, false, progressBarStyle);
+        progressBar = new ProgressBar(0, playerMaxArmor, 0.1f, false, progressBarStyle);
     }
 }

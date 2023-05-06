@@ -70,7 +70,7 @@ public class HealthBar {
         progressBarStyle.knobBefore = drawable;
 
         // creates the progress bar
-        progressBar = new ProgressBar(0, playerMaxHealth, 1, false, progressBarStyle);
+        progressBar = new ProgressBar(0, playerMaxHealth, 0.1f, false, progressBarStyle);
 
     }
     private void changePixmapColor(Pixmap pixmap, float playerHealth){

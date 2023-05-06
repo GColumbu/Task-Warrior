@@ -192,9 +192,9 @@ public class PlayState implements Screen {
     private Enemy getEnemy(int x, int y){
         Random rand  = new Random();
         int probability = rand.nextInt(1, 100);
-        if(probability >= 0 && probability < 80){
+        if(probability >= 0 && probability < 90){
             return new Minion(x, y);
-        } else if (probability >= 80){
+        } else if (probability >= 90){
             return new Runner(x, y);
         }
         return null;

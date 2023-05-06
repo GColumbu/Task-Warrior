@@ -313,10 +313,14 @@ public abstract class PlayerChampion {
     }
 
     public void calculateDamage(float totalDamage){
-        float armorDamage = (armorEffectiveness/100) * totalDamage;
-        float healthDamage = totalDamage - armorDamage;
-        armor -= armorDamage;
-        health -= healthDamage;
+        if (armor <= 0){
+            health -= totalDamage;
+        } else {
+            float armorDamage = (armorEffectiveness / 100) * totalDamage;
+            float healthDamage = totalDamage - armorDamage;
+            armor -= armorDamage;
+            health -= healthDamage;
+        }
     }
 
     protected void updateArmor(float deltaTime){
