@@ -323,14 +323,14 @@ public abstract class Enemy {
 
     private void calculateDamageToEnemies(PlayerChampion player){
         // minion takes damage from E spell
-        if(player.getState() == PlayerChampion.State.E && player.isEAttackTiming(true) && isCollidingWithAttackRange(player.getEAttackRange(), enemyRectangle)) {
+        if(player.getCurrentState() == PlayerChampion.State.E && player.isEAttackTiming(true) && isCollidingWithAttackRange(player.getEAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getEAttackDamage());
         }
         // minion takes damage from Q spell
-        else if (player.getState() == PlayerChampion.State.Q && player.isQAttackTiming(true) && isCollidingWithAttackRange(player.getQAttackRange(), enemyRectangle)) {
+        else if (player.getCurrentState() == PlayerChampion.State.Q && player.isQAttackTiming(true) && isCollidingWithAttackRange(player.getQAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getQAttackDamage());
         }
-        else if (player.getState() == PlayerChampion.State.W && player.isWAttackTiming(true) && isCollidingWithAttackRange(player.getWAttackRange(), enemyRectangle)) {
+        else if (player.getCurrentState() == PlayerChampion.State.W && player.isWAttackTiming(true) && isCollidingWithAttackRange(player.getWAttackRange(), enemyRectangle)) {
             deductEnemyHealth(player.getWAttackDamage());
         }
         // minion doesn't take damage

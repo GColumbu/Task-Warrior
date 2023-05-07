@@ -124,6 +124,7 @@ public abstract class PlayerChampion {
     // getters
     public float getMaxHealth(){return maxHealth; }
     public float getMaxArmor(){return maxArmor; }
+    public State getCurrentState(){return currentState; }
     public float getHealth() {
         return health;
     }

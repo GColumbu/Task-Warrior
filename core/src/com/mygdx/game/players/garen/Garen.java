@@ -74,7 +74,6 @@ public class Garen extends PlayerChampion {
         // reset velocity vector
         velocity = new Vector2(0, 0);
 
-        State currentState = getState();
         if(currentState != State.W || currentState == State.W && !wAnimation.isBurst(stateTimer, false)) {
 
             // movement on y axis
