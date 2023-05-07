@@ -92,6 +92,11 @@ public class Minion extends Enemy {
         return new Rectangle(getAttackRelativePosition().x, getAttackRelativePosition().y, getSprite().getRegionWidth(), getSprite().getRegionHeight());
     }
 
+    @Override
+    protected boolean isAttackTiming() {
+        return true;
+    }
+
     private void avoidRunner(List<Enemy> runners, float deltaTime){
         for(Enemy runner : runners){
             currentSteeringBehavior = flee(runner.position.cpy(), deltaTime);

@@ -52,7 +52,6 @@ public class PlayState implements Screen {
         camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
         enemies = new ArrayList<>();
         for(int i = 0; i < 5; i++){
-            //enemies.add(new Troll(getRandomValue("x"), getRandomValue("y")));
             enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
         potions = new ArrayList<>();
@@ -192,12 +191,12 @@ public class PlayState implements Screen {
     private Enemy getEnemy(int x, int y){
         Random rand  = new Random();
         int probability = rand.nextInt(1, 100);
-        if(probability >= 0 && probability < 90){
+        if(probability >= 0 && probability < 75){
             return new Minion(x, y);
-        } else if (probability >= 90){
+        } else if (probability >= 75 && probability < 90){
             return new Runner(x, y);
-        }
-        return null;
+        } else
+            return new Troll(x, y);
     }
     private int getRandomValue(String axis){
         Random rand  = new Random();
@@ -270,8 +269,11 @@ public class PlayState implements Screen {
             // troll specific behavior
             if(enemies.get(i) instanceof Troll){
                 Circle trollCharge = ((Troll) enemies.get(i)).getTrollChargeRange();
+                Circle targetPosition = new Circle(((Troll) enemies.get(i)).getAttackTarget().x , ((Troll) enemies.get(i)).getAttackTarget().y , 50);
                 shapeRenderer.setColor(Color.FIREBRICK);
                 shapeRenderer.circle(trollCharge.x, trollCharge.y, trollCharge.radius);
+                shapeRenderer.setColor(Color.BLACK);
+                shapeRenderer.circle(targetPosition.x, targetPosition.y, targetPosition.radius);
             }
         }
 

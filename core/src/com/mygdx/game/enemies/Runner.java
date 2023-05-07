@@ -45,6 +45,11 @@ public class Runner extends Enemy{
     }
 
     @Override
+    protected boolean isAttackTiming() {
+        return false;
+    }
+
+    @Override
     protected void addBehavior(PlayerChampion player, float deltaTime) {
         // apply flee steering behaviour if collision not detected
         if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {

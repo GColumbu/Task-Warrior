@@ -273,15 +273,15 @@ public abstract class Enemy {
 
     // make enemy recognize walls for steering behaviors
     protected void applyVelocityAndRecognizeWalls(Vector2 velocity){
-        if(relativePosition.x > 0 && relativePosition.x < TaskWarrior.WIDTH - getSprite().getRegionWidth()) {
+        if(getWalkingRelativePosition().x > 0 && getWalkingRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
             position.x += velocity.x;
-        } else if(relativePosition.x <= 0 && isLooking("right") || relativePosition.x >= TaskWarrior.WIDTH - getSprite().getRegionWidth() && isLooking("left")){
+        } else if(getWalkingRelativePosition().x <= 0 && isLooking("right") || getWalkingRelativePosition().x >= TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth() && isLooking("left")){
             position.x += velocity.x;
         }
 
-        if(relativePosition.y > 0 && relativePosition.y < TaskWarrior.HEIGHT - getSprite().getRegionHeight()){
+        if(getWalkingRelativePosition().y > 0 && getWalkingRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()){
             position.y += velocity.y;
-        } else if(relativePosition.y <= 0 && isLooking("up") || relativePosition.y >= TaskWarrior.HEIGHT - getSprite().getRegionHeight() && isLooking("down")){
+        } else if(getWalkingRelativePosition().y <= 0 && isLooking("up") || getWalkingRelativePosition().y >= TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight() && isLooking("down")){
             position.y += velocity.y;
         }
     }
@@ -305,6 +305,7 @@ public abstract class Enemy {
 
     // DAMAGE METHODS
     public abstract Shape2D getAttackRange();
+    protected abstract boolean isAttackTiming();
     protected void calculateDamage(PlayerChampion player, int damageFrame) {
         calculateDamageFromMinions(player, damageFrame);
         calculateDamageToEnemies(player);
@@ -312,6 +313,7 @@ public abstract class Enemy {
 
     private void calculateDamageFromMinions(PlayerChampion player, int damageFrame){
         if(currentState == State.ATTACK
+//                && isAttackTiming()
                 && isCollidingWithAttackRange(getAttackRange(), player.getPlayerRectangle())
                 && attackAnimation.getKeyFrameIndex(stateTimer) == damageFrame){
             player.resetArmorStateTimer();
@@ -339,7 +341,6 @@ public abstract class Enemy {
 
     private void deductEnemyHealth(float damage){
         health -= damage;
-        System.out.println(health);
         isAttacked = true;
     }
 
