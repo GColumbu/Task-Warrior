@@ -18,6 +18,7 @@ import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.states.PlayState.UI.UserInterface;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -27,40 +28,66 @@ public class PlayState implements Screen {
 
     // game utils
     private final TaskWarrior game;
-    private final Texture background;
-    protected Viewport viewport;
-    protected Viewport minimapReference;
-    private final OrthographicCamera camera;
-    private float spawnTimer;
 
-    // game characters
-    private List<Enemy> enemies;
-    private List<Potion> potions;
-    private final PlayerChampion target;
+        // UI and textures
+    private final Texture background;
     private UserInterface userInterface;
     private Minimap minimap;
 
-    // shape renderer for debug purposes
+        // camera and viewports
+    protected Viewport viewport;
+    protected Viewport minimapReference;
+    private final OrthographicCamera camera;
+
+        // spawn variables
+    private float spawnTimer;
+    HashMap<Class<?>, Integer> spawnProbabilities = new HashMap<Class<?>, Integer>() {{
+        put(Minion.class, 75);
+        put(Runner.class, 15);
+        put(Troll.class, 10);
+    }};
+
+        // score variables
+    private int score;
+    HashMap<Class<?>, Integer> enemyScore = new HashMap<Class<?>, Integer>() {{
+        put(Minion.class, 100);
+        put(Runner.class, 150);
+        put(Troll.class, 200);
+    }};
+
+    // Game Characters
+    private final PlayerChampion target;
+    private List<Enemy> enemies;
+    private List<Potion> potions;
+
+    // ShapeRenderer for DEBUG purposes
     ShapeRenderer shapeRenderer;
 
-    // constructor
+    // constructor  //TODO: pass a difficulty class to initiate the player upgrades
     public PlayState(TaskWarrior game){
         this.game = game;
-        spawnTimer = 0;
-        background = new Texture("assets/play screen/background.png");
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
-        enemies = new ArrayList<>();
+        this.background = new Texture("assets/play screen/background.png");
+        this.enemies = new ArrayList<>();
+        this.potions = new ArrayList<>();
         for(int i = 0; i < 5; i++){
-            enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
+            this.enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
-        potions = new ArrayList<>();
-        target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
-        shapeRenderer = new ShapeRenderer();
-        userInterface = new UserInterface("assets/play screen/UI_template.png", target, camera);
-        viewport = new ExtendViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT, camera);
-        minimapReference = new FitViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
-        minimap = new Minimap(new Texture("assets/play screen/minimap/minimap.png"));
+        this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
+        this.shapeRenderer = new ShapeRenderer(); // for debug purposes
+        this.spawnTimer = 0;
+        this.score = 0;
+
+        // camera and viewports
+        this.camera = new OrthographicCamera();
+        this.camera.setToOrtho(false, TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
+        this.viewport = new ExtendViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT, this.camera);
+        this.minimapReference = new FitViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
+
+        // UI
+        this.userInterface = new UserInterface("assets/play screen/UI_template.png", target, camera);
+        this.minimap = new Minimap(new Texture("assets/play screen/minimap/minimap.png"));
+
+        // set input processor
         MyInputProcessor myInputProcessor = new MyInputProcessor(camera, target);
         Gdx.input.setInputProcessor(myInputProcessor);
     }
@@ -121,14 +148,14 @@ public class PlayState implements Screen {
 
     private void update(float deltaTime) {
         target.update(deltaTime);
-        for(int i = 0; i< enemies.size(); i++){
+        for(int i = 0; i < enemies.size(); i++){
             enemies.get(i).update(target, deltaTime);
             if(enemies.get(i).isDyingAnimationFinished()){
-                enemies.get(i).getSprite().getTexture().dispose();
+                addScore(enemies.get(i));
                 if(enemies.get(i) instanceof Runner) {
-                    Random rd = new Random();
-                    potions.add(new Potion(rd.nextBoolean(), enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15));
+                    potions.add(new Potion(isArmor(), enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15));
                 }
+                enemies.get(i).getSprite().getTexture().dispose();
                 enemies.remove(i);
                 i--;
             }
@@ -136,7 +163,7 @@ public class PlayState implements Screen {
         for(int i = 0; i< enemies.size(); i++){
             enemies.get(i).move(target, enemies, deltaTime);
         }
-        for(int i = 0; i< potions.size(); i++) {
+        for(int i = 0; i < potions.size(); i++) {
             if (target.getPlayerRectangle().overlaps(potions.get(i).getBounds())){
                 if(!potions.get(i).isArmor()){
                     target.incrementHealth(potions.get(i).getHealing());
@@ -172,7 +199,7 @@ public class PlayState implements Screen {
                 target.getSprite().getRegionHeight() / 2, target.getSprite().getRegionWidth(),
                 target.getSprite().getRegionHeight(), 1, 1,
                 target.getHeading());
-        for(int i = 0; i< potions.size(); i++){
+        for(int i = 0; i < potions.size(); i++){
             potions.get(i).draw(game.batch);
         }
         for(int i = 0; i < enemies.size(); i++) {
@@ -191,12 +218,13 @@ public class PlayState implements Screen {
     private Enemy getEnemy(int x, int y){
         Random rand  = new Random();
         int probability = rand.nextInt(1, 100);
-        if(probability >= 0 && probability < 75){
+        if(probability >= 0 && probability <= spawnProbabilities.get(Minion.class)){
             return new Minion(x, y);
-        } else if (probability >= 75 && probability < 90){
+        } else if (probability > spawnProbabilities.get(Minion.class) && probability <= spawnProbabilities.get(Minion.class) + spawnProbabilities.get(Runner.class)){
             return new Runner(x, y);
-        } else
+        } else if (probability > spawnProbabilities.get(Minion.class) + spawnProbabilities.get(Runner.class) && probability <= spawnProbabilities.get(Minion.class) + spawnProbabilities.get(Runner.class) + spawnProbabilities.get(Troll.class))
             return new Troll(x, y);
+        return null;
     }
     private int getRandomValue(String axis){
         Random rand  = new Random();
@@ -216,16 +244,33 @@ public class PlayState implements Screen {
             // don't allow minions to spawn near player
             do{
                 newPosition = new Vector2(getRandomValue("x"), getRandomValue("y"));
-            }while(player.getForbiddenMinionSpawnRange().contains(newPosition));
+            } while(player.getForbiddenMinionSpawnRange().contains(newPosition));
             enemies.add(getEnemy((int)newPosition.x, (int)newPosition.y));
             spawnTimer = 0;
         } else
             spawnTimer += deltaTime;
     }
 
+    // POTION SPAWNING METHODS
+    private boolean isArmor(){
+        Random rd = new Random();
+        return rd.nextBoolean();
+    }
+
+    // SCORE METHODS
+    private void addScore(Enemy enemy){
+        if(enemy instanceof Minion){
+            this.score += enemyScore.get(Minion.class);
+        } else if(enemy instanceof Runner){
+            this.score += enemyScore.get(Runner.class);
+        } else if(enemy instanceof Troll){
+            this.score += enemyScore.get(Troll.class);
+        }
+    }
+
     // UPDATE CAMERA METHODS
 
-    // update camera position based on background limits
+        // update camera position based on background limits
     private void updateCamera(PlayerChampion target){
         if(target.getPosition().x - camera.viewportWidth/2 * camera.zoom > 0 && target.getPosition().x + camera.viewportWidth/2 * camera.zoom < TaskWarrior.WIDTH){
             followPlayerX(target);
@@ -236,7 +281,7 @@ public class PlayState implements Screen {
         camera.update();
     }
 
-    // update camera position based on the player and axis
+        // update camera position based on the player and axis
     private void followPlayerX(PlayerChampion target){
         camera.position.x = target.getPosition().x;
     }
@@ -286,8 +331,9 @@ public class PlayState implements Screen {
         }
     }
 
+    // border for champion texture
     private void showBordersForChampion(ShapeRenderer shapeRenderer, PlayerChampion target){
-        // border for champion
+        // border for champion texture
         shapeRenderer.setColor(Color.WHITE);
         shapeRenderer.rect(target.getPlayerRectangle().getX(), target.getPlayerRectangle().getY(), target.getPlayerRectangle().getWidth(), target.getPlayerRectangle().getHeight());
 

@@ -20,8 +20,6 @@ public class Garen_E extends AttackAnimation {
     protected Animation<TextureRegion> eSpinAnimation;
     protected int eSpinFrames;
     protected float eSpinFrameDuration;
-
-    //TODO: calculate it based on player enhancements
     protected float eSpinAttackDamage = 2;
 
 

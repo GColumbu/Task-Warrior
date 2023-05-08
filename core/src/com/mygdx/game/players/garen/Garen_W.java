@@ -16,8 +16,6 @@ public class Garen_W extends AttackAnimation {
     protected int wBurstFrames;
     protected float wBurstFrameDuration;
     protected float burstDuration;
-
-    //TODO: calculate it based on player enhancements
     protected float wAttackDamage = 10;
         //WALKING
     protected Animation<TextureRegion> wWalkingAnimation;
