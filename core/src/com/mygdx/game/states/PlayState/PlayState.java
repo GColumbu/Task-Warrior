@@ -286,10 +286,14 @@ public class PlayState implements Screen {
 
         // update camera position based on the player and axis
     private void followPlayerX(PlayerChampion target){
-        camera.position.x = target.getPosition().x;
+        Vector2 cameraPosition = new Vector2(camera.position.x, 0);
+        cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.1f);
+        camera.position.x = cameraPosition.x;
     }
     private void followPlayerY(PlayerChampion target){
-        camera.position.y = target.getPosition().y;
+        Vector2 cameraPosition = new Vector2(0, camera.position.y);
+        cameraPosition.lerp(new Vector2(0, target.getPosition().y), 0.1f);
+        camera.position.y = cameraPosition.y;
     }
 
     // SHOW BORDER METHODS (for debug purposes)

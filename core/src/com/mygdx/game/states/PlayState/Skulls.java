@@ -27,14 +27,14 @@ public class Skulls {
         Label label = new Label(skulls.toString(), labelStyle);
         label.setSize(100 * camera.zoom, 100 * camera.zoom);
         label.setAlignment(Align.center);
-        label.setPosition(x + 100 * camera.zoom, y - 15 * camera.zoom);
+        label.setPosition(x + 80 * camera.zoom, y - 15 * camera.zoom);
         batch.draw(skullTexture, x, y, skullTexture.getWidth() * camera.zoom, skullTexture.getHeight() * camera.zoom);
         label.draw(batch, 1);
     }
 
     // get position
     private Vector2 getSkullsPosition(OrthographicCamera camera){
-        return new Vector2(camera.position.x + (camera.viewportWidth/2 - 250) * camera.zoom, camera.position.y + (camera.viewportHeight/2 - 90)  * camera.zoom);
+        return new Vector2(camera.position.x + (camera.viewportWidth/2 - 200) * camera.zoom, camera.position.y + (camera.viewportHeight/2 - 90)  * camera.zoom);
     }
 
     // get font style
