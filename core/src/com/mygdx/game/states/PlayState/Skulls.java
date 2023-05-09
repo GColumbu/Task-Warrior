@@ -24,19 +24,19 @@ public class Skulls {
         float x = getSkullsPosition(camera).x;
         float y = getSkullsPosition(camera).y;
         Label label = new Label(skulls.toString(), labelStyle);
-        label.setSize(100, 100);
-        label.setPosition(x + 120, y);
-        batch.draw(skullTexture, x, y);
+        label.setSize(100 * camera.zoom, 100 * camera.zoom);
+        label.setPosition(x + 120 * camera.zoom, y);
+        batch.draw(skullTexture, x, y, skullTexture.getWidth() * camera.zoom, skullTexture.getHeight() * camera.zoom);
         label.draw(batch, 1);
     }
 
     // get position
     private Vector2 getSkullsPosition(OrthographicCamera camera){
-        return new Vector2(camera.position.x + (camera.viewportWidth/2 * camera.zoom) - 250, camera.position.y + (camera.viewportHeight/2 * camera.zoom) - 130);
+        return new Vector2(camera.position.x + (camera.viewportWidth/2 - 250) * camera.zoom, camera.position.y + (camera.viewportHeight/2 - 130)  * camera.zoom);
     }
 
     // get font style
-    private BitmapFont getFontStyle(){
+    private BitmapFont getFontStyle(){ //TODO: keep in mind the camera zoom
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/pixel_font.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 30;
