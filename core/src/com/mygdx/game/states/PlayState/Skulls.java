@@ -42,7 +42,7 @@ public class Skulls {
         parameter.color = Color.WHITE;
         parameter.shadowOffsetX = 3;
         parameter.shadowOffsetY = 3;
-        parameter.shadowColor = Color.BLACK;
+        parameter.shadowColor = new Color(100/255f, 240/255f, 195/255f, 1);
         BitmapFont font = generator.generateFont(parameter);
         generator.dispose();
         return font;

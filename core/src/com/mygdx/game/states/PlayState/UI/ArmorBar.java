@@ -59,7 +59,7 @@ public class ArmorBar {
 
         // creates the knob before
         pixmap = new Pixmap(HEALTH_BAR_WIDTH, (int)(HEALTH_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.NAVY);
+        pixmap.setColor(new Color(100/255f, 240/255f, 195/255f, 1));
         pixmap.fill();
         drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
         pixmap.dispose();
