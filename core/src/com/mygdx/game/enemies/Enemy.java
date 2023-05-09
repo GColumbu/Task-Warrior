@@ -50,9 +50,10 @@ public abstract class Enemy {
 
     // constructor
     public Enemy(int x, int y, float maxSpeed, float maxForce, float health, float damage, float cooldownDuration){
-        position = new Vector2(x, y);
-        relativePosition = new Vector2(x, y);
-        velocity = new Vector2(1, 0);
+        this.position = new Vector2(x, y);
+        this.relativePosition = new Vector2(x, y);
+        this.velocity = new Vector2(1, 0);
+        this.stateTimer = 0;
         this.maxSpeed = maxSpeed;
         this.maxForce = maxForce;
         this.health = health;
@@ -313,7 +314,7 @@ public abstract class Enemy {
 
     private void calculateDamageFromMinions(PlayerChampion player, int damageFrame){
         if(currentState == State.ATTACK
-//                && isAttackTiming()
+                && isAttackTiming()
                 && isCollidingWithAttackRange(getAttackRange(), player.getPlayerRectangle())
                 && attackAnimation.getKeyFrameIndex(stateTimer) == damageFrame){
             player.resetArmorStateTimer();
@@ -401,6 +402,11 @@ public abstract class Enemy {
             }
         }
         return false;
+    }
+
+    // COOLDOWN METHODS
+    protected boolean isCooldownFinished(){
+        return cooldownStateTimer >= cooldownDuration;
     }
 
     // methods used in order to remove minion from array

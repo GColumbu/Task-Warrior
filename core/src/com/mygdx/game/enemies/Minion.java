@@ -19,7 +19,6 @@ public class Minion extends Enemy {
 
     public Minion(int x, int y) {
         super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE, MINION_HEALTH, MINION_DAMAGE, ATTACK_COOLDOWN);
-        stateTimer = 0;
         idleTextureRegion = new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png"));
         currentRegion = idleTextureRegion;
         currentState = State.WALKING;

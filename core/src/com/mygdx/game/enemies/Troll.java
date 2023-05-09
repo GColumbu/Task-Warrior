@@ -18,14 +18,11 @@ public class Troll extends Enemy{
     private final static float TROLL_DAMAGE = 3F;
     private final static float ATTACK_COOLDOWN = 5F;
 
+    // troll custom variables
     private Circle trollChargeRange;
-
-    public Vector2 getAttackTarget() {
-        return attackTarget;
-    }
-
     private Vector2 attackTarget;
 
+    //TODO: fix frame drop when troll spawns
     public Troll(int x, int y) {
         super(x, y, TROLL_MAX_SPEED, TROLL_MAX_FORCE, TROLL_HEALTH, TROLL_DAMAGE, ATTACK_COOLDOWN);
         attackTarget = new Vector2(0, 0);
@@ -61,6 +58,10 @@ public class Troll extends Enemy{
         velocityProjection.setLength(280);
         velocityProjection.add(position);
         return new Circle(velocityProjection.x, velocityProjection.y, 300);
+    }
+
+    public Vector2 getAttackTarget() {
+        return attackTarget;
     }
 
     @Override
@@ -107,10 +108,6 @@ public class Troll extends Enemy{
 
     private boolean isAttackOngoing(){
         return currentState == State.ATTACK && !attackAnimation.animation.isAnimationFinished(stateTimer);
-    }
-
-    private boolean isCooldownFinished(){
-        return cooldownStateTimer >= cooldownDuration;
     }
 
     // get range for the attack charge (for debug purposes)

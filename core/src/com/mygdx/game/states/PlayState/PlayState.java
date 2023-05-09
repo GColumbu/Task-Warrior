@@ -221,11 +221,13 @@ public class PlayState implements Screen {
     private Enemy getEnemy(int x, int y){
         Random rand  = new Random();
         int probability = rand.nextInt(1, 100);
-        if(probability >= 0 && probability <= spawnProbabilities.get(Minion.class)){
+        int minionProbability = spawnProbabilities.get(Minion.class);
+        int minionRunnerProbability = minionProbability + spawnProbabilities.get(Runner.class);
+        if(probability >= 0 && probability <= minionProbability){
             return new Minion(x, y);
-        } else if (probability > spawnProbabilities.get(Minion.class) && probability <= spawnProbabilities.get(Minion.class) + spawnProbabilities.get(Runner.class)){
+        } else if (probability > minionProbability && probability <= minionRunnerProbability){
             return new Runner(x, y);
-        } else if (probability > spawnProbabilities.get(Minion.class) + spawnProbabilities.get(Runner.class) && probability <= spawnProbabilities.get(Minion.class) + spawnProbabilities.get(Runner.class) + spawnProbabilities.get(Troll.class))
+        } else if (probability > minionRunnerProbability && probability <= 100)
             return new Troll(x, y);
         return null;
     }
@@ -281,19 +283,19 @@ public class PlayState implements Screen {
         if(target.getPosition().y - camera.viewportHeight/2 * camera.zoom > 0 && target.getPosition().y + camera.viewportHeight/2 * camera.zoom< TaskWarrior.HEIGHT){
             followPlayerY(target);
         }
-        camera.update();
+        viewport.getCamera().update();
     }
 
         // update camera position based on the player and axis
-    private void followPlayerX(PlayerChampion target){
-        Vector2 cameraPosition = new Vector2(camera.position.x, 0);
-        cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.1f);
-        camera.position.x = cameraPosition.x;
+    private void followPlayerX(PlayerChampion target){ //TODO: camera smoothness breaks the player colliding with map margins
+        Vector2 cameraPosition = new Vector2(viewport.getCamera().position.x, 0);
+        cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.07f);
+        viewport.getCamera().position.x = cameraPosition.x;
     }
     private void followPlayerY(PlayerChampion target){
-        Vector2 cameraPosition = new Vector2(0, camera.position.y);
-        cameraPosition.lerp(new Vector2(0, target.getPosition().y), 0.1f);
-        camera.position.y = cameraPosition.y;
+        Vector2 cameraPosition = new Vector2(0, viewport.getCamera().position.y);
+        cameraPosition.lerp(new Vector2(0, target.getPosition().y), 0.07f);
+        viewport.getCamera().position.y = cameraPosition.y;
     }
 
     // SHOW BORDER METHODS (for debug purposes)

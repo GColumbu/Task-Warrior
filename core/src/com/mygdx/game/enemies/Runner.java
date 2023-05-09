@@ -17,7 +17,6 @@ public class Runner extends Enemy{
     private final static float ATTACK_COOLDOWN = 0F;
     public Runner(int x, int y){
         super(x, y, RUNNER_MAX_SPEED, RUNNER_MAX_FORCE, RUNNER_HEALTH, RUNNER_DAMAGE, ATTACK_COOLDOWN);
-        stateTimer = 0;
         idleTextureRegion = new TextureRegion(new Texture("assets/play screen/runner/runner_idle.png"));
         currentState = State.WALKING;
         currentRegion = idleTextureRegion;
