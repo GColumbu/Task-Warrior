@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 
 public class Skulls {
     private final Texture skullTexture;
@@ -25,14 +26,15 @@ public class Skulls {
         float y = getSkullsPosition(camera).y;
         Label label = new Label(skulls.toString(), labelStyle);
         label.setSize(100 * camera.zoom, 100 * camera.zoom);
-        label.setPosition(x + 120 * camera.zoom, y);
+        label.setAlignment(Align.center);
+        label.setPosition(x + 100 * camera.zoom, y - 15 * camera.zoom);
         batch.draw(skullTexture, x, y, skullTexture.getWidth() * camera.zoom, skullTexture.getHeight() * camera.zoom);
         label.draw(batch, 1);
     }
 
     // get position
     private Vector2 getSkullsPosition(OrthographicCamera camera){
-        return new Vector2(camera.position.x + (camera.viewportWidth/2 - 250) * camera.zoom, camera.position.y + (camera.viewportHeight/2 - 130)  * camera.zoom);
+        return new Vector2(camera.position.x + (camera.viewportWidth/2 - 250) * camera.zoom, camera.position.y + (camera.viewportHeight/2 - 90)  * camera.zoom);
     }
 
     // get font style
