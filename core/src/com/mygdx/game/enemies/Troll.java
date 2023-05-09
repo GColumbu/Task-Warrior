@@ -28,8 +28,9 @@ public class Troll extends Enemy{
 
     public Troll(int x, int y) {
         super(x, y, TROLL_MAX_SPEED, TROLL_MAX_FORCE, TROLL_HEALTH, TROLL_DAMAGE, ATTACK_COOLDOWN);
+        attackTarget = new Vector2(0, 0);
+        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/troll/troll_idle.png"));
         currentState = State.WALKING;
-        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png"));
         currentRegion = idleTextureRegion;
         walkingAnimation = new EnemyAnimation("assets/play screen/troll/troll_walk.png", 0.2f, 11);
         walkingDamageAnimation = new EnemyAnimation("assets/play screen/troll/troll_walk_damage.png", 0.2f, 11);
@@ -41,7 +42,7 @@ public class Troll extends Enemy{
     @Override
     public void update(PlayerChampion player, float deltaTime) {
         setCurrentRegion(getFrame(deltaTime));
-        setEnemyRectangle(new Rectangle(getWalkingRelativePosition().x , getWalkingRelativePosition().y, 150, 150)); //TODO: replace with idleTextureRegion width and height
+        setEnemyRectangle(new Rectangle(getWalkingRelativePosition().x , getWalkingRelativePosition().y, idleTextureRegion.getRegionWidth(), idleTextureRegion.getRegionHeight()));
         setEnemySenseRange(new Circle(position.x, position.y, 200));
         if(currentState != State.ATTACK)
             trollChargeRange = new Circle(position.x, position.y, 575);

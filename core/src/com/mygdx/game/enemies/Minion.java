@@ -20,9 +20,9 @@ public class Minion extends Enemy {
     public Minion(int x, int y) {
         super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE, MINION_HEALTH, MINION_DAMAGE, ATTACK_COOLDOWN);
         stateTimer = 0;
-        currentState = State.WALKING;
         idleTextureRegion = new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png"));
         currentRegion = idleTextureRegion;
+        currentState = State.WALKING;
         walkingAnimation = new EnemyAnimation("assets/play screen/minion/minion_walk.png", 0.1f, 12);
         walkingDamageAnimation = new EnemyAnimation("assets/play screen/minion/minion_walk_damage.png", 0.1f, 12);
         attackAnimation = new EnemyAnimation("assets/play screen/minion/minion_attack.png", 0.08f, 7);
@@ -35,7 +35,7 @@ public class Minion extends Enemy {
         //applySteeringBehaviour(flee(player.getPosition().cpy(), deltaTime));
         //applySteeringBehaviour(pursue(player, deltaTime));
         setCurrentRegion(getFrame(deltaTime));
-        setEnemyRectangle(new Rectangle(getWalkingRelativePosition().x + 10, getWalkingRelativePosition().y, idleTextureRegion.getRegionWidth()/2, idleTextureRegion.getRegionHeight()));
+        setEnemyRectangle(new Rectangle(getWalkingRelativePosition().x, getWalkingRelativePosition().y, idleTextureRegion.getRegionWidth(), idleTextureRegion.getRegionHeight()));
         setEnemySenseRange(new Circle(position.x, position.y, 100));
         calculateDamage(player, 5);
     }

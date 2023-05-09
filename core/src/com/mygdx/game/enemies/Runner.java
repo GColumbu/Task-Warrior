@@ -18,8 +18,8 @@ public class Runner extends Enemy{
     public Runner(int x, int y){
         super(x, y, RUNNER_MAX_SPEED, RUNNER_MAX_FORCE, RUNNER_HEALTH, RUNNER_DAMAGE, ATTACK_COOLDOWN);
         stateTimer = 0;
+        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/runner/runner_idle.png"));
         currentState = State.WALKING;
-        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png")); //TODO: change with runner idle
         currentRegion = idleTextureRegion;
         walkingAnimation = new EnemyAnimation("assets/play screen/runner/runner_walk.png", 0.07f, 12);
         walkingDamageAnimation = new EnemyAnimation("assets/play screen/runner/runner_walk_dmg.png", 0.07f, 12);
@@ -28,7 +28,7 @@ public class Runner extends Enemy{
     @Override
     public void update(PlayerChampion player, float deltaTime) {
         setCurrentRegion(getFrame(deltaTime));
-        setEnemyRectangle(new Rectangle(relativePosition.x + 17, relativePosition.y, getSprite().getRegionWidth() - 34, getSprite().getRegionHeight()));
+        setEnemyRectangle(new Rectangle(getWalkingRelativePosition().x, getWalkingRelativePosition().y, idleTextureRegion.getRegionWidth(), idleTextureRegion.getRegionHeight()));
         setEnemySenseRange(new Circle(position.x, position.y, 200));
         calculateDamage(player, 0);
     }
