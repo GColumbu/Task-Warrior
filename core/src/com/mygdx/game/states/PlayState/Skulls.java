@@ -12,10 +12,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 public class Skulls {
     private final Texture skullTexture;
-    Label.LabelStyle labelStyle;
+    private Color magicColor;
+    private Label.LabelStyle labelStyle;
     public Skulls(String skullTexture){
         this.skullTexture = new Texture(skullTexture);
         this.labelStyle = new Label.LabelStyle();
+        this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
         this.labelStyle.font = getFontStyle();
     }
     public void draw(SpriteBatch batch, OrthographicCamera camera,  Integer skulls){
@@ -38,11 +40,11 @@ public class Skulls {
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/pixel_font.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 30;
-        parameter.borderWidth = 1;
+        parameter.borderWidth = 2;
         parameter.color = Color.WHITE;
         parameter.shadowOffsetX = 3;
         parameter.shadowOffsetY = 3;
-        parameter.shadowColor = new Color(100/255f, 240/255f, 195/255f, 1);
+        parameter.shadowColor = magicColor;
         BitmapFont font = generator.generateFont(parameter);
         generator.dispose();
         return font;

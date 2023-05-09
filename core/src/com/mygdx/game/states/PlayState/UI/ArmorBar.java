@@ -20,15 +20,16 @@ public class ArmorBar {
     // progress bar utils
     private final ProgressBar.ProgressBarStyle progressBarStyle;
     private ProgressBar progressBar;
+    private Color magicColor;
 
     // progress bar variable
     float playerMaxArmor;
 
     public ArmorBar(float playerMaxArmor) {
-
         // ProgressBarStyle creates the style of the healthbar
         progressBarStyle = new ProgressBar.ProgressBarStyle();
         this.playerMaxArmor = playerMaxArmor;
+        this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
     }
 
     protected void draw(SpriteBatch spriteBatch, float posX, float posY, float playerArmor, float cameraZoom){
@@ -59,7 +60,7 @@ public class ArmorBar {
 
         // creates the knob before
         pixmap = new Pixmap(HEALTH_BAR_WIDTH, (int)(HEALTH_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
-        pixmap.setColor(new Color(100/255f, 240/255f, 195/255f, 1));
+        pixmap.setColor(magicColor);
         pixmap.fill();
         drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
         pixmap.dispose();

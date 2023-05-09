@@ -23,12 +23,14 @@ public class AbilityCooldownBar {
     private ProgressBar progressBar;
     private final int progressBarWidth;
     private final float cooldown;
+    private Color magicColor;
 
     protected AbilityCooldownBar(float cooldown, int offsetX, int offsetY , int progressBarWidth){
         this.progressBarWidth = progressBarWidth;
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.cooldown = cooldown;
+        this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
         progressBarStyle = new ProgressBar.ProgressBarStyle();
     }
 
@@ -80,7 +82,7 @@ public class AbilityCooldownBar {
 
     private void changePixmapColor(Pixmap pixmap, float cooldownStateTimer){
         if(cooldownStateTimer >= cooldown)
-            pixmap.setColor(Color.GREEN);
+            pixmap.setColor(magicColor);
         else
             pixmap.setColor(Color.RED);
     }
