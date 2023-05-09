@@ -36,7 +36,7 @@ public class Troll extends Enemy{
         walkingDamageAnimation = new EnemyAnimation("assets/play screen/troll/troll_walk_damage.png", 0.2f, 11);
         attackAnimation = new EnemyAnimation("assets/play screen/troll/troll_attack.png", 0.2f, 10);
         attackDamageAnimation = new EnemyAnimation("assets/play screen/troll/troll_attack_damage.png", 0.2f, 10);
-        //dyingAnimation = new EnemyAnimation("assets/play screen/troll/troll_death.png", 0.07f, 4);
+        dyingAnimation = new EnemyAnimation("assets/play screen/troll/troll_death.png", 0.09f, 5);
     }
 
     @Override
