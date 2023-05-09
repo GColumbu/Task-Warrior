@@ -33,6 +33,7 @@ public class PlayState implements Screen {
     private final Texture background;
     private UserInterface userInterface;
     private Minimap minimap;
+    private Skulls skulls;
 
         // camera and viewports
     protected Viewport viewport;
@@ -47,9 +48,9 @@ public class PlayState implements Screen {
         put(Troll.class, 10);
     }};
 
-        // score variables
-    private int score;
-    HashMap<Class<?>, Integer> enemyScore = new HashMap<Class<?>, Integer>() {{
+        // skulls variables
+    private Integer skullsNumber;
+    HashMap<Class<?>, Integer> enemySkulls = new HashMap<Class<?>, Integer>() {{
         put(Minion.class, 100);
         put(Runner.class, 150);
         put(Troll.class, 200);
@@ -67,6 +68,7 @@ public class PlayState implements Screen {
     public PlayState(TaskWarrior game){
         this.game = game;
         this.background = new Texture("assets/play screen/background.png");
+        this.skulls = new Skulls("assets/play screen/skull.png");
         this.enemies = new ArrayList<>();
         this.potions = new ArrayList<>();
         for(int i = 0; i < 5; i++){
@@ -75,7 +77,7 @@ public class PlayState implements Screen {
         this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
         this.shapeRenderer = new ShapeRenderer(); // for debug purposes
         this.spawnTimer = 0;
-        this.score = 0;
+        this.skullsNumber = 0;
 
         // camera and viewports
         this.camera = new OrthographicCamera();
@@ -151,7 +153,7 @@ public class PlayState implements Screen {
         for(int i = 0; i < enemies.size(); i++){
             enemies.get(i).update(target, deltaTime);
             if(enemies.get(i).isDyingAnimationFinished()){
-                addScore(enemies.get(i));
+                addSkulls(enemies.get(i));
                 if(enemies.get(i) instanceof Runner) {
                     potions.add(new Potion(isArmor(), enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15));
                 }
@@ -210,6 +212,7 @@ public class PlayState implements Screen {
                     enemies.get(i).getHeading());
         }
         userInterface.draw(game.batch, camera, target);
+        skulls.draw(game.batch, camera, skullsNumber);
         shapeRenderer.end();
         game.batch.end();
     }
@@ -257,14 +260,14 @@ public class PlayState implements Screen {
         return rd.nextBoolean();
     }
 
-    // SCORE METHODS
-    private void addScore(Enemy enemy){
+    // SKULLS METHODS
+    private void addSkulls(Enemy enemy){
         if(enemy instanceof Minion){
-            this.score += enemyScore.get(Minion.class);
+            this.skullsNumber += enemySkulls.get(Minion.class);
         } else if(enemy instanceof Runner){
-            this.score += enemyScore.get(Runner.class);
+            this.skullsNumber += enemySkulls.get(Runner.class);
         } else if(enemy instanceof Troll){
-            this.score += enemyScore.get(Troll.class);
+            this.skullsNumber += enemySkulls.get(Troll.class);
         }
     }
 
