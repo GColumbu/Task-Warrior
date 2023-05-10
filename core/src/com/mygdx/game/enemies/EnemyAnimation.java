@@ -17,7 +17,6 @@ public class EnemyAnimation {
             frames.add(new TextureRegion(texture, i*walkingFrameWidth, 0, walkingFrameWidth, texture.getHeight()));
         }
         animation = new Animation(frameDuration, frames);
-        animation.setPlayMode(Animation.PlayMode.LOOP);
     }
 
     protected float getKeyFrameWidth(float stateTimer){

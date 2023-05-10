@@ -172,31 +172,34 @@ public abstract class PlayerChampion {
     protected abstract TextureRegion getCurrentFrame(float deltaTime);
     protected TextureRegion getIdleTextureRegion() {return idleTextureRegion;}
     protected Vector2 getIdleRelativePosition() {
-        return new Vector2(position.x - idleTextureRegion.getRegionWidth() / 2, position.y - idleTextureRegion.getRegionHeight() / 2);
+        return new Vector2(position.x - idleTextureRegion.getRegionWidth() / 2.0f, position.y - idleTextureRegion.getRegionHeight() / 2.0f);
     }
 
     // MOVEMENT METHODS
-    protected void movePlayer(float deltaTime){
+    protected void movePlayer(){
         // reset velocity vector
         velocity = new Vector2(0, 0);
+
+        Vector2 idleRelativePosition = getIdleRelativePosition();
+
         // movement on y axis
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            if (getIdleRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
-                velocity.y = deltaTime * speed;
+            if (idleRelativePosition.y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
+                velocity.y = speed;
             }
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            if (getIdleRelativePosition().y > 0) {
-                velocity.y = -deltaTime * speed;
+            if (idleRelativePosition.y > 0) {
+                velocity.y = -speed;
             }
         }
         // movement on x axis
          if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            if (getIdleRelativePosition().x > 0) {
-                velocity.x = -deltaTime * speed;
+            if (idleRelativePosition.x > 0) {
+                velocity.x = -speed;
             }
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-             if (getIdleRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
-                 velocity.x = deltaTime * speed;
+             if (idleRelativePosition.x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
+                 velocity.x = speed;
              }
          }
 
@@ -217,48 +220,45 @@ public abstract class PlayerChampion {
     public State getState() {
 
         // Q checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.Q)) && areAnimationsNotOngoingAndCooldownFinished(State.Q)) {
+        boolean isQKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.Q);
+        if (isQKeyPressed && areAnimationsNotOngoingAndCooldownFinished(State.Q)) {
             // reset q cooldown
-            if ((Gdx.input.isKeyPressed(Input.Keys.Q))){
-                qBasicAnimation.resetCooldown();
-            }
+            qBasicAnimation.resetCooldown();
             return State.Q;
         }
         if(!qBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.Q){
             // cancel q
-            if(Gdx.input.isKeyJustPressed(Input.Keys.Q)){
+            if(isQKeyPressed){
                 return State.STANDING;
             }
             return State.Q;
         }
 
         // W checking state
-        if ((Gdx.input.isKeyJustPressed(Input.Keys.W)) && areAnimationsNotOngoingAndCooldownFinished(State.W)) {
+        boolean isWKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.W);
+        if (isWKeyPressed && areAnimationsNotOngoingAndCooldownFinished(State.W)) {
             // reset w cooldown
-            if ((Gdx.input.isKeyJustPressed(Input.Keys.W))){
-                wBasicAnimation.resetCooldown();
-            }
+            wBasicAnimation.resetCooldown();
             return State.W;
         }
         if(!wBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.W){
             // cancel w
-            if(Gdx.input.isKeyJustPressed(Input.Keys.W)){
+            if(isWKeyPressed){
                 return State.STANDING;
             }
             return State.W;
         }
 
         // E checking state
-        if ((Gdx.input.isKeyPressed(Input.Keys.E)) && areAnimationsNotOngoingAndCooldownFinished(State.E)){
+        boolean isEKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.E);
+        if (isEKeyPressed && areAnimationsNotOngoingAndCooldownFinished(State.E)){
             // reset e cooldown
-            if ((Gdx.input.isKeyPressed(Input.Keys.E))){
-                eBasicAnimation.resetCooldown();
-            }
+            eBasicAnimation.resetCooldown();
             return State.E;
         }
         if(!eBasicAnimation.isAnimationFinished(stateTimer) && previousState == State.E){
             // cancel e
-            if(Gdx.input.isKeyJustPressed(Input.Keys.E)){
+            if(isEKeyPressed){
                 return State.STANDING;
             }
             return State.E;

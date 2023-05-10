@@ -287,7 +287,7 @@ public class PlayState implements Screen {
     }
 
         // update camera position based on the player and axis
-    private void followPlayerX(PlayerChampion target){ //TODO: camera smoothness breaks the player colliding with map margins
+    private void followPlayerX(PlayerChampion target){
         Vector2 cameraPosition = new Vector2(viewport.getCamera().position.x, 0);
         cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.07f);
         viewport.getCamera().position.x = cameraPosition.x;

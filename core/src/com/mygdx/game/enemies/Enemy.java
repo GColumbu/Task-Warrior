@@ -228,19 +228,13 @@ public abstract class Enemy {
 
     // separation
         // get nearby enemies
-    protected List<Enemy> getNearbyEnemies(List<Enemy> minions, boolean onlyRunners) {
+    protected List<Enemy> getNearbyEnemies(List<Enemy> minions) {
         List<Enemy> nearbyEnemies = new ArrayList<>();
         for (Enemy enemy : minions){ // allEnemies is a list of all enemies in the game
-            if(onlyRunners)
-                enemySenseRange.radius = 200;
             if (enemy != this && enemySenseRange.contains(enemy.position)) {
                 // add enemy to the list if it is within the minimum separation distance
-                if(onlyRunners && enemy instanceof Runner)
-                    nearbyEnemies.add(enemy);
-                else if (!onlyRunners)
-                    nearbyEnemies.add(enemy);
+                nearbyEnemies.add(enemy);
             }
-            enemySenseRange.radius = 100;
         }
         return nearbyEnemies;
     }

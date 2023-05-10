@@ -15,7 +15,7 @@ public class Garen extends PlayerChampion {
     protected Garen_E eAnimation;
 
     public Garen(int x, int y){
-        super(x, y, 500, 200, 100, 50, 3, 0.05f);
+        super(x, y, 10, 200, 100, 50, 3, 0.05f);
         walkingAnimation = new WalkingAnimation("assets/play screen/garen/walk.png", 0.05f);
         wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f);
         wBasicAnimation = wAnimation;
@@ -40,7 +40,7 @@ public class Garen extends PlayerChampion {
         if(currentState == PlayerChampion.State.W && !wAnimation.isBurst(stateTimer,false))
             wAnimation.setInvincibilityRange(new Circle(position.x, position.y, 275));
         setRunnerBehaviorRange(new Circle(position.x, position.y, 450));
-        movePlayer(deltaTime);
+        movePlayer();
         updateArmor(deltaTime);
     }
 
@@ -70,54 +70,57 @@ public class Garen extends PlayerChampion {
 
     // MOVEMENT METHODS
     @Override
-    protected void movePlayer(float deltaTime){
+    protected void movePlayer(){
         // reset velocity vector
         velocity = new Vector2(0, 0);
 
-        if(currentState != State.W || currentState == State.W && !wAnimation.isBurst(stateTimer, false)) {
+        boolean isWBurst = wAnimation.isBurst(stateTimer, false);
+        Vector2 idleRelativePosition = getIdleRelativePosition();
+
+        if(currentState != State.W || !isWBurst) {
 
             // movement on y axis
             if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                if (getIdleRelativePosition().y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
-                    velocity.y = deltaTime * speed;
+                if (idleRelativePosition.y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
+                    velocity.y = speed;
                     if (currentState == State.Q) {
-                        velocity.y -= (deltaTime * speed) / 2;
+                        velocity.y -= speed / 2.0;
                     }
-                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.y += (deltaTime * speed) / 3;
+                    if (currentState == State.W && !isWBurst){
+                        velocity.y += speed / 3.0;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                if (getIdleRelativePosition().y > 0) {
-                    velocity.y = -deltaTime * speed;
+                if (idleRelativePosition.y > 0) {
+                    velocity.y = -speed;
                     if (currentState == State.Q) {
-                        velocity.y += (deltaTime * speed) / 2;
+                        velocity.y += speed / 2.0;
                     }
-                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.y -= (deltaTime * speed) / 3;
+                    if (currentState == State.W && !isWBurst){
+                        velocity.y -= speed / 3.0;
                     }
                 }
             }
 
             // movement on x axis
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                if (getIdleRelativePosition().x > 0) {
-                    velocity.x = -deltaTime * speed;
+                if (idleRelativePosition.x > 0) {
+                    velocity.x = -speed;
                     if (currentState == State.Q) {
-                        velocity.x += (deltaTime * speed) / 2;
+                        velocity.x += speed / 2.0;
                     }
-                     if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.x -= (deltaTime * speed) / 3;
+                     if (currentState == State.W && !isWBurst){
+                        velocity.x -= speed / 3.0;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                if (getIdleRelativePosition().x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
-                    velocity.x = deltaTime * speed;
+                if (idleRelativePosition.x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
+                    velocity.x = speed;
                     if (currentState == State.Q) {
-                        velocity.x -= (deltaTime * speed) / 2;
+                        velocity.x -= speed / 2.0;
                     }
-                    if (currentState == State.W && !wAnimation.isBurst(stateTimer, false)){
-                        velocity.x += (deltaTime * speed) / 3;
+                    if (currentState == State.W && !isWBurst){
+                        velocity.x += speed / 3.0;
                     }
                 }
             }

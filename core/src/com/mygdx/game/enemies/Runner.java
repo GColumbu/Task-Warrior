@@ -34,7 +34,7 @@ public class Runner extends Enemy{
 
     @Override
     public void move(PlayerChampion player, List<Enemy> minions, float deltaTime) {
-        separation(getNearbyEnemies(minions, false));
+        separation(getNearbyEnemies(minions));
         addBehavior(player, deltaTime);
     }
 

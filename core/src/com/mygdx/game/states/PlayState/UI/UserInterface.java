@@ -15,7 +15,6 @@ public class UserInterface {
     private final HealthBar healthBar;
 
     // armor bar
-
     private final ArmorBar armorBar;
 
     // first attack utils
@@ -49,26 +48,26 @@ public class UserInterface {
     }
 
     public void draw(SpriteBatch spriteBatch, OrthographicCamera camera, PlayerChampion player){
-        float x = getUIPosition(camera).x;
-        float y = getUIPosition(camera).y;
+        Vector2 position = getUIPosition(camera);
+
         // draw template
-        spriteBatch.draw(userInterface, x, y, userInterface.getWidth() * camera.zoom, userInterface.getHeight() * camera.zoom);
+        spriteBatch.draw(userInterface, position.x, position.y, userInterface.getWidth() * camera.zoom, userInterface.getHeight() * camera.zoom);
 
         // draw Q ability icon and cooldown
-        spriteBatch.draw(firstAttack.attackIconTexture, x + firstAttack.xOffset * camera.zoom, y + secondAttack.yOffset * camera.zoom, firstAttack.attackIconTexture.getWidth() * camera.zoom, firstAttack.attackIconTexture.getHeight() * camera.zoom);
-        firstAbilityCooldown.draw(spriteBatch, x, y, player.getQBasicAnimation().getCooldownStateTimer(), camera.zoom);
+        spriteBatch.draw(firstAttack.attackIconTexture, position.x + firstAttack.xOffset * camera.zoom, position.y + secondAttack.yOffset * camera.zoom, firstAttack.attackIconTexture.getWidth() * camera.zoom, firstAttack.attackIconTexture.getHeight() * camera.zoom);
+        firstAbilityCooldown.draw(spriteBatch, position.x, position.y, player.getQBasicAnimation().getCooldownStateTimer(), camera.zoom);
 
         // draw W ability icon and cooldown
-        spriteBatch.draw(secondAttack.attackIconTexture, x + secondAttack.xOffset * camera.zoom, y + secondAttack.yOffset * camera.zoom, secondAttack.attackIconTexture.getWidth() * camera.zoom, secondAttack.attackIconTexture.getHeight() * camera.zoom);
-        secondAbilityCooldown.draw(spriteBatch, x, y, player.getWBasicAnimation().getCooldownStateTimer(), camera.zoom);
+        spriteBatch.draw(secondAttack.attackIconTexture, position.x + secondAttack.xOffset * camera.zoom, position.y + secondAttack.yOffset * camera.zoom, secondAttack.attackIconTexture.getWidth() * camera.zoom, secondAttack.attackIconTexture.getHeight() * camera.zoom);
+        secondAbilityCooldown.draw(spriteBatch, position.x, position.y, player.getWBasicAnimation().getCooldownStateTimer(), camera.zoom);
 
         // draw E ability icon and cooldown
-        spriteBatch.draw(thirdAttack.attackIconTexture, x + thirdAttack.xOffset * camera.zoom, y + thirdAttack.yOffset * camera.zoom, thirdAttack.attackIconTexture.getWidth() * camera.zoom, thirdAttack.attackIconTexture.getHeight() * camera.zoom);
-        thirdAbilityCooldown.draw(spriteBatch, x, y, player.getEBasicAnimation().getCooldownStateTimer(), camera.zoom);
+        spriteBatch.draw(thirdAttack.attackIconTexture, position.x + thirdAttack.xOffset * camera.zoom, position.y + thirdAttack.yOffset * camera.zoom, thirdAttack.attackIconTexture.getWidth() * camera.zoom, thirdAttack.attackIconTexture.getHeight() * camera.zoom);
+        thirdAbilityCooldown.draw(spriteBatch, position.x, position.y, player.getEBasicAnimation().getCooldownStateTimer(), camera.zoom);
 
         // draw health and armor bar
-        healthBar.draw(spriteBatch, x, y, player.getHealth(), camera.zoom);
-        armorBar.draw(spriteBatch, x, y, player.getArmor(), camera.zoom);
+        healthBar.draw(spriteBatch, position.x, position.y, player.getHealth(), camera.zoom);
+        armorBar.draw(spriteBatch, position.x, position.y, player.getArmor(), camera.zoom);
     }
 
     public void dispose(){

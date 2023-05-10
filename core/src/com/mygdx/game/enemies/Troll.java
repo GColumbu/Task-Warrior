@@ -48,7 +48,7 @@ public class Troll extends Enemy{
 
     @Override
     public void move(PlayerChampion player, List<Enemy> minions, float deltaTime) {
-        separation(getNearbyEnemies(minions, false));
+        separation(getNearbyEnemies(minions));
         addBehavior(player, deltaTime);
     }
 
@@ -72,7 +72,7 @@ public class Troll extends Enemy{
     @Override
     protected void addBehavior(PlayerChampion player, float deltaTime) {
         if(isCooldownFinished() && isCollidingWithAttackRange(trollChargeRange, player.getPlayerRectangle()) || isAttackOngoing()){
-            // save the position to seek when it is first "seen"
+            // save the position to seek when it is first "seen" and project on the circle
             if(currentState != State.ATTACK){
                 attackTarget = player.getPosition().cpy();
                 Vector2 vectorToCenter = attackTarget.sub(position);

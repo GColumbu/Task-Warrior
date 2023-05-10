@@ -41,13 +41,14 @@ public class Minion extends Enemy {
 
     @Override
     public void move(PlayerChampion player, List<Enemy> minions, float deltaTime) {
-        separation(getNearbyEnemies(minions, false));
-        avoidRunner(getNearbyEnemies(minions, true), deltaTime);
+        separation(getNearbyEnemies(minions));
         addBehavior(player, deltaTime);
     }
 
     @Override
     protected void addBehavior(PlayerChampion player, float deltaTime) {
+        // improvement variables
+        boolean isColliding = enemyRectangle.overlaps(player.getPlayerRectangle());
         // garen custom behavior
         if (player instanceof Garen) {
             Garen garen = (Garen) player;
@@ -60,7 +61,7 @@ public class Minion extends Enemy {
                 currentState = State.WALKING;
             }
             // apply seek steering behaviour if collision not detected and is not W Invincibility
-            else if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {
+            else if (!isColliding) {
                 currentSteeringBehavior = seek(player.getPosition().cpy(), deltaTime);
                 applySteeringBehaviour(currentSteeringBehavior, deltaTime);
                 currentState = State.WALKING;
@@ -68,7 +69,7 @@ public class Minion extends Enemy {
         }
         else {
             // apply seek steering behaviour if collision not detected
-            if (!enemyRectangle.overlaps(player.getPlayerRectangle())) {
+            if (!isColliding) {
                 currentSteeringBehavior = seek(player.getPosition().cpy(), deltaTime);
                 applySteeringBehaviour(currentSteeringBehavior, deltaTime);
                 currentState = State.WALKING;
@@ -76,7 +77,7 @@ public class Minion extends Enemy {
         }
 
         // don't let player overlap minion
-        if (enemyRectangle.overlaps(player.getPlayerRectangle())) {
+        if (isColliding) {
             noOverlappingWithPlayer(player);
             currentState = State.ATTACK;
         }
@@ -94,12 +95,5 @@ public class Minion extends Enemy {
     @Override
     protected boolean isAttackTiming() {
         return true;
-    }
-
-    private void avoidRunner(List<Enemy> runners, float deltaTime){
-        for(Enemy runner : runners){
-            currentSteeringBehavior = flee(runner.position.cpy(), deltaTime);
-            applySteeringBehaviour(currentSteeringBehavior, deltaTime);
-        }
     }
 }
