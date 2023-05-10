@@ -37,7 +37,7 @@ public class AbilityCooldownBar {
 
         // ProgressBarStyle variables that remain the same
             // creates the knob
-        Pixmap pixmap = new Pixmap(2, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(0, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
         pixmap.dispose();
@@ -56,7 +56,7 @@ public class AbilityCooldownBar {
 
     protected void updateProgressBar(float cooldownStateTimer){
         // creates the appearence of the background
-        Pixmap pixmap = new Pixmap(progressBarWidth, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
+        Pixmap pixmap = new Pixmap((int)(progressBarWidth * cameraZoom), (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.BLACK);
         pixmap.fill();
         TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
@@ -64,7 +64,7 @@ public class AbilityCooldownBar {
         progressBarStyle.background = drawable;
 
         // creates the knob before
-        pixmap = new Pixmap(progressBarWidth, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
+        pixmap = new Pixmap((int)(progressBarWidth * cameraZoom), (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
         changePixmapColor(pixmap, cooldownStateTimer);
         pixmap.fill();
         drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));

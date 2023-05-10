@@ -246,7 +246,7 @@ public class PlayState implements Screen {
                     enemies.get(i).getHeading());
         }
         userInterface.draw(game.batch, camera, target);
-        skulls.draw(game.batch, camera, skullsNumber);
+        //skulls.draw(game.batch, camera, skullsNumber); // TODO: fix skull display (DRASTICALLY slows down the game)
         shapeRenderer.end();
         game.batch.end();
     }
