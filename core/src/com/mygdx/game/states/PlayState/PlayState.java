@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -59,6 +60,15 @@ public class PlayState implements Screen {
     // Game Characters
     private final PlayerChampion target;
     private List<Enemy> enemies;
+        // minion
+    private final EnemyTextures minionTextures;
+
+        // runner
+    private final EnemyTextures runnerTextures;
+
+        // troll
+    private final EnemyTextures trollTexturs;
+
     private List<Potion> potions;
 
     // ShapeRenderer for DEBUG purposes
@@ -70,6 +80,26 @@ public class PlayState implements Screen {
         this.background = new Texture("assets/play screen/background.png");
         this.skulls = new Skulls("assets/play screen/skull.png");
         this.enemies = new ArrayList<>();
+        this.minionTextures = new EnemyTextures(
+                new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png")),
+                new EnemyAnimation("assets/play screen/minion/minion_walk.png", 0.1f, 12),
+                new EnemyAnimation("assets/play screen/minion/minion_walk_damage.png", 0.1f, 12),
+                new EnemyAnimation("assets/play screen/minion/minion_attack.png", 0.08f, 7),
+                new EnemyAnimation("assets/play screen/minion/minion_attack_damage.png", 0.08f, 7),
+                new EnemyAnimation("assets/play screen/minion/minion_death.png", 0.07f, 4));
+        this.runnerTextures = new EnemyTextures(
+                new TextureRegion(new Texture("assets/play screen/runner/runner_idle.png")),
+                new EnemyAnimation("assets/play screen/runner/runner_walk.png", 0.07f, 12),
+                new EnemyAnimation("assets/play screen/runner/runner_walk_dmg.png", 0.07f, 12),
+                null, null,
+                new EnemyAnimation("assets/play screen/runner/runner_death.png", 0.07f, 4));
+        this.trollTexturs = new EnemyTextures(
+                new TextureRegion(new Texture("assets/play screen/troll/troll_idle.png")),
+                new EnemyAnimation("assets/play screen/troll/troll_walk.png", 0.2f, 11),
+                new EnemyAnimation("assets/play screen/troll/troll_walk_damage.png", 0.2f, 11),
+                new EnemyAnimation("assets/play screen/troll/troll_attack.png", 0.2f, 10),
+                new EnemyAnimation("assets/play screen/troll/troll_attack_damage.png", 0.2f, 10),
+                new EnemyAnimation("assets/play screen/troll/troll_death.png", 0.09f, 5));
         this.potions = new ArrayList<>();
         for(int i = 0; i < 5; i++){
             this.enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
@@ -131,17 +161,21 @@ public class PlayState implements Screen {
 
     @Override
     public void dispose() {
-        //dispose background
+        // dispose background
         background.dispose();
-        //dispose UI
+        // dispose UI
         userInterface.dispose();
-        //dispose minimap
+        // dispose minimap
         minimap.dispose();
-        //dispose minions
-        for(int i = 0; i < enemies.size(); i++){
-            enemies.get(i).getSprite().getTexture().dispose();
+        // dispose minions
+        minionTextures.dispose();
+        runnerTextures.dispose();
+        trollTexturs.dispose();
+        // dispose remaining potions
+        for(int i = 0; i < potions.size(); i++) {
+            potions.get(i).dispose();
         }
-        //dispose player
+        // dispose player
         target.getSprite().getTexture().dispose();
     }
 
@@ -157,7 +191,6 @@ public class PlayState implements Screen {
                 if(enemies.get(i) instanceof Runner) {
                     potions.add(new Potion(isArmor(), enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15));
                 }
-                enemies.get(i).getSprite().getTexture().dispose();
                 enemies.remove(i);
                 i--;
             }
@@ -172,6 +205,7 @@ public class PlayState implements Screen {
                 } else {
                     target.incrementArmor(potions.get(i).getHealing());
                 }
+                potions.get(i).dispose();
                 potions.remove(i);
             }
         }
@@ -224,11 +258,11 @@ public class PlayState implements Screen {
         int minionProbability = spawnProbabilities.get(Minion.class);
         int minionRunnerProbability = minionProbability + spawnProbabilities.get(Runner.class);
         if(probability >= 0 && probability <= minionProbability){
-            return new Minion(x, y);
+            return new Minion(x, y, minionTextures);
         } else if (probability > minionProbability && probability <= minionRunnerProbability){
-            return new Runner(x, y);
+            return new Runner(x, y, runnerTextures);
         } else if (probability > minionRunnerProbability && probability <= 100)
-            return new Troll(x, y);
+            return new Troll(x, y, trollTexturs);
         return null;
     }
     private int getRandomValue(String axis){

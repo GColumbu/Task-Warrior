@@ -35,4 +35,8 @@ public class Potion {
     public float getHealing(){
         return healing;
     }
+
+    public void dispose(){
+        potion.dispose();
+    }
 }

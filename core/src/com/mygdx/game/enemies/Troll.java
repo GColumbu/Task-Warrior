@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Shape2D;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.players.PlayerChampion;
+import com.mygdx.game.states.PlayState.EnemyTextures;
 
 import java.util.List;
 
@@ -23,17 +24,17 @@ public class Troll extends Enemy{
     private Vector2 attackTarget;
 
     //TODO: fix frame drop when troll spawns
-    public Troll(int x, int y) {
+    public Troll(int x, int y, EnemyTextures enemyTextures) {
         super(x, y, TROLL_MAX_SPEED, TROLL_MAX_FORCE, TROLL_HEALTH, TROLL_DAMAGE, ATTACK_COOLDOWN);
         attackTarget = new Vector2(0, 0);
-        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/troll/troll_idle.png"));
         currentState = State.WALKING;
-        currentRegion = idleTextureRegion;
-        walkingAnimation = new EnemyAnimation("assets/play screen/troll/troll_walk.png", 0.2f, 11);
-        walkingDamageAnimation = new EnemyAnimation("assets/play screen/troll/troll_walk_damage.png", 0.2f, 11);
-        attackAnimation = new EnemyAnimation("assets/play screen/troll/troll_attack.png", 0.2f, 10);
-        attackDamageAnimation = new EnemyAnimation("assets/play screen/troll/troll_attack_damage.png", 0.2f, 10);
-        dyingAnimation = new EnemyAnimation("assets/play screen/troll/troll_death.png", 0.09f, 5);
+        currentRegion = enemyTextures.idleTextureRegion;
+        idleTextureRegion = enemyTextures.idleTextureRegion;
+        walkingAnimation = enemyTextures.walkingAnimation;
+        walkingDamageAnimation = enemyTextures.walkingDamageAnimation;
+        attackAnimation = enemyTextures.attackAnimation;
+        attackDamageAnimation = enemyTextures.attackDamageAnimation;
+        dyingAnimation = enemyTextures.dyingAnimation;
     }
 
     @Override

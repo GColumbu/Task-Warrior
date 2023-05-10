@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Shape2D;
 import com.mygdx.game.players.PlayerChampion;
+import com.mygdx.game.states.PlayState.EnemyTextures;
 
 import java.util.List;
 
@@ -15,14 +16,14 @@ public class Runner extends Enemy{
     private final static int RUNNER_HEALTH = 300;
     private final static float RUNNER_DAMAGE = 0F;
     private final static float ATTACK_COOLDOWN = 0F;
-    public Runner(int x, int y){
+    public Runner(int x, int y, EnemyTextures enemyTextures){
         super(x, y, RUNNER_MAX_SPEED, RUNNER_MAX_FORCE, RUNNER_HEALTH, RUNNER_DAMAGE, ATTACK_COOLDOWN);
-        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/runner/runner_idle.png"));
+        currentRegion = enemyTextures.idleTextureRegion;
         currentState = State.WALKING;
-        currentRegion = idleTextureRegion;
-        walkingAnimation = new EnemyAnimation("assets/play screen/runner/runner_walk.png", 0.07f, 12);
-        walkingDamageAnimation = new EnemyAnimation("assets/play screen/runner/runner_walk_dmg.png", 0.07f, 12);
-        dyingAnimation = new EnemyAnimation("assets/play screen/runner/runner_death.png", 0.07f, 4);
+        idleTextureRegion = enemyTextures.idleTextureRegion;
+        walkingAnimation = enemyTextures.walkingAnimation;
+        walkingDamageAnimation = enemyTextures.walkingDamageAnimation;
+        dyingAnimation = enemyTextures.dyingAnimation;
     }
     @Override
     public void update(PlayerChampion player, float deltaTime) {

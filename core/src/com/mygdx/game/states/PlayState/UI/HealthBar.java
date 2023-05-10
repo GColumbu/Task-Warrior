@@ -31,13 +31,20 @@ public class HealthBar {
     protected HealthBar(float playerMaxHealth){
         // ProgressBarStyle creates the style of the healthbar
         progressBarStyle = new ProgressBar.ProgressBarStyle();
+
+        // ProgressBarStyle variables that remain the same
+            // creates the knob
+        Pixmap pixmap = new Pixmap(0, HEALTH_BAR_HEIGHT, Pixmap.Format.RGBA8888);
+        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
+        progressBarStyle.knob = drawable;
+
         this.playerMaxHealth = playerMaxHealth;
         this.sixtyPercentPlayerHealth = (float)(60.0/100.0) * playerMaxHealth;
         this.thirtyPercentPlayerHealth = (float)(30.0/100.0) * playerMaxHealth;
     }
     protected void draw(SpriteBatch spriteBatch, float posX, float posY, float playerHealth, float cameraZoom){
         updateProgressBar(playerHealth, cameraZoom);
-        progressBar.setScale(cameraZoom);
         progressBar.setValue(playerHealth);
         progressBar.setAnimateDuration(0.02f);
         progressBar.setPosition(posX + (OFFSET_X * cameraZoom), posY + (OFFSET_Y * cameraZoom));
@@ -54,12 +61,6 @@ public class HealthBar {
         TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
         pixmap.dispose();
         progressBarStyle.background = drawable;
-
-        // creates the knob
-        pixmap = new Pixmap(0, (int)(HEALTH_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
-        drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
-        pixmap.dispose();
-        progressBarStyle.knob = drawable;
 
         // creates the knob before
         pixmap = new Pixmap(HEALTH_BAR_WIDTH, (int)(HEALTH_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);

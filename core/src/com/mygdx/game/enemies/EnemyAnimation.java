@@ -9,7 +9,7 @@ public class EnemyAnimation {
     protected Animation<TextureRegion> animation;
     protected Texture texture;
 
-    protected EnemyAnimation(String walkingTexturePath, float frameDuration, int nrOfFrames) {
+    public EnemyAnimation(String walkingTexturePath, float frameDuration, int nrOfFrames) {
         this.texture = new Texture(walkingTexturePath);
         Array<TextureRegion> frames = new Array<>();
         int walkingFrameWidth = texture.getWidth() / nrOfFrames;
@@ -17,6 +17,7 @@ public class EnemyAnimation {
             frames.add(new TextureRegion(texture, i*walkingFrameWidth, 0, walkingFrameWidth, texture.getHeight()));
         }
         animation = new Animation(frameDuration, frames);
+        animation.setPlayMode(Animation.PlayMode.LOOP);
     }
 
     protected float getKeyFrameWidth(float stateTimer){
@@ -32,6 +33,10 @@ public class EnemyAnimation {
     }
     protected int getKeyFrameIndex(float stateTimer){
         return animation.getKeyFrameIndex(stateTimer);
+    }
+
+    public void dispose(){
+        texture.dispose();
     }
 
 }

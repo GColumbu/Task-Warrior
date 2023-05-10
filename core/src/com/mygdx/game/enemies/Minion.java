@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.players.garen.Garen;
+import com.mygdx.game.states.PlayState.EnemyTextures;
 
 import java.util.List;
 
@@ -17,16 +18,16 @@ public class Minion extends Enemy {
     private final static float MINION_DAMAGE = 1F;
     private final static float ATTACK_COOLDOWN = 0F;
 
-    public Minion(int x, int y) {
+    public Minion(int x, int y, EnemyTextures enemyTextures) {
         super(x, y, MINION_MAX_SPEED, MINION_MAX_FORCE, MINION_HEALTH, MINION_DAMAGE, ATTACK_COOLDOWN);
-        idleTextureRegion = new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png"));
-        currentRegion = idleTextureRegion;
+        currentRegion = enemyTextures.idleTextureRegion;
         currentState = State.WALKING;
-        walkingAnimation = new EnemyAnimation("assets/play screen/minion/minion_walk.png", 0.1f, 12);
-        walkingDamageAnimation = new EnemyAnimation("assets/play screen/minion/minion_walk_damage.png", 0.1f, 12);
-        attackAnimation = new EnemyAnimation("assets/play screen/minion/minion_attack.png", 0.08f, 7);
-        attackDamageAnimation = new EnemyAnimation("assets/play screen/minion/minion_attack_damage.png", 0.08f, 7);
-        dyingAnimation = new EnemyAnimation("assets/play screen/minion/minion_death.png", 0.07f, 4);
+        this.idleTextureRegion = enemyTextures.idleTextureRegion;
+        this.walkingAnimation = enemyTextures.walkingAnimation;
+        this.walkingDamageAnimation = enemyTextures.walkingDamageAnimation;
+        this.attackAnimation = enemyTextures.attackAnimation;
+        this.attackDamageAnimation = enemyTextures.attackDamageAnimation;
+        this.dyingAnimation = enemyTextures.dyingAnimation;
     }
 
     @Override

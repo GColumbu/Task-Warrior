@@ -26,15 +26,22 @@ public class ArmorBar {
     float playerMaxArmor;
 
     public ArmorBar(float playerMaxArmor) {
-        // ProgressBarStyle creates the style of the healthbar
+        // ProgressBarStyle creates the style of the armorbar
         progressBarStyle = new ProgressBar.ProgressBarStyle();
+
+        // ProgressBarStyle variables that remain the same
+            // creates the knob
+        Pixmap pixmap = new Pixmap(0, HEALTH_BAR_HEIGHT, Pixmap.Format.RGBA8888);
+        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
+        progressBarStyle.knob = drawable;
+
         this.playerMaxArmor = playerMaxArmor;
         this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
     }
 
     protected void draw(SpriteBatch spriteBatch, float posX, float posY, float playerArmor, float cameraZoom){
         updateProgressBar(cameraZoom);
-        progressBar.setScale(cameraZoom);
         progressBar.setValue(playerArmor);
         progressBar.setAnimateDuration(0.02f);
         progressBar.setPosition(posX + (OFFSET_X * cameraZoom), posY + (OFFSET_Y * cameraZoom));
@@ -51,12 +58,6 @@ public class ArmorBar {
         TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
         pixmap.dispose();
         progressBarStyle.background = drawable;
-
-        // creates the knob
-        pixmap = new Pixmap(0, (int)(HEALTH_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
-        drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
-        pixmap.dispose();
-        progressBarStyle.knob = drawable;
 
         // creates the knob before
         pixmap = new Pixmap(HEALTH_BAR_WIDTH, (int)(HEALTH_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);

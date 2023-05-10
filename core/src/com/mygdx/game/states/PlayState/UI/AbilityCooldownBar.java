@@ -31,7 +31,17 @@ public class AbilityCooldownBar {
         this.offsetY = offsetY;
         this.cooldown = cooldown;
         this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
+
+        // ProgressBarStyle creates the style of the ability cooldown bar
         progressBarStyle = new ProgressBar.ProgressBarStyle();
+
+        // ProgressBarStyle variables that remain the same
+            // creates the knob
+        Pixmap pixmap = new Pixmap(2, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
+        pixmap.dispose();
+        progressBarStyle.knob = drawable;
     }
 
     protected void draw(SpriteBatch spriteBatch, float posX, float posY, float cooldownStateTimer, float cameraZoom){
@@ -53,13 +63,6 @@ public class AbilityCooldownBar {
         pixmap.dispose();
         progressBarStyle.background = drawable;
 
-        // creates the knob
-        pixmap = new Pixmap(2, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
-        pixmap.dispose();
-        progressBarStyle.knob = drawable;
-
         // creates the knob before
         pixmap = new Pixmap(progressBarWidth, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
         changePixmapColor(pixmap, cooldownStateTimer);
@@ -67,14 +70,6 @@ public class AbilityCooldownBar {
         drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
         pixmap.dispose();
         progressBarStyle.knobBefore = drawable;
-
-        // creates the knob after
-        pixmap = new Pixmap(progressBarWidth, (int)(PROGRESS_BAR_HEIGHT * cameraZoom), Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.BLACK);
-        pixmap.fill();
-        drawable = new TextureRegionDrawable(new TextureRegion(new Texture(pixmap)));
-        pixmap.dispose();
-        progressBarStyle.knobAfter = drawable;
 
         // creates the progress bar
         progressBar = new ProgressBar(0, cooldown, 0.1f, false, progressBarStyle);
@@ -86,6 +81,4 @@ public class AbilityCooldownBar {
         else
             pixmap.setColor(Color.RED);
     }
-
-
 }
