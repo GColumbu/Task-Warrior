@@ -278,7 +278,7 @@ public class PlayState implements Screen {
 
     // adds minion at random value (except for player range)
     private void addMinion(PlayerChampion player, float deltaTime){
-        if(spawnTimer >= ENEMY_SPAWN_FREQUENCY){
+        if(spawnTimer >= ENEMY_SPAWN_FREQUENCY && enemies.size() != 10){
             Vector2 newPosition;
             // don't allow minions to spawn near player
             do{
