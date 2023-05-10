@@ -12,10 +12,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class HealthBar {
     // health bar dimension
     private final int HEALTH_BAR_WIDTH = 198;
-    private final int HEALTH_BAR_HEIGHT = 19;
+    private final int HEALTH_BAR_HEIGHT = 18;
 
     // health bar offset from UI
-    private final int OFFSET_X = 45;
+    private final int OFFSET_X = 43;
     private final int OFFSET_Y = 84;
 
     // color change variables

@@ -34,9 +34,9 @@ public class UserInterface {
     public UserInterface(String userInterfaceFilePath,PlayerChampion player){
         this.userInterface = new Texture(userInterfaceFilePath);
         this.firstAttack = new AttackIcon(player.getQBasicAnimation().getAttackIcon(), 45, 5);
-        this.firstAbilityCooldown = new AbilityCooldownBar(player.getQBasicAnimation().getCooldownDuration(), 30, 4, 10);
+        this.firstAbilityCooldown = new AbilityCooldownBar(player.getQBasicAnimation().getCooldownDuration(), 28, 4, 10);
         this.secondAttack = new AttackIcon(player.getWBasicAnimation().getAttackIcon(), 117, 4);
-        this.secondAbilityCooldown = new AbilityCooldownBar(player.getWBasicAnimation().getCooldownDuration(), 102, 4, 10);
+        this.secondAbilityCooldown = new AbilityCooldownBar(player.getWBasicAnimation().getCooldownDuration(), 100, 4, 10);
         this.thirdAttack = new AttackIcon(player.getEBasicAnimation().getAttackIcon(), 189, 4);
         this.thirdAbilityCooldown = new AbilityCooldownBar(player.getEBasicAnimation().getCooldownDuration(), 174, 4, 10);
         this.healthBar = new HealthBar(player.getMaxHealth());
