@@ -17,7 +17,7 @@ public abstract class PlayerChampion {
     // variables
     protected float previousX;
     protected float previousY;
-    protected int speed;
+    protected float speed;
 
         // health and armor variables
     protected float health;
@@ -49,7 +49,7 @@ public abstract class PlayerChampion {
     protected Circle runnerBehaviorRange;
 
     // constructor
-    public PlayerChampion(int x, int y, int speed, float maxHealth, float maxArmor, float armorEffectiveness, float armorDuration, float armorIncreaseRate){
+    public PlayerChampion(int x, int y, float speed, float maxHealth, float maxArmor, float armorEffectiveness, float armorDuration, float armorIncreaseRate){
         position = new Vector2(x, y);
         relativePosition = new Vector2(x, y);
         velocity = new Vector2(0, 0);
@@ -176,7 +176,7 @@ public abstract class PlayerChampion {
     }
 
     // MOVEMENT METHODS
-    protected void movePlayer(){
+    protected void movePlayer(float deltaTime){
         // reset velocity vector
         velocity = new Vector2(0, 0);
 

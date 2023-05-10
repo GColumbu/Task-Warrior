@@ -10,12 +10,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class ArmorBar {
     // armor bar dimension
-    private final int HEALTH_BAR_WIDTH = 165;
-    private final int HEALTH_BAR_HEIGHT = 22;
+    private final int HEALTH_BAR_WIDTH = 198;
+    private final int HEALTH_BAR_HEIGHT = 19;
 
     // armor bar offset from UI
-    private final int OFFSET_X = 19;
-    private final int OFFSET_Y = 70;
+    private final int OFFSET_X = 45;
+    private final int OFFSET_Y = 60;
 
     // progress bar utils
     private final ProgressBar.ProgressBarStyle progressBarStyle;

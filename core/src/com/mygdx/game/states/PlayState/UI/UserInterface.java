@@ -31,14 +31,14 @@ public class UserInterface {
 
 
 
-    public UserInterface(String userInterfaceFilePath,PlayerChampion player, OrthographicCamera camera){
+    public UserInterface(String userInterfaceFilePath,PlayerChampion player){
         this.userInterface = new Texture(userInterfaceFilePath);
-        this.firstAttack = new AttackIcon(player.getQBasicAnimation().getAttackIcon(), 19, 5);
-        this.firstAbilityCooldown = new AbilityCooldownBar(player.getQBasicAnimation().getCooldownDuration(), 19, player.getQBasicAnimation().getAttackIcon().getHeight() + 7, player.getQBasicAnimation().getAttackIcon().getWidth());
-        this.secondAttack = new AttackIcon(player.getWBasicAnimation().getAttackIcon(), 59, 5);
-        this.secondAbilityCooldown = new AbilityCooldownBar(player.getWBasicAnimation().getCooldownDuration(), 59, player.getQBasicAnimation().getAttackIcon().getHeight() + 7, player.getWBasicAnimation().getAttackIcon().getWidth());
-        this.thirdAttack = new AttackIcon(player.getEBasicAnimation().getAttackIcon(), 99, 5);
-        this.thirdAbilityCooldown = new AbilityCooldownBar(player.getEBasicAnimation().getCooldownDuration(), 99, player.getQBasicAnimation().getAttackIcon().getHeight() + 7, player.getEBasicAnimation().getAttackIcon().getWidth());
+        this.firstAttack = new AttackIcon(player.getQBasicAnimation().getAttackIcon(), 45, 5);
+        this.firstAbilityCooldown = new AbilityCooldownBar(player.getQBasicAnimation().getCooldownDuration(), 30, 4, 10);
+        this.secondAttack = new AttackIcon(player.getWBasicAnimation().getAttackIcon(), 117, 4);
+        this.secondAbilityCooldown = new AbilityCooldownBar(player.getWBasicAnimation().getCooldownDuration(), 102, 4, 10);
+        this.thirdAttack = new AttackIcon(player.getEBasicAnimation().getAttackIcon(), 189, 4);
+        this.thirdAbilityCooldown = new AbilityCooldownBar(player.getEBasicAnimation().getCooldownDuration(), 174, 4, 10);
         this.healthBar = new HealthBar(player.getMaxHealth());
         this.armorBar = new ArmorBar(player.getMaxArmor());
     }

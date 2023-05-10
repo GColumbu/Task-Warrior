@@ -40,7 +40,7 @@ public class Garen extends PlayerChampion {
         if(currentState == PlayerChampion.State.W && !wAnimation.isBurst(stateTimer,false))
             wAnimation.setInvincibilityRange(new Circle(position.x, position.y, 275));
         setRunnerBehaviorRange(new Circle(position.x, position.y, 450));
-        movePlayer();
+        movePlayer(deltaTime);
         updateArmor(deltaTime);
     }
 
@@ -70,34 +70,34 @@ public class Garen extends PlayerChampion {
 
     // MOVEMENT METHODS
     @Override
-    protected void movePlayer(){
+    protected void movePlayer(float deltaTime){
         // reset velocity vector
         velocity = new Vector2(0, 0);
 
         boolean isWBurst = wAnimation.isBurst(stateTimer, false);
         Vector2 idleRelativePosition = getIdleRelativePosition();
+        float speedDifference = speed / 2f;
 
         if(currentState != State.W || !isWBurst) {
-
             // movement on y axis
             if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
                 if (idleRelativePosition.y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
                     velocity.y = speed;
                     if (currentState == State.Q) {
-                        velocity.y -= speed / 2.0;
+                        velocity.y -= speedDifference;
                     }
                     if (currentState == State.W && !isWBurst){
-                        velocity.y += speed / 3.0;
+                        velocity.y += speedDifference;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
                 if (idleRelativePosition.y > 0) {
                     velocity.y = -speed;
                     if (currentState == State.Q) {
-                        velocity.y += speed / 2.0;
+                        velocity.y += speedDifference;
                     }
                     if (currentState == State.W && !isWBurst){
-                        velocity.y -= speed / 3.0;
+                        velocity.y -= speedDifference;
                     }
                 }
             }
@@ -107,20 +107,20 @@ public class Garen extends PlayerChampion {
                 if (idleRelativePosition.x > 0) {
                     velocity.x = -speed;
                     if (currentState == State.Q) {
-                        velocity.x += speed / 2.0;
+                        velocity.x += speedDifference;
                     }
                      if (currentState == State.W && !isWBurst){
-                        velocity.x -= speed / 3.0;
+                        velocity.x -= speedDifference;
                     }
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 if (idleRelativePosition.x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
                     velocity.x = speed;
                     if (currentState == State.Q) {
-                        velocity.x -= speed / 2.0;
+                        velocity.x -= speedDifference;
                     }
                     if (currentState == State.W && !isWBurst){
-                        velocity.x += speed / 3.0;
+                        velocity.x += speedDifference;
                     }
                 }
             }

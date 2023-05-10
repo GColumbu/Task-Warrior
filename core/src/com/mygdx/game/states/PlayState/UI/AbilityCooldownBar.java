@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class AbilityCooldownBar {
     // progress bar dimension
-    private final int PROGRESS_BAR_HEIGHT = 3;
+    private final int PROGRESS_BAR_HEIGHT = 37;
 
     // health bar offset from UI
     private final int offsetX;
@@ -72,7 +72,7 @@ public class AbilityCooldownBar {
         progressBarStyle.knobBefore = drawable;
 
         // creates the progress bar
-        progressBar = new ProgressBar(0, cooldown, 0.1f, false, progressBarStyle);
+        progressBar = new ProgressBar(0, cooldown, 0.1f, true, progressBarStyle);
     }
 
     private void changePixmapColor(Pixmap pixmap, float cooldownStateTimer){

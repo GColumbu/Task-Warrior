@@ -116,7 +116,7 @@ public class PlayState implements Screen {
         this.minimapReference = new FitViewport(TaskWarrior.WIDTH, TaskWarrior.HEIGHT);
 
         // UI
-        this.userInterface = new UserInterface("assets/play screen/UI_template.png", target, camera);
+        this.userInterface = new UserInterface("assets/play screen/UI_template.png", target);
         this.minimap = new Minimap(new Texture("assets/play screen/minimap/minimap.png"));
 
         // set input processor
@@ -322,14 +322,16 @@ public class PlayState implements Screen {
 
         // update camera position based on the player and axis
     private void followPlayerX(PlayerChampion target){
-        Vector2 cameraPosition = new Vector2(viewport.getCamera().position.x, 0);
-        cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.07f);
-        viewport.getCamera().position.x = cameraPosition.x;
+//        Vector2 cameraPosition = new Vector2(viewport.getCamera().position.x, 0);
+//        cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.07f);
+//        viewport.getCamera().position.x = cameraPosition.x;
+        viewport.getCamera().position.x = target.getPosition().x;
     }
     private void followPlayerY(PlayerChampion target){
-        Vector2 cameraPosition = new Vector2(0, viewport.getCamera().position.y);
-        cameraPosition.lerp(new Vector2(0, target.getPosition().y), 0.07f);
-        viewport.getCamera().position.y = cameraPosition.y;
+//        Vector2 cameraPosition = new Vector2(0, viewport.getCamera().position.y);
+//        cameraPosition.lerp(new Vector2(0, target.getPosition().y), 0.07f);
+//        viewport.getCamera().position.y = cameraPosition.y;
+        viewport.getCamera().position.y = target.getPosition().y;
     }
 
     // SHOW BORDER METHODS (for debug purposes)
