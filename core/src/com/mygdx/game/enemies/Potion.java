@@ -6,19 +6,15 @@ import com.badlogic.gdx.math.Rectangle;
 
 
 public class Potion {
-    private Texture potion;
-    private boolean isArmor;
-    private float healing;
-    private float x;
-    private float y;
+    private final Texture potion;
+    private final boolean isArmor;
+    private final float healing;
+    private final float x;
+    private final float y;
 
-    public Potion(boolean armor, float x, float y, float healing){
-        if(armor){
-            potion = new Texture("assets/play screen/potions/armor_potion.png");
-        } else {
-            potion = new Texture("assets/play screen/potions/health_potion.png");
-        }
-        this.isArmor = armor;
+    public Potion(boolean isArmor, float x, float y, float healing, Texture potionTexture){
+        this.potion = potionTexture;
+        this.isArmor = isArmor;
         this.healing = healing;
         this.x = x;
         this.y = y;
@@ -34,9 +30,5 @@ public class Potion {
     }
     public float getHealing(){
         return healing;
-    }
-
-    public void dispose(){
-        potion.dispose();
     }
 }

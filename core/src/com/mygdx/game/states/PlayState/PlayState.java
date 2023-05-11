@@ -69,7 +69,11 @@ public class PlayState implements Screen {
         // troll
     private final EnemyTextures trollTexturs;
 
+    // potions
     private List<Potion> potions;
+        //potion textures
+    private Texture armorPotion;
+    private Texture healthPotion;
 
     // ShapeRenderer for DEBUG purposes
     ShapeRenderer shapeRenderer;
@@ -78,7 +82,12 @@ public class PlayState implements Screen {
     public PlayState(TaskWarrior game){
         this.game = game;
         this.background = new Texture("assets/play screen/background.png");
-        this.skulls = new Skulls("assets/play screen/skull.png");
+        this.skulls = new Skulls("assets/play screen/skull.png", "assets/fonts/pixel_font.ttf");
+
+        // player
+        this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
+
+        // enemies
         this.enemies = new ArrayList<>();
         this.minionTextures = new EnemyTextures(
                 new TextureRegion(new Texture("assets/play screen/minion/minion_idle.png")),
@@ -100,11 +109,16 @@ public class PlayState implements Screen {
                 new EnemyAnimation("assets/play screen/troll/troll_attack.png", 0.2f, 10),
                 new EnemyAnimation("assets/play screen/troll/troll_attack_damage.png", 0.2f, 10),
                 new EnemyAnimation("assets/play screen/troll/troll_death.png", 0.09f, 5));
+
+        // potions
         this.potions = new ArrayList<>();
+        this.armorPotion = new Texture("assets/play screen/potions/armor_potion.png");
+        this.healthPotion = new Texture("assets/play screen/potions/health_potion.png");
+
+        // default enemies on screen
         for(int i = 0; i < 5; i++){
             this.enemies.add(getEnemy(getRandomValue("x"), getRandomValue("y")));
         }
-        this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
         this.shapeRenderer = new ShapeRenderer(); // for debug purposes
         this.spawnTimer = 0;
         this.skullsNumber = 0;
@@ -171,10 +185,9 @@ public class PlayState implements Screen {
         minionTextures.dispose();
         runnerTextures.dispose();
         trollTexturs.dispose();
-        // dispose remaining potions
-        for(int i = 0; i < potions.size(); i++) {
-            potions.get(i).dispose();
-        }
+        // dispose
+        armorPotion.dispose();
+        healthPotion.dispose();
         // dispose player
         target.getSprite().getTexture().dispose();
     }
@@ -189,7 +202,10 @@ public class PlayState implements Screen {
             if(enemies.get(i).isDyingAnimationFinished()){
                 addSkulls(enemies.get(i));
                 if(enemies.get(i) instanceof Runner) {
-                    potions.add(new Potion(isArmor(), enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15));
+                    if (isArmor())
+                        potions.add(new Potion(true, enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15, armorPotion));
+                    else
+                        potions.add(new Potion(false, enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15, healthPotion));
                 }
                 enemies.remove(i);
                 i--;
@@ -200,12 +216,11 @@ public class PlayState implements Screen {
         }
         for(int i = 0; i < potions.size(); i++) {
             if (target.getPlayerRectangle().overlaps(potions.get(i).getBounds())){
-                if(!potions.get(i).isArmor()){
-                    target.incrementHealth(potions.get(i).getHealing());
-                } else {
+                if(potions.get(i).isArmor()){
                     target.incrementArmor(potions.get(i).getHealing());
+                } else {
+                    target.incrementHealth(potions.get(i).getHealing());
                 }
-                potions.get(i).dispose();
                 potions.remove(i);
             }
         }

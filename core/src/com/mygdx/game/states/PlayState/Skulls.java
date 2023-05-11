@@ -18,15 +18,15 @@ public class Skulls {
     private Label.LabelStyle labelStyle;
     private final FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
-    public Skulls(String skullTexture){
+    public Skulls(String skullTexture, String fontPath){
         this.skullTexture = new Texture(skullTexture);
         this.labelStyle = new Label.LabelStyle();
         this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
-        this.generator = new FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/pixel_font.ttf"));
+        this.generator = new FreeTypeFontGenerator(Gdx.files.internal(fontPath));
         this.parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         labelStyle.font = getFontStyle();
     }
-    public void draw(SpriteBatch batch, OrthographicCamera camera,  Integer skulls){ // TODO: take into account zoom without DRASTICALLY slowing down the game
+    public void draw(SpriteBatch batch, OrthographicCamera camera,  Integer skulls){
         Vector2 position = getSkullsPosition(camera.position, camera.zoom, camera.viewportWidth, camera.viewportHeight);
 
         // draw skull texture
@@ -47,7 +47,7 @@ public class Skulls {
 
     // get font style
     private BitmapFont getFontStyle(){
-        parameter.size = 30;
+        parameter.size = 30; // TODO: take into account zoom without DRASTICALLY slowing down the game
         parameter.borderWidth = 2;
         parameter.color = Color.WHITE;
         parameter.shadowOffsetX = 3;
