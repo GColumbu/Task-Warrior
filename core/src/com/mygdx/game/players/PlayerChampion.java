@@ -181,25 +181,26 @@ public abstract class PlayerChampion {
         velocity = new Vector2(0, 0);
 
         Vector2 idleRelativePosition = getIdleRelativePosition();
+        int constantSpeed = (int)(deltaTime * speed);
 
         // movement on y axis
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
             if (idleRelativePosition.y < TaskWarrior.HEIGHT - idleTextureRegion.getRegionHeight()) {
-                velocity.y = speed;
+                velocity.y = constantSpeed;
             }
         } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             if (idleRelativePosition.y > 0) {
-                velocity.y = -speed;
+                velocity.y = -constantSpeed;
             }
         }
         // movement on x axis
          if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             if (idleRelativePosition.x > 0) {
-                velocity.x = -speed;
+                velocity.x = -constantSpeed;
             }
         } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
              if (idleRelativePosition.x < TaskWarrior.WIDTH - idleTextureRegion.getRegionWidth()) {
-                 velocity.x = speed;
+                 velocity.x = constantSpeed;
              }
          }
 

@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Align;
 
 public class Skulls {
     private final Texture skullTexture;
-    private Color magicColor;
+    private final Color magicColor;
     private Label.LabelStyle labelStyle;
     private final FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
