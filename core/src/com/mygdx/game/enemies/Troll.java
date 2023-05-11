@@ -72,6 +72,7 @@ public class Troll extends Enemy{
 
     @Override
     protected void addBehavior(PlayerChampion player, float deltaTime) {
+        boolean isCollidingWithPlayer = enemyRectangle.overlaps(player.getPlayerRectangle());
         if(isCooldownFinished() && isCollidingWithAttackRange(trollChargeRange, player.getPlayerRectangle()) || isAttackOngoing()){
             // save the position to seek when it is first "seen" and project on the circle
             if(currentState != State.ATTACK){
@@ -81,7 +82,7 @@ public class Troll extends Enemy{
             }
             // accelerate to match the dash animation and seek the position of the player when it was first "seen"
             if(isAttackTiming()){
-                if(!enemyRectangle.overlaps(player.getPlayerRectangle()) && trollChargeRange.contains(position)) {
+                if(!isCollidingWithPlayer && trollChargeRange.contains(position)) {
                     maxSpeed = 3000;
                     maxForce = 500;
                     currentSteeringBehavior = seek(attackTarget.cpy(), deltaTime);
@@ -92,14 +93,16 @@ public class Troll extends Enemy{
             }
             currentState = State.ATTACK;
         } else{
-            if(!enemyRectangle.overlaps(player.getPlayerRectangle())){
+            if(!isCollidingWithPlayer){
                 currentSteeringBehavior = seek(player.getPosition().cpy(), deltaTime);
                 applySteeringBehaviour(currentSteeringBehavior, deltaTime);
-            } else {
-                // don't let player overlap minion
-                noOverlappingWithPlayer(player);
             }
             currentState = State.WALKING;
+        }
+
+        // don't let player overlap minion
+        if(isCollidingWithPlayer){
+            noOverlappingWithPlayer(player);
         }
 
         // troll dies
