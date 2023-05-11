@@ -24,9 +24,9 @@ public class Skulls {
         this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
         this.generator = new FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/pixel_font.ttf"));
         this.parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        labelStyle.font = getFontStyle();
     }
-    public void draw(SpriteBatch batch, OrthographicCamera camera,  Integer skulls){
-        labelStyle.font = getFontStyle(camera.zoom);
+    public void draw(SpriteBatch batch, OrthographicCamera camera,  Integer skulls){ // TODO: take into account zoom without DRASTICALLY slowing down the game
         Vector2 position = getSkullsPosition(camera.position, camera.zoom, camera.viewportWidth, camera.viewportHeight);
 
         // draw skull texture
@@ -46,12 +46,12 @@ public class Skulls {
     }
 
     // get font style
-    private BitmapFont getFontStyle(float cameraZoom){
-        parameter.size = (int)(30 * cameraZoom);
-        parameter.borderWidth = 2 * cameraZoom;
+    private BitmapFont getFontStyle(){
+        parameter.size = 30;
+        parameter.borderWidth = 2;
         parameter.color = Color.WHITE;
-        parameter.shadowOffsetX = (int)(3 * cameraZoom);
-        parameter.shadowOffsetY = (int)(3 * cameraZoom);
+        parameter.shadowOffsetX = 3;
+        parameter.shadowOffsetY = 3;
         parameter.shadowColor = magicColor;
         return generator.generateFont(parameter);
     }
