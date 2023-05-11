@@ -32,11 +32,14 @@ public class Skulls {
         // draw skull texture
         batch.draw(skullTexture, position.x, position.y, skullTexture.getWidth() * camera.zoom, skullTexture.getHeight() * camera.zoom);
 
-        // draw no. of skulls
+        // draw skulls acquired
+            // update the scale of the BitmapFont to take into account zoom
+        labelStyle.font.getData().setScale(camera.zoom);
+            // create and draw label
         Label label = new Label(skulls.toString(), labelStyle);
         label.setSize(100 * camera.zoom, 100 * camera.zoom);
         label.setAlignment(Align.center);
-        label.setPosition(position.x + 80 * camera.zoom, position.y - 15 * camera.zoom);
+        label.setPosition(position.x + (80 * camera.zoom), position.y - (15 * camera.zoom));
         label.draw(batch, 1);
     }
 
@@ -47,7 +50,7 @@ public class Skulls {
 
     // get font style
     private BitmapFont getFontStyle(){
-        parameter.size = 30; // TODO: take into account zoom without DRASTICALLY slowing down the game
+        parameter.size = 30;
         parameter.borderWidth = 2;
         parameter.color = Color.WHITE;
         parameter.shadowOffsetX = 3;

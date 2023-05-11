@@ -13,7 +13,7 @@ import java.util.List;
 public class Minion extends Enemy {
     //constants
     private final static int MINION_MAX_SPEED = 150;
-    private final static int MINION_MAX_FORCE = 30;
+    private final static int MINION_MAX_FORCE = 20;
     private final static int MINION_HEALTH = 300;
     private final static float MINION_DAMAGE = 1F;
     private final static float ATTACK_COOLDOWN = 0F;

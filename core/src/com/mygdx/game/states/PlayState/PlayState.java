@@ -67,13 +67,13 @@ public class PlayState implements Screen {
     private final EnemyTextures runnerTextures;
 
         // troll
-    private final EnemyTextures trollTexturs;
+    private final EnemyTextures trollTextures;
 
     // potions
     private List<Potion> potions;
         //potion textures
-    private Texture armorPotion;
-    private Texture healthPotion;
+    private final Texture armorPotion;
+    private final Texture healthPotion;
 
     // ShapeRenderer for DEBUG purposes
     ShapeRenderer shapeRenderer;
@@ -102,7 +102,7 @@ public class PlayState implements Screen {
                 new EnemyAnimation("assets/play screen/runner/runner_walk_dmg.png", 0.07f, 12),
                 null, null,
                 new EnemyAnimation("assets/play screen/runner/runner_death.png", 0.07f, 4));
-        this.trollTexturs = new EnemyTextures(
+        this.trollTextures = new EnemyTextures(
                 new TextureRegion(new Texture("assets/play screen/troll/troll_idle.png")),
                 new EnemyAnimation("assets/play screen/troll/troll_walk.png", 0.2f, 11),
                 new EnemyAnimation("assets/play screen/troll/troll_walk_damage.png", 0.2f, 11),
@@ -184,7 +184,7 @@ public class PlayState implements Screen {
         // dispose minions
         minionTextures.dispose();
         runnerTextures.dispose();
-        trollTexturs.dispose();
+        trollTextures.dispose();
         // dispose
         armorPotion.dispose();
         healthPotion.dispose();
@@ -277,7 +277,7 @@ public class PlayState implements Screen {
         } else if (probability > minionProbability && probability <= minionRunnerProbability){
             return new Runner(x, y, runnerTextures);
         } else if (probability > minionRunnerProbability && probability <= 100)
-            return new Troll(x, y, trollTexturs);
+            return new Troll(x, y, trollTextures);
         return null;
     }
     private int getRandomValue(String axis){
@@ -324,8 +324,8 @@ public class PlayState implements Screen {
 
     // UPDATE CAMERA METHODS
 
-        // update camera position based on background limits
-    private void updateCamera(PlayerChampion target){
+        // update camera position based on arena limits
+    private void updateCamera(PlayerChampion target){ // TODO: arena limits not working with the new camera lag
         if(target.getPosition().x - camera.viewportWidth/2 * camera.zoom > 0 && target.getPosition().x + camera.viewportWidth/2 * camera.zoom < TaskWarrior.WIDTH){
             followPlayerX(target);
         }
@@ -337,16 +337,14 @@ public class PlayState implements Screen {
 
         // update camera position based on the player and axis
     private void followPlayerX(PlayerChampion target){
-//        Vector2 cameraPosition = new Vector2(viewport.getCamera().position.x, 0);
-//        cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.07f);
-//        viewport.getCamera().position.x = cameraPosition.x;
-        viewport.getCamera().position.x = target.getPosition().x;
+        Vector2 cameraPosition = new Vector2(viewport.getCamera().position.x, 0);
+        cameraPosition.lerp(new Vector2(target.getPosition().x, 0), 0.07f);
+        viewport.getCamera().position.x = (int)cameraPosition.x;
     }
     private void followPlayerY(PlayerChampion target){
-//        Vector2 cameraPosition = new Vector2(0, viewport.getCamera().position.y);
-//        cameraPosition.lerp(new Vector2(0, target.getPosition().y), 0.07f);
-//        viewport.getCamera().position.y = cameraPosition.y;
-        viewport.getCamera().position.y = target.getPosition().y;
+        Vector2 cameraPosition = new Vector2(0, viewport.getCamera().position.y);
+        cameraPosition.lerp(new Vector2(0, target.getPosition().y), 0.07f);
+        viewport.getCamera().position.y = (int)cameraPosition.y;
     }
 
     // SHOW BORDER METHODS (for debug purposes)
