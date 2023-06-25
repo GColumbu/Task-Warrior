@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -58,6 +59,7 @@ public class PlayState implements Screen {
 
         // skulls variables
     private Integer skullsNumber;
+    private Integer bestSkullsNumber;
     HashMap<Class<?>, Integer> enemySkulls = new HashMap<Class<?>, Integer>() {{
         put(Minion.class, 100);
         put(Runner.class, 150);
@@ -86,13 +88,15 @@ public class PlayState implements Screen {
     ShapeRenderer shapeRenderer;
 
     // constructor  //TODO: pass a difficulty class to initiate the player upgrades
-    public PlayState(TaskWarrior game){
+    public PlayState(TaskWarrior game, Integer bestScore){
         this.game = game;
+        this.game.batch = new SpriteBatch();
         this.background = new Texture("assets/play screen/background.png");
         this.gameMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/in_game_music.mp3"));
         this.gameMusic.setLooping(true);
         this.gameMusic.play();
         this.skulls = new Skulls("assets/play screen/skull.png", "assets/fonts/pixel_font.ttf");
+        this.bestSkullsNumber = bestScore;
 
         // player
         this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
@@ -252,7 +256,7 @@ public class PlayState implements Screen {
         if(target.isDeathAnimationFinished()){
             game.batch.dispose();
             gameMusic.stop();
-            game.setScreen( new GameOverState(game));
+            game.setScreen( new GameOverState(game, skullsNumber, bestSkullsNumber));
         }
     }
 

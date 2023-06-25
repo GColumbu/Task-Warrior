@@ -10,9 +10,11 @@ import com.mygdx.game.states.PlayState.PlayState;
 public class MenuState implements Screen {
     private TaskWarrior game;
     private Texture img;
-    public MenuState(TaskWarrior game) {
+    private Integer bestScore;
+    public MenuState(TaskWarrior game, Integer bestScore) {
         this.game = game;
         img = new Texture("home_background.jpg");
+        this.bestScore = bestScore;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class MenuState implements Screen {
 
     private void handleInput() {
         if(Gdx.input.justTouched()){
-            game.setScreen( new PlayState(game));
+            game.setScreen( new PlayState(game, bestScore));
         }
     }
 

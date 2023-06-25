@@ -16,7 +16,7 @@ public class TaskWarrior extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		setScreen(new MenuState(this));
+		setScreen(new MenuState(this, 0));
 	}
 
 	@Override
