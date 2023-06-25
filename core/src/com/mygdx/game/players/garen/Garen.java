@@ -3,6 +3,7 @@ package com.mygdx.game.players.garen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
@@ -13,6 +14,7 @@ public class Garen extends PlayerChampion {
     protected Garen_W wAnimation;
     protected Garen_Q qAnimation;
     protected Garen_E eAnimation;
+    protected Garen_DeathAnimation deathAnimation;
 
     public Garen(int x, int y){
         super(x, y, 500, 200, 100, 50, 3, 0.05f);
@@ -23,6 +25,7 @@ public class Garen extends PlayerChampion {
         qBasicAnimation = qAnimation;
         eAnimation = new Garen_E("assets/play screen/garen/spin.png", "assets/play screen/garen/e_icon.png", 0.15f, 0.05f);
         eBasicAnimation = eAnimation;
+        deathAnimation = new Garen_DeathAnimation("assets/play screen/garen/death.png", 0.15f);
         idleTextureRegion = new TextureRegion(new Texture("assets/play screen/garen/idle.png"));
         currentRegion = idleTextureRegion;
         currentState = State.STANDING;
@@ -49,6 +52,9 @@ public class Garen extends PlayerChampion {
     protected void setRelativePosition() {
         currentState = getState();
         switch (currentState) {
+            case DEATH:
+                relativePosition = getDeathRelativePosition();
+                break;
             case Q:
                 relativePosition = getQSlashRelativePosition();
                 break;
@@ -145,6 +151,9 @@ public class Garen extends PlayerChampion {
     protected TextureRegion getCurrentFrame(float deltaTime){
         TextureRegion region;
         switch(currentState){
+            case DEATH:
+                region = deathAnimation.getKeyFrame(stateTimer);
+                break;
             case Q:
                 region = qAnimation.getKeyFrame(stateTimer);
                 break;
@@ -176,6 +185,15 @@ public class Garen extends PlayerChampion {
             stateTimer = 0;
         previousState = currentState;
         return region;
+    }
+
+    // player death methods
+    @Override
+    public boolean isDeathAnimationFinished(){
+        return currentState == State.DEATH && deathAnimation.deathAnimation.isAnimationFinished(stateTimer);
+    }
+    protected Vector2 getDeathRelativePosition(){
+        return new Vector2(position.x - deathAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - deathAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
 
     // Q spell methods

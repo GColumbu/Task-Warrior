@@ -249,7 +249,7 @@ public class PlayState implements Screen {
         // minimap
         minimap.draw(game.batch, minimapReference, target, enemies);
 
-        if(target.getHealth() <= 0){
+        if(target.isDeathAnimationFinished()){
             game.batch.dispose();
             gameMusic.stop();
             game.setScreen( new GameOverState(game));

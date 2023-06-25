@@ -30,7 +30,7 @@ public abstract class PlayerChampion {
     protected float armorIncreaseRate;
 
     // player states
-    public enum State {STANDING, WALKING, Q, E, W}
+    public enum State {STANDING, WALKING, DEATH, Q, E, W}
     protected State currentState;
     protected State previousState;
     protected float stateTimer;
@@ -98,6 +98,9 @@ public abstract class PlayerChampion {
                 break;
         }
     }
+
+    // player death methods
+    public abstract boolean isDeathAnimationFinished();
 
     // q ability methods
     public AttackAnimation getQBasicAnimation() { return qBasicAnimation;}
@@ -219,6 +222,10 @@ public abstract class PlayerChampion {
 
     // gets current state based on player decisions
     public State getState() {
+        // checks if player died
+        if(health <= 0){
+            return State.DEATH;
+        }
 
         // Q checking state
         boolean isQKeyPressed = Gdx.input.isKeyJustPressed(Input.Keys.Q);
