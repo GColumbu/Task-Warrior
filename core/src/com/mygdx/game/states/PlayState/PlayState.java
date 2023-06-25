@@ -95,6 +95,7 @@ public class PlayState implements Screen {
         this.gameMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/in_game_music.mp3"));
         this.gameMusic.setLooping(true);
         this.gameMusic.play();
+        this.gameMusic.setVolume(0.03f);
         this.skulls = new Skulls("assets/play screen/skull.png", "assets/fonts/pixel_font.ttf");
         this.bestSkullsNumber = bestScore;
 

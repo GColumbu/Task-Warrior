@@ -1,5 +1,7 @@
 package com.mygdx.game.players.garen;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,6 +18,7 @@ public class Garen_W extends AttackAnimation {
     protected int wBurstFrames;
     protected float wBurstFrameDuration;
     protected float burstDuration;
+    protected Sound burstSoundEffect;
     protected float wAttackDamage = 10;
         //WALKING
     protected Animation<TextureRegion> wWalkingAnimation;
@@ -26,7 +29,7 @@ public class Garen_W extends AttackAnimation {
     protected TextureRegion idleInvincibilityTextureRegion;
     protected Circle invincibilityRange;
 
-    protected Garen_W(String wBurstFilePath, String wWalkingFilePath, String wIdleTexture,  String wIconFilePath, float wBurstFrameDuration, float wWalkingFrameDuration) {
+    protected Garen_W(String wBurstFilePath, String wWalkingFilePath, String wIdleTexture,  String wIconFilePath, float wBurstFrameDuration, float wWalkingFrameDuration, String wSoundFilePath) {
         cooldownDuration = COOLDOWN;
         cooldownStateTimer = cooldownDuration;
         wBurstFrames = 10;
@@ -50,6 +53,7 @@ public class Garen_W extends AttackAnimation {
         idleInvincibilityTextureRegion = new TextureRegion(new Texture(wIdleTexture));
         attackIcon = new Texture(wIconFilePath);
         burstDuration = wBurstAnimation.getAnimationDuration();
+        burstSoundEffect = Gdx.audio.newSound(Gdx.files.internal(wSoundFilePath));
     }
     // GETTERS
     protected TextureRegion getBurstKeyFrame(float stateTimer){
@@ -80,6 +84,10 @@ public class Garen_W extends AttackAnimation {
     @Override
     public float getKeyFrameHeight(float stateTimer){
         return wBurstAnimation.getKeyFrame(stateTimer, false).getRegionHeight();
+    }
+
+    public int getKeyFrameIndex(float stateTimer){
+       return wBurstAnimation.getKeyFrameIndex(stateTimer);
     }
 
     @Override

@@ -19,7 +19,7 @@ public class Garen extends PlayerChampion {
     public Garen(int x, int y){
         super(x, y, 500, 200, 100, 50, 3, 0.05f);
         walkingAnimation = new WalkingAnimation("assets/play screen/garen/walk.png", 0.05f);
-        wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f);
+        wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f, "assets/sounds/w_burst.mp3");
         wBasicAnimation = wAnimation;
         qAnimation = new Garen_Q("assets/play screen/garen/slash_combo_part1.png", "assets/play screen/garen/slash_combo_part2.png", "assets/play screen/garen/q_icon.png",0.07f);
         qBasicAnimation = qAnimation;
@@ -45,6 +45,7 @@ public class Garen extends PlayerChampion {
         setRunnerBehaviorRange(new Circle(position.x, position.y, 450));
         movePlayer(deltaTime);
         updateArmor(deltaTime);
+        playWSoundEffect();
     }
 
     // calculates where the draw function should start based on the current state
@@ -323,6 +324,12 @@ public class Garen extends PlayerChampion {
     }
 
     // W spell
+    protected void playWSoundEffect(){
+        int index = wAnimation.getKeyFrameIndex(stateTimer);
+        if(currentState == State.W && index == 6){
+            wAnimation.burstSoundEffect.setVolume(wAnimation.burstSoundEffect.play(), 4f);
+        }
+    }
     protected Vector2 getWBurstRelativePosition() {
         return new Vector2(position.x - wAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - wAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
