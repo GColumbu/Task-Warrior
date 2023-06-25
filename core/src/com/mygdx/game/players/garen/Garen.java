@@ -21,7 +21,7 @@ public class Garen extends PlayerChampion {
         wBasicAnimation = wAnimation;
         qAnimation = new Garen_Q("assets/play screen/garen/slash_combo_part1.png", "assets/play screen/garen/slash_combo_part2.png", "assets/play screen/garen/q_icon.png",0.07f);
         qBasicAnimation = qAnimation;
-        eAnimation = new Garen_E("assets/play screen/garen/spin.png", "assets/play screen/garen/e_icon.png", 0.1f, 0.05f);
+        eAnimation = new Garen_E("assets/play screen/garen/spin.png", "assets/play screen/garen/e_icon.png", 0.15f, 0.05f);
         eBasicAnimation = eAnimation;
         idleTextureRegion = new TextureRegion(new Texture("assets/play screen/garen/idle.png"));
         currentRegion = idleTextureRegion;

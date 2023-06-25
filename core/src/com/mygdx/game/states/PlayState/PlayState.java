@@ -3,10 +3,12 @@ package com.mygdx.game.states.PlayState;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -16,6 +18,7 @@ import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.enemies.*;
 import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
+import com.mygdx.game.states.GameOverState;
 import com.mygdx.game.states.PlayState.UI.UserInterface;
 
 import java.util.ArrayList;
@@ -29,6 +32,10 @@ public class PlayState implements Screen {
 
     // game utils
     private final TaskWarrior game;
+
+    private final Music gameMusic;
+        // Shader
+    private ShaderProgram shaderProgram;
 
         // UI and textures
     private final Texture background;
@@ -82,6 +89,9 @@ public class PlayState implements Screen {
     public PlayState(TaskWarrior game){
         this.game = game;
         this.background = new Texture("assets/play screen/background.png");
+        this.gameMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/in_game_music.mp3"));
+        this.gameMusic.setLooping(true);
+        this.gameMusic.play();
         this.skulls = new Skulls("assets/play screen/skull.png", "assets/fonts/pixel_font.ttf");
 
         // player
@@ -185,11 +195,15 @@ public class PlayState implements Screen {
         minionTextures.dispose();
         runnerTextures.dispose();
         trollTextures.dispose();
-        // dispose
+        // dispose potions
         armorPotion.dispose();
         healthPotion.dispose();
+        //dispose shader
+        shaderProgram.dispose();
         // dispose player
         target.getSprite().getTexture().dispose();
+        //dispose music
+        gameMusic.dispose();
     }
 
 
@@ -234,6 +248,12 @@ public class PlayState implements Screen {
 
         // minimap
         minimap.draw(game.batch, minimapReference, target, enemies);
+
+        if(target.getHealth() <= 0){
+            game.batch.dispose();
+            gameMusic.stop();
+            game.setScreen( new GameOverState(game));
+        }
     }
 
     // draw method for game objects
@@ -293,7 +313,7 @@ public class PlayState implements Screen {
 
     // adds minion at random value (except for player range)
     private void addMinion(PlayerChampion player, float deltaTime){
-        if(spawnTimer >= ENEMY_SPAWN_FREQUENCY && enemies.size() != 10){
+        if(spawnTimer >= ENEMY_SPAWN_FREQUENCY){
             Vector2 newPosition;
             // don't allow minions to spawn near player
             do{
