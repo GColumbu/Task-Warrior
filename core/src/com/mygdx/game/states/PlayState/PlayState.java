@@ -222,9 +222,9 @@ public class PlayState implements Screen {
                 addSkulls(enemies.get(i));
                 if(enemies.get(i) instanceof Runner) {
                     if (isArmor())
-                        potions.add(new Potion(true, enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15, armorPotion));
+                        potions.add(new Potion(true, enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15, armorPotion, "assets/sounds/potion_pickup.mp3"));
                     else
-                        potions.add(new Potion(false, enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15, healthPotion));
+                        potions.add(new Potion(false, enemies.get(i).getPosition().x, enemies.get(i).getPosition().y, 15, healthPotion, "assets/sounds/potion_pickup.mp3"));
                 }
                 enemies.remove(i);
                 i--;
@@ -237,8 +237,10 @@ public class PlayState implements Screen {
             if (target.getPlayerRectangle().overlaps(potions.get(i).getBounds())){
                 if(potions.get(i).isArmor()){
                     target.incrementArmor(potions.get(i).getHealing());
+                    potions.get(i).getPickupSoundEffect().play();
                 } else {
                     target.incrementHealth(potions.get(i).getHealing());
+                    potions.get(i).getPickupSoundEffect().play();
                 }
                 potions.remove(i);
             }

@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.players.AttackAnimation;
 
+import java.util.ArrayList;
+
 public class Garen_W extends AttackAnimation {
     private final float COOLDOWN = 10;
     private final int INVINCIBILITY_DURATION = 3;
@@ -18,7 +20,6 @@ public class Garen_W extends AttackAnimation {
     protected int wBurstFrames;
     protected float wBurstFrameDuration;
     protected float burstDuration;
-    protected Sound burstSoundEffect;
     protected float wAttackDamage = 10;
         //WALKING
     protected Animation<TextureRegion> wWalkingAnimation;
@@ -53,7 +54,8 @@ public class Garen_W extends AttackAnimation {
         idleInvincibilityTextureRegion = new TextureRegion(new Texture(wIdleTexture));
         attackIcon = new Texture(wIconFilePath);
         burstDuration = wBurstAnimation.getAnimationDuration();
-        burstSoundEffect = Gdx.audio.newSound(Gdx.files.internal(wSoundFilePath));
+        this.soundEffects = new ArrayList<>();
+        this.soundEffects.add(Gdx.audio.newSound(Gdx.files.internal(wSoundFilePath)));
     }
     // GETTERS
     protected TextureRegion getBurstKeyFrame(float stateTimer){

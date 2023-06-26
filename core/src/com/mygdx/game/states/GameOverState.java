@@ -31,6 +31,7 @@ public class GameOverState implements Screen {
     private final Music gameOverMusic;
     private final Sound selectSound;
 
+    private final Color redColor;
     // textures
     private Image background;
 
@@ -65,6 +66,7 @@ public class GameOverState implements Screen {
         this.stage = new Stage();
         this.score = score;
         this.bestScore = bestScore;
+        this.redColor = new Color(117/255f, 25/255f, 25/255f, 1);
 
         // buttons
         configureBackground();
@@ -84,9 +86,10 @@ public class GameOverState implements Screen {
         configureScoreLabel();
 
         this.viewport = new ScreenViewport();
-        gameOverMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/game_over_music.mp3"));
-        gameOverMusic.setLooping(true);
-        gameOverMusic.play();
+        this.gameOverMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/game_over_music.mp3"));
+        this.gameOverMusic.setLooping(true);
+        this.gameOverMusic.play();
+        this.gameOverMusic.setVolume(0.03f);
         selectSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/select.mp3"));
 
         Gdx.input.setInputProcessor(stage);
@@ -147,7 +150,7 @@ public class GameOverState implements Screen {
         mainMenuButton.addListener( new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                selectSound.play();
+                selectSound.setVolume(selectSound.play(), 0.1f);
                 gameOverMusic.stop();
                 game.setScreen( new MenuState(game, bestScore));
             }
@@ -164,7 +167,7 @@ public class GameOverState implements Screen {
         tryAgainButton.addListener( new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                selectSound.play();
+                selectSound.setVolume(selectSound.play(), 0.1f);
                 gameOverMusic.stop();
                 game.setScreen( new PlayState(game, bestScore));
             }
@@ -244,7 +247,7 @@ public class GameOverState implements Screen {
     private BitmapFont getRedirectAndScoreButtonsStyle(){
         parameter.size = 20;
         parameter.borderWidth = 2;
-        parameter.color = Color.RED;
+        parameter.color = redColor;
         parameter.shadowOffsetX = 3;
         parameter.shadowOffsetY = 3;
         parameter.shadowColor = Color.BLACK;
@@ -254,7 +257,7 @@ public class GameOverState implements Screen {
     private BitmapFont getYouLostStyle(){
         parameter.size = 50;
         parameter.borderWidth = 3;
-        parameter.color = Color.RED;
+        parameter.color = redColor;
         parameter.shadowOffsetX = 3;
         parameter.shadowOffsetY = 3;
         parameter.shadowColor = Color.BLACK;
@@ -264,7 +267,7 @@ public class GameOverState implements Screen {
     private BitmapFont getSkullsStyle(){
         parameter.size = 30;
         parameter.borderWidth = 3;
-        parameter.color = Color.RED;
+        parameter.color = redColor;
         parameter.shadowOffsetX = 3;
         parameter.shadowOffsetY = 3;
         parameter.shadowColor = Color.BLACK;

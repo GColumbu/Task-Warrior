@@ -2,6 +2,7 @@ package com.mygdx.game.players.garen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -45,7 +46,7 @@ public class Garen extends PlayerChampion {
         setRunnerBehaviorRange(new Circle(position.x, position.y, 450));
         movePlayer(deltaTime);
         updateArmor(deltaTime);
-        playWSoundEffect();
+        addAbilitySoundEffects();
     }
 
     // calculates where the draw function should start based on the current state
@@ -198,6 +199,11 @@ public class Garen extends PlayerChampion {
     }
 
     // Q spell methods
+
+    protected void playQSoundEffect(){
+        //TODO: add q sound effect
+    }
+
     protected Vector2 getQSlashRelativePosition() {
         return new Vector2(position.x - qAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - qAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
@@ -324,10 +330,12 @@ public class Garen extends PlayerChampion {
     }
 
     // W spell
-    protected void playWSoundEffect(){
+
+    protected void playWBurstSoundEffect(){
         int index = wAnimation.getKeyFrameIndex(stateTimer);
+        Sound wBurstSoundEffect = wAnimation.getSoundEffects().get(0);
         if(currentState == State.W && index == 6){
-            wAnimation.burstSoundEffect.setVolume(wAnimation.burstSoundEffect.play(), 4f);
+            wBurstSoundEffect.play();
         }
     }
     protected Vector2 getWBurstRelativePosition() {
@@ -354,6 +362,10 @@ public class Garen extends PlayerChampion {
 
     // E spell
 
+    protected void playESpinSoundEffect(){
+        // TODO: add e spin sound effect
+    }
+
     protected Vector2 getESpinRelativePosition() {
         return new Vector2(position.x - eAnimation.getKeyFrameWidth(stateTimer) / 2, position.y - eAnimation.getKeyFrameHeight(stateTimer) / 2);
     }
@@ -369,5 +381,12 @@ public class Garen extends PlayerChampion {
     @Override
     public Circle getEAttackRange(){
         return new Circle(position.x, position.y, 310);
+    }
+
+    // add sound effect logic
+    protected void addAbilitySoundEffects(){
+        playQSoundEffect();
+        playWBurstSoundEffect();
+        playESpinSoundEffect();
     }
 }
