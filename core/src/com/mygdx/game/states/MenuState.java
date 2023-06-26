@@ -2,6 +2,7 @@ package com.mygdx.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,15 +10,15 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -37,6 +38,7 @@ public class MenuState implements Screen {
     private Integer bestScore;
     private final Stage stage;
     private final Sound selectSound;
+    private final Music mainMenuMusic;
 
     // Buttons
         // Play Button
@@ -67,6 +69,10 @@ public class MenuState implements Screen {
         this.bestScore = bestScore;
         this.viewport = new ScreenViewport();
         this.selectSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/select.mp3"));
+        this.mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/main_menu_music.mp3"));
+        this.mainMenuMusic.setLooping(true);
+        this.mainMenuMusic.play();
+        this.mainMenuMusic.setVolume(0.03f);
 
         // GdxFreeType
         this.labelStyle = new Label.LabelStyle();
@@ -88,7 +94,10 @@ public class MenuState implements Screen {
 
     @Override
     public void render(float deltaTime) {
+        viewport.getCamera().update();
+        stage.getBatch().setProjectionMatrix(viewport.getCamera().combined);
         stage.act(deltaTime);
+        addHoverLogic();
         render();
     }
 
@@ -158,6 +167,7 @@ public class MenuState implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 selectSound.setVolume(selectSound.play(), 0.1f);
+                mainMenuMusic.stop();
                 game.setScreen(new PlayState(game, bestScore));
             }
         } );
@@ -171,7 +181,7 @@ public class MenuState implements Screen {
 
     private void configureTasksButton(){
         // button
-        tasksButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/game over screen/main_menu.png")));
+        tasksButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/game over screen/try_again.png")));
         tasksButtonStyle = new Button.ButtonStyle();
         tasksButtonStyle.up = tasksButtonTexture;
         tasksButton = new Button(tasksButtonStyle);
@@ -183,16 +193,17 @@ public class MenuState implements Screen {
                 //game.setScreen(new PlayState(game, bestScore));
             }
         } );
+
         // label
         labelStyle.font = getRedirectButtonsStyle();
-        Label playLabel = new Label(TASKS, labelStyle);
-        tasksButton.add(playLabel);
+        Label tasksLabel = new Label(TASKS, labelStyle);
+        tasksButton.add(tasksLabel);
         stage.addActor(tasksButton);
     }
 
     private void configureChampionsButton(){
         // button
-        championsButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/game over screen/try_again.png")));
+        championsButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/game over screen/main_menu.png")));
         championsButtonStyle = new Button.ButtonStyle();
         championsButtonStyle.up = championsButtonTexture;
         championsButton = new Button(championsButtonStyle);
@@ -204,6 +215,7 @@ public class MenuState implements Screen {
                 //game.setScreen(new PlayState(game, bestScore));
             }
         } );
+
         // label
         labelStyle.font = getRedirectButtonsStyle();
         Label championLabel = new Label(CHAMPIONS, labelStyle);
@@ -230,5 +242,20 @@ public class MenuState implements Screen {
         parameter.shadowOffsetY = 2;
         parameter.shadowColor = Color.BLACK;
         return generator.generateFont(parameter);
+    }
+
+    // Hover Logic
+    private void addHoverLogic(){
+        addHoverLogicForButton(playButton);
+        addHoverLogicForButton(tasksButton);
+        addHoverLogicForButton(championsButton);
+    }
+
+    private void addHoverLogicForButton(Button button){
+        if(button.isOver() && button.getX() < 60){
+            button.setPosition(button.getX() + 3, button.getY());
+        } else if(!button.isOver() && button.getX() > 20){
+            button.setPosition(button.getX() - 3, button.getY());
+        }
     }
 }
