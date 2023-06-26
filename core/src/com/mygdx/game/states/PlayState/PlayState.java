@@ -203,12 +203,14 @@ public class PlayState implements Screen {
         // dispose potions
         armorPotion.dispose();
         healthPotion.dispose();
-        //dispose shader
+        // dispose shader
         shaderProgram.dispose();
         // dispose player
         target.getSprite().getTexture().dispose();
-        //dispose music
+        // dispose music
         gameMusic.dispose();
+        // dispose batch
+        game.batch.dispose();
     }
 
 

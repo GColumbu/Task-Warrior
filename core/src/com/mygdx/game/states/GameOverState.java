@@ -30,7 +30,6 @@ public class GameOverState implements Screen {
     private final Viewport viewport;
     private final Music gameOverMusic;
     private final Sound selectSound;
-
     private final Color redColor;
     // textures
     private Image background;
@@ -45,11 +44,12 @@ public class GameOverState implements Screen {
     private Button tryAgainButton;
     private Button.ButtonStyle tryAgainButtonStyle;
 
-    // Labels
-        // GdxFreeType
+    // GdxFreeType
     private Label.LabelStyle labelStyle;
     private final FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
+
+    // Scores
     private Integer bestScore;
     private Integer score;
     private static final String MAIN_MENU_LABEL = "Main Menu";
@@ -73,8 +73,8 @@ public class GameOverState implements Screen {
         configureMainMenuButton();
         configureTryAgainButton();
 
-        // Labels
-            // GdxFreeType
+
+        // GdxFreeType
         this.labelStyle = new Label.LabelStyle();
         this.generator = new FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/pixel_font.ttf"));
         this.parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -90,7 +90,7 @@ public class GameOverState implements Screen {
         this.gameOverMusic.setLooping(true);
         this.gameOverMusic.play();
         this.gameOverMusic.setVolume(0.03f);
-        selectSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/select.mp3"));
+        this.selectSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/select.mp3"));
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -128,6 +128,7 @@ public class GameOverState implements Screen {
 
     @Override
     public void dispose() {
+        game.batch.dispose();
         stage.dispose();
     }
 
