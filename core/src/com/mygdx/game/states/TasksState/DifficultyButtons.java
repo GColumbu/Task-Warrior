@@ -1,6 +1,7 @@
 package com.mygdx.game.states.TasksState;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -8,10 +9,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.mygdx.game.states.PlayState.PlayState;
 
 public class DifficultyButtons {
     // STAGE
@@ -24,18 +28,18 @@ public class DifficultyButtons {
     private final Color hardColor = Color.RED;
 
     // BUTTONS
-        // Easy Button
-    ButtonGroup<CheckBox> buttonGroup;
+    protected ButtonGroup<CheckBox> buttonGroup;
     private FileHandle checkboxIcon;
-    private CheckBox easyButton;
+        // Easy Button
+    protected CheckBox easyButton;
     private CheckBox.CheckBoxStyle easyButtonStyle;
 
         // Medium Button
-    private CheckBox mediumButton;
+        protected CheckBox mediumButton;
     private CheckBox.CheckBoxStyle mediumButtonStyle;
 
         // Hard Button
-    private CheckBox hardButton;
+        protected CheckBox hardButton;
     private CheckBox.CheckBoxStyle hardButtonStyle;
 
 
@@ -74,7 +78,7 @@ public class DifficultyButtons {
         easyButtonStyle.checkboxOff  = getButtonTexture(easyColor, false);
         easyButtonStyle.font = getWritingStyle();
 
-        easyButton = new CheckBox("Easy", easyButtonStyle);
+        easyButton = new CheckBox(" Easy", easyButtonStyle);
         easyButton.setChecked(false);
         easyButton.setPosition(350, Gdx.graphics.getHeight() - 430);
     }
@@ -85,7 +89,7 @@ public class DifficultyButtons {
         mediumButtonStyle.checkboxOff  = getButtonTexture(mediumColor, false);
         mediumButtonStyle.font = getWritingStyle();
 
-        mediumButton = new CheckBox("Medium", mediumButtonStyle);
+        mediumButton = new CheckBox(" Medium", mediumButtonStyle);
         mediumButton.setChecked(false);
         mediumButton.setPosition(550, Gdx.graphics.getHeight() - 430);
     }
@@ -96,7 +100,7 @@ public class DifficultyButtons {
         hardButtonStyle.checkboxOff  = getButtonTexture(hardColor, false);
         hardButtonStyle.font = getWritingStyle();
 
-        hardButton = new CheckBox("Hard", hardButtonStyle);
+        hardButton = new CheckBox(" Hard", hardButtonStyle);
         hardButton.setChecked(false);
         hardButton.setPosition(750, Gdx.graphics.getHeight() - 430);
     }

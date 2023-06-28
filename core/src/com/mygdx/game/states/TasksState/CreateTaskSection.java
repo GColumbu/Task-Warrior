@@ -5,18 +5,17 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+
+import java.util.List;
 
 public class CreateTaskSection extends Section {
     // CONSTANTS
@@ -25,6 +24,8 @@ public class CreateTaskSection extends Section {
     private static final String DIFFICULTY = "Difficulty: ";
     private static final String SUBMIT = "SUBMIT";
 
+    private List<Task> tasks;
+
     private DifficultyButtons difficultyButtons;
     private TextField taskName;
     private Label taskNameLabel;
@@ -32,8 +33,10 @@ public class CreateTaskSection extends Section {
     private Image container;
     private Button submitButton;
 
-    protected CreateTaskSection(Stage stage){
+    protected CreateTaskSection(Stage stage, List<Task> tasks){
+        super();
         this.stage = stage;
+        this.tasks = tasks;
 
         // configure
         configureTitle();
@@ -45,8 +48,22 @@ public class CreateTaskSection extends Section {
         difficultyButtons = new DifficultyButtons(stage);
     }
 
+    protected void update(){
+        disableTextFieldWhenMaxTasksAchieved();
+    }
+
     protected void draw(){
         difficultyButtons.draw();
+    }
+
+    // update methods
+    private void disableTextFieldWhenMaxTasksAchieved(){
+        if(tasks.size() == 5){
+            taskName.setDisabled(true);
+            difficultyButtons.easyButton.setDisabled(true);
+            difficultyButtons.mediumButton.setDisabled(true);
+            difficultyButtons.hardButton.setDisabled(true);
+        }
     }
 
     // configure methods
@@ -66,7 +83,7 @@ public class CreateTaskSection extends Section {
         pixmap.fill();
         container = new Image(new Texture(pixmap));
         pixmap.dispose();
-        container.setSize(Gdx.graphics.getWidth() / 2.0f - 150, 200);
+        container.setSize(850, 200);
         container.setPosition(90, Gdx.graphics.getHeight() - 450);
         stage.addActor(container);
     }
@@ -90,8 +107,30 @@ public class CreateTaskSection extends Section {
         submitButtonStyle.down = checkedButtonTexture;
 
         submitButton = new Button(submitButtonStyle);
-        submitButton.setPosition(Gdx.graphics.getWidth() / 4.0f - 100, Gdx.graphics.getHeight() - 520);
+        submitButton.setPosition(430, Gdx.graphics.getHeight() - 520);
         submitButton.setSize(200, 50);
+        submitButton.addListener( new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (tasks.size() < 5) {
+                    String difficulty;
+                    if (difficultyButtons.easyButton.isChecked()) {
+                        difficulty = "easy";
+                    } else if (difficultyButtons.mediumButton.isChecked()) {
+                        difficulty = "medium";
+                    } else if (difficultyButtons.hardButton.isChecked()) {
+                        difficulty = "hard";
+                    } else {
+                        difficulty = "easy";
+                    }
+                    Task addedTask = new Task(taskName.getMessageText(), difficulty);
+                    tasks.add(addedTask);
+                    taskName.setText("");
+                } else {
+                    taskName.setText("");
+                }
+            }
+        } );
 
         // configure button label
         labelStyle.font = getSubTitleStyle();
@@ -139,7 +178,7 @@ public class CreateTaskSection extends Section {
         textFieldStyle.font = getTextFieldStyle();
         textFieldStyle.fontColor = Color.WHITE;
         taskName = new TextField("", textFieldStyle);
-        taskName.sizeBy(Gdx.graphics.getWidth() / 2.0f - 600,15);
+        taskName.setSize(550,70);
         taskName.setPosition(350, Gdx.graphics.getHeight() - 350);
         taskName.setAlignment(Align.center);
 
@@ -153,15 +192,7 @@ public class CreateTaskSection extends Section {
         parameter.color = Color.BLACK;
         return generator.generateFont(parameter);
     }
-    private BitmapFont getTitleStyle(){
-        parameter.size = 50;
-        parameter.borderWidth = 3;
-        parameter.color = magicColor;
-        parameter.shadowOffsetX = 2;
-        parameter.shadowOffsetY = 2;
-        parameter.shadowColor = Color.BLACK;
-        return generator.generateFont(parameter);
-    }
+
     private BitmapFont getTextFieldStyle(){
         parameter.size = 20;
         parameter.borderWidth = 2;

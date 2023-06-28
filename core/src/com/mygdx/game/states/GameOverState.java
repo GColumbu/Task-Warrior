@@ -187,7 +187,7 @@ public class GameOverState implements Screen {
 
         if(score > accountDetails.getBestScore()){
             stage.addActor(highScoreLabel);
-            accountDetails.bestScore = score;
+            accountDetails.setBestScore(score);
         }
     }
 

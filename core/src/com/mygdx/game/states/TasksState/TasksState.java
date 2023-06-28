@@ -19,6 +19,7 @@ public class TasksState implements Screen {
 
     // Screen Componenets
     private CreateTaskSection createTaskSection;
+    private ViewTasksSection viewTasksSection;
 
 
     public TasksState(TaskWarrior game, TemporaryAccountDetails accountDetails){
@@ -30,7 +31,8 @@ public class TasksState implements Screen {
         this.accountDetails = accountDetails;
 
         // screen components
-        createTaskSection = new CreateTaskSection(stage);
+        createTaskSection = new CreateTaskSection(stage, accountDetails.getTasks());
+        viewTasksSection = new ViewTasksSection(stage, accountDetails.getTasks());
 
         Gdx.input.setInputProcessor(stage);
     }
@@ -78,9 +80,11 @@ public class TasksState implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(deltaTime);
+        createTaskSection.update();
     }
 
     private void draw() {
         createTaskSection.draw();
+        viewTasksSection.draw();
     }
 }
