@@ -31,6 +31,7 @@ public class GameOverState implements Screen {
     private final Music gameOverMusic;
     private final Sound selectSound;
     private final Color redColor;
+    private TemporaryAccountDetails accountDetails;
     // textures
     private Image background;
 
@@ -50,7 +51,6 @@ public class GameOverState implements Screen {
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
 
     // Scores
-    private Integer bestScore;
     private Integer score;
     private static final String MAIN_MENU_LABEL = "Main Menu";
     private static final String TRY_AGAIN_LABEL = "Try Again";
@@ -60,12 +60,12 @@ public class GameOverState implements Screen {
     private static final String THIS_RUN = "This Run";
     private static final String BEST_RUN = "Best Run";
 
-    public GameOverState(TaskWarrior game, Integer score, Integer bestScore) {
+    public GameOverState(TaskWarrior game, Integer score, TemporaryAccountDetails accountDetails) {
         // game utils
         this.game = game;
         this.stage = new Stage();
         this.score = score;
-        this.bestScore = bestScore;
+        this.accountDetails = accountDetails;
         this.redColor = new Color(117/255f, 25/255f, 25/255f, 1);
 
         // buttons
@@ -139,6 +139,7 @@ public class GameOverState implements Screen {
     private void configureBackground(){
         this.background = new Image(new Texture("assets/game over screen/background_sword.png"));
         this.background.setPosition(0, 0);
+        this.background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         this.stage.addActor(this.background);
     }
 
@@ -153,7 +154,7 @@ public class GameOverState implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 selectSound.setVolume(selectSound.play(), 0.1f);
                 gameOverMusic.stop();
-                game.setScreen( new MenuState(game, bestScore));
+                game.setScreen( new MenuState(game, accountDetails));
             }
         } );
         stage.addActor(mainMenuButton);
@@ -170,7 +171,7 @@ public class GameOverState implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 selectSound.setVolume(selectSound.play(), 0.1f);
                 gameOverMusic.stop();
-                game.setScreen( new PlayState(game, bestScore));
+                game.setScreen( new PlayState(game, accountDetails));
             }
         } );
         stage.addActor(tryAgainButton);
@@ -184,9 +185,9 @@ public class GameOverState implements Screen {
         highScoreLabel.setAlignment(Align.center);
         highScoreLabel.setPosition(920, 330);
 
-        if(score > bestScore){
+        if(score > accountDetails.getBestScore()){
             stage.addActor(highScoreLabel);
-            bestScore = score;
+            accountDetails.bestScore = score;
         }
     }
 
@@ -235,7 +236,7 @@ public class GameOverState implements Screen {
         thisScoreLabel.setAlignment(Align.center);
         thisScoreLabel.setPosition(760, 150);
 
-        Label bestScoreLabel = new Label(bestScore.toString(), labelStyle);
+        Label bestScoreLabel = new Label(accountDetails.getBestScore().toString(), labelStyle);
         bestScoreLabel.setSize(80, 80);
         bestScoreLabel.setAlignment(Align.center);
         bestScoreLabel.setPosition(1060, 150);

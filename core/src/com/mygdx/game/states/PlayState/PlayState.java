@@ -21,6 +21,7 @@ import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.states.GameOverState;
 import com.mygdx.game.states.PlayState.UI.UserInterface;
+import com.mygdx.game.states.TemporaryAccountDetails;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +36,7 @@ public class PlayState implements Screen {
     private final TaskWarrior game;
 
     private final Music gameMusic;
-        // Shader
-    private ShaderProgram shaderProgram;
+    private TemporaryAccountDetails accountDetails;
 
         // UI and textures
     private final Texture background;
@@ -59,7 +59,6 @@ public class PlayState implements Screen {
 
         // skulls variables
     private Integer skullsNumber;
-    private Integer bestSkullsNumber;
     HashMap<Class<?>, Integer> enemySkulls = new HashMap<Class<?>, Integer>() {{
         put(Minion.class, 100);
         put(Runner.class, 150);
@@ -88,7 +87,7 @@ public class PlayState implements Screen {
     ShapeRenderer shapeRenderer;
 
     // constructor  //TODO: pass a difficulty class to initiate the player upgrades
-    public PlayState(TaskWarrior game, Integer bestScore){
+    public PlayState(TaskWarrior game, TemporaryAccountDetails accountDetails){
         this.game = game;
         this.game.batch = new SpriteBatch();
         this.background = new Texture("assets/play screen/background.png");
@@ -97,7 +96,7 @@ public class PlayState implements Screen {
         this.gameMusic.play();
         this.gameMusic.setVolume(0.03f);
         this.skulls = new Skulls("assets/play screen/skull.png", "assets/fonts/pixel_font.ttf");
-        this.bestSkullsNumber = bestScore;
+        this.accountDetails = accountDetails;
 
         // player
         this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
@@ -203,8 +202,6 @@ public class PlayState implements Screen {
         // dispose potions
         armorPotion.dispose();
         healthPotion.dispose();
-        // dispose shader
-        shaderProgram.dispose();
         // dispose player
         target.getSprite().getTexture().dispose();
         // dispose music
@@ -261,7 +258,7 @@ public class PlayState implements Screen {
         if(target.isDeathAnimationFinished()){
             game.batch.dispose();
             gameMusic.stop();
-            game.setScreen( new GameOverState(game, skullsNumber, bestSkullsNumber));
+            game.setScreen( new GameOverState(game, skullsNumber, accountDetails));
         }
     }
 

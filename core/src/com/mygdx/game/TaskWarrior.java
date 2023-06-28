@@ -5,6 +5,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.states.MenuState;
+import com.mygdx.game.states.TemporaryAccountDetails;
 
 public class TaskWarrior extends Game {
 	// window constants
@@ -16,7 +17,8 @@ public class TaskWarrior extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		setScreen(new MenuState(this, 0));
+		TemporaryAccountDetails accountDetails = new TemporaryAccountDetails();
+		setScreen(new MenuState(this, accountDetails));
 	}
 
 	@Override

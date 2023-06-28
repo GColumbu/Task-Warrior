@@ -10,10 +10,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -24,6 +20,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.states.PlayState.PlayState;
+import com.mygdx.game.states.TasksState.TasksState;
 
 public class MenuState implements Screen {
     // constants
@@ -35,7 +32,7 @@ public class MenuState implements Screen {
     // game utils
     private TaskWarrior game;
     private final Viewport viewport;
-    private Integer bestScore;
+    private TemporaryAccountDetails accountDetails;
     private final Stage stage;
     private final Sound selectSound;
     private final Music mainMenuMusic;
@@ -61,12 +58,12 @@ public class MenuState implements Screen {
     private final FreeTypeFontGenerator generator;
     FreeTypeFontGenerator.FreeTypeFontParameter parameter;
 
-    public MenuState(TaskWarrior game, Integer bestScore) {
+    public MenuState(TaskWarrior game, TemporaryAccountDetails accountDetails) {
         // game utils
         this.game = game;
         this.game.batch = new SpriteBatch();
         this.stage = new Stage();
-        this.bestScore = bestScore;
+        this.accountDetails = accountDetails;
         this.viewport = new ScreenViewport();
         this.selectSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/select.mp3"));
         this.mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/main_menu_music.mp3"));
@@ -94,10 +91,7 @@ public class MenuState implements Screen {
 
     @Override
     public void render(float deltaTime) {
-        viewport.getCamera().update();
-        stage.getBatch().setProjectionMatrix(viewport.getCamera().combined);
-        stage.act(deltaTime);
-        addHoverLogic();
+        update(deltaTime);
         render();
     }
 
@@ -144,7 +138,7 @@ public class MenuState implements Screen {
         Label titleLabel = new Label(TITLE, labelStyle);
         titleLabel.setSize(100, 100);
         titleLabel.setAlignment(Align.center);
-        titleLabel.setPosition(280, 940);
+        titleLabel.setPosition(280, Gdx.graphics.getHeight() - 110);
         stage.addActor(titleLabel);
     }
 
@@ -162,13 +156,13 @@ public class MenuState implements Screen {
         playButtonStyle = new Button.ButtonStyle();
         playButtonStyle.up = playButtonTexture;
         playButton = new Button(playButtonStyle);
-        playButton.setPosition(20, 850);
+        playButton.setPosition(20, Gdx.graphics.getHeight() - 200);
         playButton.addListener( new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 selectSound.setVolume(selectSound.play(), 0.1f);
                 mainMenuMusic.stop();
-                game.setScreen(new PlayState(game, bestScore));
+                game.setScreen(new PlayState(game, accountDetails));
             }
         } );
 
@@ -185,12 +179,13 @@ public class MenuState implements Screen {
         tasksButtonStyle = new Button.ButtonStyle();
         tasksButtonStyle.up = tasksButtonTexture;
         tasksButton = new Button(tasksButtonStyle);
-        tasksButton.setPosition(20, 785);
+        tasksButton.setPosition(20, Gdx.graphics.getHeight() - 265);
         tasksButton.addListener( new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 selectSound.setVolume(selectSound.play(), 0.1f);
-                //game.setScreen(new PlayState(game, bestScore));
+                mainMenuMusic.stop();
+                game.setScreen(new TasksState(game, accountDetails));
             }
         } );
 
@@ -207,7 +202,7 @@ public class MenuState implements Screen {
         championsButtonStyle = new Button.ButtonStyle();
         championsButtonStyle.up = championsButtonTexture;
         championsButton = new Button(championsButtonStyle);
-        championsButton.setPosition(20, 720);
+        championsButton.setPosition(20, Gdx.graphics.getHeight() - 330);
         championsButton.addListener( new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -257,5 +252,12 @@ public class MenuState implements Screen {
         } else if(!button.isOver() && button.getX() > 20){
             button.setPosition(button.getX() - 3, button.getY());
         }
+    }
+
+    private void update(float deltaTime){
+        viewport.getCamera().update();
+        stage.getBatch().setProjectionMatrix(viewport.getCamera().combined);
+        stage.act(deltaTime);
+        addHoverLogic();
     }
 }
