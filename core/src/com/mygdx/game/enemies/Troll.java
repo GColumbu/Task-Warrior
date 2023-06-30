@@ -1,5 +1,7 @@
 package com.mygdx.game.enemies;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -23,6 +25,8 @@ public class Troll extends Enemy{
     private Circle trollChargeRange;
     private Vector2 attackTarget;
 
+    private Sound attackSoundEffect;
+
     //TODO: fix frame drop when troll spawns
     public Troll(int x, int y, EnemyTextures enemyTextures) {
         super(x, y, TROLL_MAX_SPEED, TROLL_MAX_FORCE, TROLL_HEALTH, TROLL_DAMAGE, ATTACK_COOLDOWN);
@@ -35,6 +39,7 @@ public class Troll extends Enemy{
         attackAnimation = enemyTextures.attackAnimation;
         attackDamageAnimation = enemyTextures.attackDamageAnimation;
         dyingAnimation = enemyTextures.dyingAnimation;
+        attackSoundEffect = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/troll_charge.mp3"));
     }
 
     @Override
@@ -79,6 +84,7 @@ public class Troll extends Enemy{
                 attackTarget = player.getPosition().cpy();
                 Vector2 vectorToCenter = attackTarget.sub(position);
                 attackTarget = vectorToCenter.nor().scl(575).add(position);
+                attackSoundEffect.setVolume(attackSoundEffect.play(), 0.6f);
             }
             // accelerate to match the dash animation and seek the position of the player when it was first "seen"
             if(isAttackTiming()){
