@@ -1,5 +1,6 @@
 package com.mygdx.game.enemies;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
@@ -28,6 +29,8 @@ public class Minion extends Enemy {
         this.attackAnimation = enemyTextures.attackAnimation;
         this.attackDamageAnimation = enemyTextures.attackDamageAnimation;
         this.dyingAnimation = enemyTextures.dyingAnimation;
+        attackSoundEffect = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/minion/minion_attack.mp3"));
+        dyingSoundEffect = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/minion/minion_death.mp3"));
     }
 
     @Override
@@ -38,6 +41,7 @@ public class Minion extends Enemy {
         setEnemyRectangle(new Rectangle(getWalkingRelativePosition().x, getWalkingRelativePosition().y, idleTextureRegion.getRegionWidth(), idleTextureRegion.getRegionHeight()));
         setEnemySenseRange(new Circle(position.x, position.y, 100));
         calculateDamage(player, 5);
+        addSoundEffects();
     }
 
     @Override
@@ -84,8 +88,9 @@ public class Minion extends Enemy {
         }
 
         // minion dies
-        if (health <= 0)
+        if (health <= 0){
             currentState = State.DEAD;
+        }
     }
 
     @Override
@@ -96,5 +101,14 @@ public class Minion extends Enemy {
     @Override
     protected boolean isAttackTiming() {
         return true;
+    }
+
+    private void addSoundEffects(){
+        if  (currentState == State.ATTACK && attackAnimation.getKeyFrameIndex(stateTimer) == 1){
+            attackSoundEffect.setVolume(attackSoundEffect.play(), 0.03f);
+        }
+        if (currentState == State.DEAD && dyingAnimation.getKeyFrameIndex(stateTimer) == 0){
+            dyingSoundEffect.setVolume(dyingSoundEffect.play(), 0.03f);
+        }
     }
 }

@@ -36,6 +36,7 @@ public class MenuState implements Screen {
     private final Stage stage;
     private final Sound selectSound;
     private final Music mainMenuMusic;
+    private final Color magicColor;
 
     // Buttons
         // Play Button
@@ -65,8 +66,9 @@ public class MenuState implements Screen {
         this.stage = new Stage();
         this.accountDetails = accountDetails;
         this.viewport = new ScreenViewport();
+        this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
         this.selectSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/select.mp3"));
-        this.mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/main_menu_music.mp3"));
+        this.mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/music/main_menu_music.mp3"));
         this.mainMenuMusic.setLooping(true);
         this.mainMenuMusic.play();
         this.mainMenuMusic.setVolume(0.03f);
@@ -152,7 +154,7 @@ public class MenuState implements Screen {
         // Play Button
     private void configurePlayButton(){
         // button
-        playButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/game over screen/main_menu.png")));
+        playButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/main menu screen/main_button.png")));
         playButtonStyle = new Button.ButtonStyle();
         playButtonStyle.up = playButtonTexture;
         playButton = new Button(playButtonStyle);
@@ -175,7 +177,7 @@ public class MenuState implements Screen {
 
     private void configureTasksButton(){
         // button
-        tasksButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/game over screen/try_again.png")));
+        tasksButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/main menu screen/main_button.png")));
         tasksButtonStyle = new Button.ButtonStyle();
         tasksButtonStyle.up = tasksButtonTexture;
         tasksButton = new Button(tasksButtonStyle);
@@ -198,7 +200,7 @@ public class MenuState implements Screen {
 
     private void configureChampionsButton(){
         // button
-        championsButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/game over screen/main_menu.png")));
+        championsButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/main menu screen/main_button.png")));
         championsButtonStyle = new Button.ButtonStyle();
         championsButtonStyle.up = championsButtonTexture;
         championsButton = new Button(championsButtonStyle);
@@ -238,6 +240,15 @@ public class MenuState implements Screen {
         parameter.shadowColor = Color.BLACK;
         return generator.generateFont(parameter);
     }
+    private BitmapFont getRedirectButtonsHoverStyle(){
+        parameter.size = 20;
+        parameter.borderWidth = 3;
+        parameter.color = new Color(100/255f, 240/255f, 195/255f, 1);
+        parameter.shadowOffsetX = 2;
+        parameter.shadowOffsetY = 2;
+        parameter.shadowColor = Color.BLACK;
+        return generator.generateFont(parameter);
+    }
 
     // Hover Logic
     private void addHoverLogic(){
@@ -247,6 +258,13 @@ public class MenuState implements Screen {
     }
 
     private void addHoverLogicForButton(Button button){
+        if (button.isOver()){
+            championsButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/main menu screen/main_button_hover.png")));
+            button.getStyle().up = championsButtonTexture;
+        } else {
+            championsButtonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/main menu screen/main_button.png")));
+            button.getStyle().up = championsButtonTexture;
+        }
         if(button.isOver() && button.getX() < 60){
             button.setPosition(button.getX() + 3, button.getY());
         } else if(!button.isOver() && button.getX() > 20){

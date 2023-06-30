@@ -1,5 +1,6 @@
 package com.mygdx.game.enemies;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
@@ -24,12 +25,16 @@ public abstract class Enemy {
     protected boolean isAttacked;
     protected float wanderAngle;
 
-    // minion states
+    // enemy states
     public enum State {WALKING, ATTACK, DEAD};
     protected boolean isInRange = false;
     protected State currentState;
     protected State previousState;
     protected float stateTimer;
+
+    //sounds
+    protected Sound attackSoundEffect;
+    protected Sound dyingSoundEffect;
 
     // animations and textures
     protected TextureRegion currentRegion;

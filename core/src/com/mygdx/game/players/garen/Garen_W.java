@@ -96,4 +96,10 @@ public class Garen_W extends AttackAnimation {
     public boolean isAnimationFinished(float stateTimer) {
         return stateTimer > burstDuration + INVINCIBILITY_DURATION;
     }
+
+    public void disposeSoundEffects(){
+        for (Sound sound : soundEffects){
+            sound.dispose();
+        }
+    }
 }

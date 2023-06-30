@@ -20,11 +20,11 @@ public class Garen extends PlayerChampion {
     public Garen(int x, int y){
         super(x, y, 500, 200, 100, 50, 3, 0.05f);
         walkingAnimation = new WalkingAnimation("assets/play screen/garen/walk.png", 0.05f);
-        wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f, "assets/sounds/w_burst.mp3");
+        wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f, "assets/sounds/garen/w_burst.mp3");
         wBasicAnimation = wAnimation;
-        qAnimation = new Garen_Q("assets/play screen/garen/slash_combo_part1.png", "assets/play screen/garen/slash_combo_part2.png", "assets/play screen/garen/q_icon.png",0.07f);
+        qAnimation = new Garen_Q("assets/play screen/garen/slash_combo_part1.png", "assets/play screen/garen/slash_combo_part2.png", "assets/play screen/garen/q_icon.png",0.07f, "assets/sounds/garen/q_slash.mp3");
         qBasicAnimation = qAnimation;
-        eAnimation = new Garen_E("assets/play screen/garen/spin.png", "assets/play screen/garen/e_icon.png", 0.15f, 0.05f);
+        eAnimation = new Garen_E("assets/play screen/garen/spin.png", "assets/play screen/garen/e_icon.png", 0.15f, 0.05f, "assets/sounds/garen/e_spin.mp3");
         eBasicAnimation = eAnimation;
         deathAnimation = new Garen_DeathAnimation("assets/play screen/garen/death.png", 0.15f);
         idleTextureRegion = new TextureRegion(new Texture("assets/play screen/garen/idle.png"));
@@ -201,7 +201,14 @@ public class Garen extends PlayerChampion {
     // Q spell methods
 
     protected void playQSoundEffect(){
-        //TODO: add q sound effect
+        int index = qAnimation.getKeyFrameIndex(stateTimer);
+        Sound qSoundEffect = qAnimation.getSoundEffects().get(0);
+        if(currentState == State.Q && index == 0){
+            qSoundEffect.setVolume(qSoundEffect.play(), 0.03f);
+        }
+        if (currentState == State.Q && Gdx.input.isButtonJustPressed(Input.Keys.Q)){
+            qSoundEffect.stop();
+        }
     }
 
     protected Vector2 getQSlashRelativePosition() {
@@ -211,9 +218,9 @@ public class Garen extends PlayerChampion {
     public boolean isQAttackTiming(boolean forCollision){
         int index = qAnimation.getKeyFrameIndex(stateTimer);
         return index >=0 && index <=3 //first slash
-               || index >=7 && index <=9 //second slash
-               || index >=12 && index <=15 //third slash
-               || index >=17; //fourth slash
+               || index >= 7 && index <= 9 //second slash
+               || index >= 12 && index <= 15 //third slash
+               || index >= 17; //fourth slash
     }
     @Override
     public float getQAttackDamage() {
@@ -335,7 +342,7 @@ public class Garen extends PlayerChampion {
         int index = wAnimation.getKeyFrameIndex(stateTimer);
         Sound wBurstSoundEffect = wAnimation.getSoundEffects().get(0);
         if(currentState == State.W && index == 6){
-            wBurstSoundEffect.play();
+            wBurstSoundEffect.setVolume(wBurstSoundEffect.play(), 20f);
         }
     }
     protected Vector2 getWBurstRelativePosition() {
@@ -363,7 +370,15 @@ public class Garen extends PlayerChampion {
     // E spell
 
     protected void playESpinSoundEffect(){
-        // TODO: add e spin sound effect
+        int index = eAnimation.getGrabKeyFrameIndex(stateTimer);
+        Sound eSpinSoundEffect = eAnimation.getSoundEffects().get(0);
+        if(currentState == State.E && index == 0){
+            Long eSoundEffectId = eSpinSoundEffect.play();
+            eSpinSoundEffect.setVolume(eSoundEffectId, 0.03f);
+        }
+        if (currentState == State.E && Gdx.input.isButtonJustPressed(Input.Keys.E)){
+            eSpinSoundEffect.stop();
+        }
     }
 
     protected Vector2 getESpinRelativePosition() {
@@ -388,5 +403,11 @@ public class Garen extends PlayerChampion {
         playQSoundEffect();
         playWBurstSoundEffect();
         playESpinSoundEffect();
+    }
+
+    public void disposeSoundEffects(){
+        qAnimation.disposeSoundEffects();
+        wAnimation.disposeSoundEffects();
+        eAnimation.disposeSoundEffects();
     }
 }

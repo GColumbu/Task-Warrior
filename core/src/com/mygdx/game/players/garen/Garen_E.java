@@ -1,10 +1,14 @@
 package com.mygdx.game.players.garen;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.players.AttackAnimation;
+
+import java.util.ArrayList;
 
 public class Garen_E extends AttackAnimation {
     private final int SPIN_DURATION = 3;
@@ -23,7 +27,7 @@ public class Garen_E extends AttackAnimation {
     protected float eSpinAttackDamage = 2;
 
 
-    protected Garen_E(String eSpinPath, String eIconFilePath,  float eGrabFrameDuration, float eSpinFrameDuration) {
+    protected Garen_E(String eSpinPath, String eIconFilePath,  float eGrabFrameDuration, float eSpinFrameDuration, String eSoundFilePath) {
         eGrabFrames = 3;
         eSpinFrames = 6;
         cooldownDuration = COOLDOWN;
@@ -44,6 +48,8 @@ public class Garen_E extends AttackAnimation {
         eSpinAnimation.setPlayMode(Animation.PlayMode.LOOP);
         this.eSpinFrameDuration = eSpinFrameDuration;
         attackIcon = new Texture(eIconFilePath);
+        this.soundEffects = new ArrayList<>();
+        this.soundEffects.add(Gdx.audio.newSound(Gdx.files.internal(eSoundFilePath)));
     }
 
     protected TextureRegion getGrabKeyFrame(float stateTimer){
@@ -56,6 +62,10 @@ public class Garen_E extends AttackAnimation {
 
     public boolean isSwordGrab(float stateTimer){
         return stateTimer <= eGrabFrames * eGrabFrameDuration;
+    }
+
+    public int getGrabKeyFrameIndex(float stateTimer){
+        return eSwordGrabAnimation.getKeyFrameIndex(stateTimer);
     }
 
     public int getSpinKeyFrameIndex(float stateTimer){
@@ -75,5 +85,11 @@ public class Garen_E extends AttackAnimation {
     @Override
     public boolean isAnimationFinished(float stateTimer) {
         return stateTimer > swordGrabDuration + SPIN_DURATION;
+    }
+
+    public void disposeSoundEffects(){
+        for (Sound sound : soundEffects){
+            sound.dispose();
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.mygdx.game.enemies;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
@@ -24,6 +25,7 @@ public class Runner extends Enemy{
         walkingAnimation = enemyTextures.walkingAnimation;
         walkingDamageAnimation = enemyTextures.walkingDamageAnimation;
         dyingAnimation = enemyTextures.dyingAnimation;
+        dyingSoundEffect = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/runner/runner_death.mp3"));
     }
     @Override
     public void update(PlayerChampion player, float deltaTime) {
@@ -31,6 +33,7 @@ public class Runner extends Enemy{
         setEnemyRectangle(new Rectangle(getWalkingRelativePosition().x, getWalkingRelativePosition().y, idleTextureRegion.getRegionWidth(), idleTextureRegion.getRegionHeight()));
         setEnemySenseRange(new Circle(position.x, position.y, 200));
         calculateDamage(player, 0);
+        addSoundEffects();
     }
 
     @Override
@@ -70,5 +73,11 @@ public class Runner extends Enemy{
 
         if (health <= 0)
             currentState = State.DEAD;
+    }
+
+    private void addSoundEffects(){
+        if (currentState == State.DEAD && dyingAnimation.getKeyFrameIndex(stateTimer) == 0){
+            dyingSoundEffect.setVolume(dyingSoundEffect.play(), 0.03f);
+        }
     }
 }

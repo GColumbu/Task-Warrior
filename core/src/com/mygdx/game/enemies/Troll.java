@@ -25,9 +25,6 @@ public class Troll extends Enemy{
     private Circle trollChargeRange;
     private Vector2 attackTarget;
 
-    private Sound attackSoundEffect;
-
-    //TODO: fix frame drop when troll spawns
     public Troll(int x, int y, EnemyTextures enemyTextures) {
         super(x, y, TROLL_MAX_SPEED, TROLL_MAX_FORCE, TROLL_HEALTH, TROLL_DAMAGE, ATTACK_COOLDOWN);
         attackTarget = new Vector2(0, 0);
@@ -39,7 +36,8 @@ public class Troll extends Enemy{
         attackAnimation = enemyTextures.attackAnimation;
         attackDamageAnimation = enemyTextures.attackDamageAnimation;
         dyingAnimation = enemyTextures.dyingAnimation;
-        attackSoundEffect = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/troll_charge.mp3"));
+        attackSoundEffect = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/troll/troll_attack.mp3"));
+        dyingSoundEffect = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/troll/troll_death.mp3"));
     }
 
     @Override
@@ -50,6 +48,7 @@ public class Troll extends Enemy{
         if(currentState != State.ATTACK)
             trollChargeRange = new Circle(position.x, position.y, 575);
         calculateDamage(player, 7);
+        addSoundEffects();
     }
 
     @Override
@@ -84,7 +83,6 @@ public class Troll extends Enemy{
                 attackTarget = player.getPosition().cpy();
                 Vector2 vectorToCenter = attackTarget.sub(position);
                 attackTarget = vectorToCenter.nor().scl(575).add(position);
-                attackSoundEffect.setVolume(attackSoundEffect.play(), 0.6f);
             }
             // accelerate to match the dash animation and seek the position of the player when it was first "seen"
             if(isAttackTiming()){
@@ -112,8 +110,9 @@ public class Troll extends Enemy{
         }
 
         // troll dies
-        if (health <= 0)
+        if (health <= 0) {
             currentState = State.DEAD;
+        }
     }
 
     private boolean isAttackOngoing(){
@@ -123,6 +122,15 @@ public class Troll extends Enemy{
     // get range for the attack charge (for debug purposes)
     public Circle getTrollChargeRange() {
         return trollChargeRange;
+    }
+
+    private void addSoundEffects(){
+        if  (currentState == State.ATTACK && attackAnimation.getKeyFrameIndex(stateTimer) == 1){
+            attackSoundEffect.setVolume(attackSoundEffect.play(), 0.01f);
+        }
+        if (currentState == State.DEAD && dyingAnimation.getKeyFrameIndex(stateTimer) == 0){
+            dyingSoundEffect.setVolume(dyingSoundEffect.play(), 0.03f);
+        }
     }
 
 }

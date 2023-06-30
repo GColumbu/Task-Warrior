@@ -1,10 +1,14 @@
 package com.mygdx.game.players.garen;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.players.AttackAnimation;
+
+import java.util.ArrayList;
 
 public class Garen_Q extends AttackAnimation {
     private final float COOLDOWN = 7;
@@ -20,7 +24,7 @@ public class Garen_Q extends AttackAnimation {
     //TODO: calculate it based on player enhancements
     protected float qAttackDamage;
 
-    protected Garen_Q(String qTexture1, String qTexture2, String qIconFilePath, float frameDuration) {
+    protected Garen_Q(String qTexture1, String qTexture2, String qIconFilePath, float frameDuration, String qSoundFilePath) {
         cooldownDuration = COOLDOWN;
         cooldownStateTimer = cooldownDuration;
         Array<TextureRegion> frames = new Array<>();
@@ -40,6 +44,8 @@ public class Garen_Q extends AttackAnimation {
         }
         qAnimation = new Animation(frameDuration, frames);
         attackIcon = new Texture(qIconFilePath);
+        this.soundEffects = new ArrayList<>();
+        this.soundEffects.add(Gdx.audio.newSound(Gdx.files.internal(qSoundFilePath)));
     }
 
     protected TextureRegion getKeyFrame(float stateTimer){
@@ -73,5 +79,11 @@ public class Garen_Q extends AttackAnimation {
     @Override
     public boolean isAnimationFinished(float stateTimer) {
         return qAnimation.isAnimationFinished(stateTimer);
+    }
+
+    public void disposeSoundEffects(){
+        for (Sound sound : soundEffects){
+            sound.dispose();
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -63,6 +64,7 @@ public class GameOverState implements Screen {
     public GameOverState(TaskWarrior game, Integer score, TemporaryAccountDetails accountDetails) {
         // game utils
         this.game = game;
+        this.game.batch = new SpriteBatch();
         this.stage = new Stage();
         this.score = score;
         this.accountDetails = accountDetails;
@@ -86,7 +88,7 @@ public class GameOverState implements Screen {
         configureScoreLabel();
 
         this.viewport = new ScreenViewport();
-        this.gameOverMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/game_over_music.mp3"));
+        this.gameOverMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/music/game_over_music.mp3"));
         this.gameOverMusic.setLooping(true);
         this.gameOverMusic.play();
         this.gameOverMusic.setVolume(0.03f);

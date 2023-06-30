@@ -3,6 +3,7 @@ package com.mygdx.game.states.PlayState;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.AudioDevice;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -91,7 +92,7 @@ public class PlayState implements Screen {
         this.game = game;
         this.game.batch = new SpriteBatch();
         this.background = new Texture("assets/play screen/background.png");
-        this.gameMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/in_game_music.mp3"));
+        this.gameMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/music/in_game_music.mp3"));
         this.gameMusic.setLooping(true);
         this.gameMusic.play();
         this.gameMusic.setVolume(0.03f);
