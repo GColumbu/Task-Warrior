@@ -1,28 +1,21 @@
 package com.mygdx.game.states.TasksState;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
 
 public class ViewTasksSection extends Section{
     private static final String CURRENT_TASKS = "CURRENT TASKS";
-    private List<Task> tasks;
+    private List<TaskContainer> tasks;
 
-    protected ViewTasksSection(Stage stage, List<Task> tasks){
+    protected ViewTasksSection(Stage stage, List<TaskContainer> tasks){
         this.stage = stage;
         this.tasks = tasks;
         configureTitle();
@@ -38,67 +31,31 @@ public class ViewTasksSection extends Section{
         stage.addActor(titleLabel);
     }
 
-    private void configureTaskContainer(String difficulty, int index){
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        if(difficulty.equals("easy")){
-            pixmap.setColor(Color.GREEN);
-        } else if(difficulty.equals("medium")){
-            pixmap.setColor(Color.YELLOW);
-        } else if(difficulty.equals("hard")){
-            pixmap.setColor(Color.RED);
-        }
-        pixmap.fill();
-        Image taskContainer = new Image(new Texture(pixmap));
-        pixmap.dispose();
-        taskContainer.setSize(800, 150);
-        taskContainer.setPosition(1000, Gdx.graphics.getHeight() - 380 - 165*index);
+    private void configureTaskContainer(int index){
+        Image taskContainer = tasks.get(index).getContainer();
+        taskContainer.setPosition(1000, 670 - 165*index);
         stage.addActor(taskContainer);
     }
 
-    private void configureCheckBox(int index){
-        CheckBox.CheckBoxStyle checkBoxStyle = new CheckBox.CheckBoxStyle();
-        checkBoxStyle.checkboxOn = getButtonTexture(Color.WHITE, true);
-        checkBoxStyle.checkboxOff  = getButtonTexture(Color.WHITE, false);
-        checkBoxStyle.font = getWritingStyle();
+    private void configureTaskName(int index){;
+        Label taskName = tasks.get(index).getTask().getTitle();
+        taskName.setSize(100, 100);
+        taskName.setAlignment(Align.left);
+        taskName.setPosition(1100, 690 - 165*index);
+        stage.addActor(taskName);
+    }
 
-        final CheckBox checkBox = new CheckBox("", checkBoxStyle);
-        checkBox.setChecked(false);
-        checkBox.setSize(50, 50);
-        checkBox.setPosition(1020, Gdx.graphics.getHeight() - 330 - 165*index);
-        checkBox.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                boolean isChecked = checkBox.isChecked();
-                // Handle the checkbox state change
-            }
-        });
+    private void configureCheckBox(int index){
+        CheckBox checkBox = tasks.get(index).getCheckbox();
+        checkBox.setPosition(1020, 680 - 165*index);
         stage.addActor(checkBox);
     }
 
-    private TextureRegionDrawable getButtonTexture(Color color, boolean isChecked){
-        Pixmap pixmap = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
-        pixmap.setColor(color);
-        pixmap.fill();
-        if(isChecked){
-            pixmap.drawPixmap(new Pixmap(Gdx.files.internal("assets/checkbox.png")), 0, 0);
-        }
-        TextureRegionDrawable buttonTexture = new TextureRegionDrawable(new Texture(pixmap));
-        pixmap.dispose();
-        return buttonTexture;
-    }
-
-    private BitmapFont getWritingStyle(){
-        parameter.size = 50;
-        parameter.borderWidth = 2;
-        parameter.color = Color.WHITE;
-        return generator.generateFont(parameter);
-    }
-
-
     protected void draw(){
-        for(int i=0; i< tasks.size(); i++){
-            configureTaskContainer(tasks.get(i).getDifficulty(), i);
+        for(int i=0; i < tasks.size(); i++){
+            configureTaskContainer(i);
             configureCheckBox(i);
+            configureTaskName(i);
         }
         stage.draw();
     }

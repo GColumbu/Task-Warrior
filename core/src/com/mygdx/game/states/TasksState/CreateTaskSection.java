@@ -7,10 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
@@ -24,7 +21,7 @@ public class CreateTaskSection extends Section {
     private static final String DIFFICULTY = "Difficulty: ";
     private static final String SUBMIT = "SUBMIT";
 
-    private List<Task> tasks;
+    private List<TaskContainer> tasks;
 
     private DifficultyButtons difficultyButtons;
     private TextField taskName;
@@ -33,7 +30,7 @@ public class CreateTaskSection extends Section {
     private Image container;
     private Button submitButton;
 
-    protected CreateTaskSection(Stage stage, List<Task> tasks){
+    protected CreateTaskSection(Stage stage, List<TaskContainer> tasks){
         super();
         this.stage = stage;
         this.tasks = tasks;
@@ -107,7 +104,7 @@ public class CreateTaskSection extends Section {
         submitButtonStyle.down = checkedButtonTexture;
 
         submitButton = new Button(submitButtonStyle);
-        submitButton.setPosition(430, Gdx.graphics.getHeight() - 520);
+        submitButton.setPosition(415, Gdx.graphics.getHeight() - 520);
         submitButton.setSize(200, 50);
         submitButton.addListener( new ClickListener() {
             @Override
@@ -123,8 +120,12 @@ public class CreateTaskSection extends Section {
                     } else {
                         difficulty = "easy";
                     }
-                    Task addedTask = new Task(taskName.getMessageText(), difficulty);
-                    tasks.add(addedTask);
+                    labelStyle.font = getTaskLabelStyle();
+                    Label label = new Label(taskName.getText(), labelStyle);
+                    Task addedTask = new Task(label, difficulty);
+                    CheckBox checkBox = configureTaskCheckbox();
+                    Image container = configureTaskContainer(difficulty);
+                    tasks.add(new TaskContainer(addedTask, checkBox, container));
                     taskName.setText("");
                 } else {
                     taskName.setText("");
@@ -139,6 +140,8 @@ public class CreateTaskSection extends Section {
         submitButton.add(submitLabel);
         stage.addActor(submitButton);
     }
+
+
 
     private void configureSubTitle(){
         labelStyle.font = getSubTitleStyle();
@@ -185,18 +188,62 @@ public class CreateTaskSection extends Section {
         stage.addActor(taskName);
     }
 
-    // style methods
-    private BitmapFont getSubTitleStyle(){
-        parameter.size = 25;
-        parameter.borderWidth = 1;
-        parameter.color = Color.BLACK;
-        return generator.generateFont(parameter);
+    private CheckBox configureTaskCheckbox(){
+        CheckBox.CheckBoxStyle checkBoxStyle = new CheckBox.CheckBoxStyle();
+        checkBoxStyle.checkboxOn = getButtonTexture(true);
+        checkBoxStyle.checkboxOff  = getButtonTexture(false);
+        checkBoxStyle.font = getWritingStyle();
+
+        return new CheckBox("", checkBoxStyle);
     }
 
+    private Image configureTaskContainer(String difficulty){
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        if(difficulty.equals("easy")){
+            pixmap.setColor(Color.GREEN);
+        } else if(difficulty.equals("medium")){
+            pixmap.setColor(Color.YELLOW);
+        } else if(difficulty.equals("hard")){
+            pixmap.setColor(Color.RED);
+        }
+        pixmap.fill();
+        Image taskContainer = new Image(new Texture(pixmap));
+        pixmap.dispose();
+        taskContainer.setSize(800, 150);
+        return taskContainer;
+    }
+
+    // style methods
     private BitmapFont getTextFieldStyle(){
         parameter.size = 20;
         parameter.borderWidth = 2;
         parameter.color = magicColor;
+        return generator.generateFont(parameter);
+    }
+
+    private TextureRegionDrawable getButtonTexture(boolean isChecked){
+        Pixmap pixmap = new Pixmap(50, 50, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        if(isChecked){
+            pixmap.drawPixmap(new Pixmap(Gdx.files.internal("assets/checkbox.png")), 0, 0);
+        }
+        TextureRegionDrawable buttonTexture = new TextureRegionDrawable(new Texture(pixmap));
+        pixmap.dispose();
+        return buttonTexture;
+    }
+
+    private BitmapFont getWritingStyle(){
+        parameter.size = 50;
+        parameter.borderWidth = 2;
+        parameter.color = Color.WHITE;
+        return generator.generateFont(parameter);
+    }
+
+    private BitmapFont getTaskLabelStyle(){
+        parameter.size = 23;
+        parameter.borderWidth = 3;
+        parameter.color = Color.WHITE;
         return generator.generateFont(parameter);
     }
 }

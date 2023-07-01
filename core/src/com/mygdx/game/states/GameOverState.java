@@ -185,7 +185,7 @@ public class GameOverState implements Screen {
         Label highScoreLabel = new Label(HIGHSCORE, labelStyle);
         highScoreLabel.setSize(80, 80);
         highScoreLabel.setAlignment(Align.center);
-        highScoreLabel.setPosition(920, 330);
+        highScoreLabel.setPosition(Gdx.graphics.getWidth() / 2f - 40, 330);
 
         if(score > accountDetails.getBestScore()){
             stage.addActor(highScoreLabel);
@@ -208,7 +208,7 @@ public class GameOverState implements Screen {
         Label scoreLabel = new Label(YOU_LOST, labelStyle);
         scoreLabel.setSize(100, 100);
         scoreLabel.setAlignment(Align.center);
-        scoreLabel.setPosition(900, 400);
+        scoreLabel.setPosition(Gdx.graphics.getWidth() / 2f - 50, 400);
         stage.addActor(scoreLabel);
     }
     private void configureSkullsLabel(){
@@ -217,7 +217,7 @@ public class GameOverState implements Screen {
         Label skullsLabel = new Label(SKULLS, labelStyle);
         skullsLabel.setSize(80, 80);
         skullsLabel.setAlignment(Align.center);
-        skullsLabel.setPosition(920, 260);
+        skullsLabel.setPosition(Gdx.graphics.getWidth() / 2f - 40, 260);
         stage.addActor(skullsLabel);
     }
     private void configureScoreLabel(){
@@ -226,7 +226,7 @@ public class GameOverState implements Screen {
         Label thisRunLabel = new Label(THIS_RUN, labelStyle);
         thisRunLabel.setSize(80, 80);
         thisRunLabel.setAlignment(Align.center);
-        thisRunLabel.setPosition(760, 200);
+        thisRunLabel.setPosition(Gdx.graphics.getWidth() / 2f - 80, 200);
 
         Label bestRunLabel = new Label(BEST_RUN, labelStyle);
         bestRunLabel.setSize(80, 80);

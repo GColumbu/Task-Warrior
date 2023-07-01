@@ -44,4 +44,11 @@ public abstract class Section {
         parameter.shadowColor = Color.BLACK;
         return generator.generateFont(parameter);
     }
+
+    protected BitmapFont getSubTitleStyle(){
+        parameter.size = 25;
+        parameter.borderWidth = 2;
+        parameter.color = Color.WHITE;
+        return generator.generateFont(parameter);
+    }
 }

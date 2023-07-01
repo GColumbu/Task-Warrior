@@ -1,6 +1,7 @@
 package com.mygdx.game.states;
 
 import com.mygdx.game.states.TasksState.Task;
+import com.mygdx.game.states.TasksState.TaskContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public class TemporaryAccountDetails {
     private Integer bestScore;
     private Integer coins;
-    private List<Task> tasks;
+    private List<TaskContainer> tasks;
 
     public TemporaryAccountDetails(){
         tasks = new ArrayList<>();
@@ -19,7 +20,7 @@ public class TemporaryAccountDetails {
         return bestScore;
     }
 
-    public List<Task> getTasks() {
+    public List<TaskContainer> getTasks() {
         return tasks;
     }
 

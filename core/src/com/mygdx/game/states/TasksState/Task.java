@@ -1,20 +1,21 @@
 package com.mygdx.game.states.TasksState;
 
-public class Task {
-    private String title;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
+public class Task {
+    private Label title;
     private String difficulty;
 
-    public Task(String title, String difficulty){
+    public Task(Label title, String difficulty){
         this.title = title;
         this.difficulty = difficulty;
     }
 
-    public String getTitle() {
+    public Label getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(Label title) {
         this.title = title;
     }
 

@@ -240,15 +240,6 @@ public class MenuState implements Screen {
         parameter.shadowColor = Color.BLACK;
         return generator.generateFont(parameter);
     }
-    private BitmapFont getRedirectButtonsHoverStyle(){
-        parameter.size = 20;
-        parameter.borderWidth = 3;
-        parameter.color = new Color(100/255f, 240/255f, 195/255f, 1);
-        parameter.shadowOffsetX = 2;
-        parameter.shadowOffsetY = 2;
-        parameter.shadowColor = Color.BLACK;
-        return generator.generateFont(parameter);
-    }
 
     // Hover Logic
     private void addHoverLogic(){
