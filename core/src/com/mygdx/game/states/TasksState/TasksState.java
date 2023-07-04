@@ -50,7 +50,7 @@ public class TasksState implements Screen {
         viewTasksSection = new ViewTasksSection(stage, accountDetails.getTasks());
         taskRemainingAndRefreshSection = new TaskRemainingAndRefreshSection(stage, accountDetails);
 
-        configureChampionsButton();
+        configureBackToMainMenuButton();
 
 
         Gdx.input.setInputProcessor(stage);
@@ -100,16 +100,16 @@ public class TasksState implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act(deltaTime);
         createTaskSection.update();
+        addHoverLogicForButton();
     }
 
     private void draw() {
         createTaskSection.draw();
         viewTasksSection.draw();
         taskRemainingAndRefreshSection.draw();
-        addHoverLogicForButton();
     }
 
-    private void configureChampionsButton(){
+    private void configureBackToMainMenuButton(){
         // button
         TextureRegionDrawable buttonTexture = new TextureRegionDrawable(new TextureRegion(new Texture("assets/main menu screen/main_button.png")));
         Button.ButtonStyle buttonStyle = new Button.ButtonStyle();

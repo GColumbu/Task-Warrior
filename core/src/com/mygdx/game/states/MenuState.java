@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.states.PlayState.PlayState;
 import com.mygdx.game.states.TasksState.TasksState;
+import com.mygdx.game.states.UpgradesState.UpgradesState;
 
 public class MenuState implements Screen {
     // constants
@@ -36,7 +37,6 @@ public class MenuState implements Screen {
     private final Stage stage;
     private final Sound selectSound;
     private final Music mainMenuMusic;
-    private final Color magicColor;
 
     // Buttons
         // Play Button
@@ -66,7 +66,6 @@ public class MenuState implements Screen {
         this.stage = new Stage();
         this.accountDetails = accountDetails;
         this.viewport = new ScreenViewport();
-        this.magicColor = new Color(100/255f, 240/255f, 195/255f, 1);
         this.selectSound = Gdx.audio.newSound(Gdx.files.internal("assets/sounds/select.mp3"));
         this.mainMenuMusic = Gdx.audio.newMusic(Gdx.files.internal("assets/sounds/music/main_menu_music.mp3"));
         this.mainMenuMusic.setLooping(true);
@@ -210,7 +209,8 @@ public class MenuState implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 selectSound.setVolume(selectSound.play(), 0.1f);
-                //game.setScreen(new PlayState(game, bestScore));
+                mainMenuMusic.stop();
+                game.setScreen(new UpgradesState(game, accountDetails));
             }
         } );
 

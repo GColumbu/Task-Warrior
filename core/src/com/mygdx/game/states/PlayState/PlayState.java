@@ -22,6 +22,7 @@ import com.mygdx.game.players.garen.Garen;
 import com.mygdx.game.players.PlayerChampion;
 import com.mygdx.game.states.GameOverState;
 import com.mygdx.game.states.PlayState.UI.UserInterface;
+import com.mygdx.game.states.PlayerStatistic;
 import com.mygdx.game.states.TemporaryAccountDetails;
 
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class PlayState implements Screen {
         this.accountDetails = accountDetails;
 
         // player
-        this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2);
+        this.target = new Garen(TaskWarrior.WIDTH/2, TaskWarrior.HEIGHT/2, accountDetails.getStatistics());
 
         // enemies
         this.enemies = new ArrayList<>();

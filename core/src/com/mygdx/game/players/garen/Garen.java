@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 import com.mygdx.game.TaskWarrior;
 import com.mygdx.game.players.*;
+import com.mygdx.game.states.PlayerStatistic;
+
+import java.util.List;
 
 
 public class Garen extends PlayerChampion {
@@ -17,8 +20,8 @@ public class Garen extends PlayerChampion {
     protected Garen_E eAnimation;
     protected Garen_DeathAnimation deathAnimation;
 
-    public Garen(int x, int y){
-        super(x, y, 500, 200, 100, 50, 3, 0.05f);
+    public Garen(int x, int y, List<PlayerStatistic> statistics){
+        super(x, y, statistics.get(0).getValue(), statistics.get(1).getValue(), statistics.get(2).getValue(), statistics.get(3).getValue(), statistics.get(4).getValue(), statistics.get(5).getValue());
         walkingAnimation = new WalkingAnimation("assets/play screen/garen/walk.png", 0.05f);
         wAnimation = new Garen_W("assets/play screen/garen/invincibility_burst.png", "assets/play screen/garen/invincibility_walk.png", "assets/play screen/garen/idle_w.png", "assets/play screen/garen/w_icon.png", 0.07f, 0.05f, "assets/sounds/garen/w_burst.mp3");
         wBasicAnimation = wAnimation;
