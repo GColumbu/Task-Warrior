@@ -226,7 +226,7 @@ public class GameOverState implements Screen {
         Label thisRunLabel = new Label(THIS_RUN, labelStyle);
         thisRunLabel.setSize(80, 80);
         thisRunLabel.setAlignment(Align.center);
-        thisRunLabel.setPosition(Gdx.graphics.getWidth() / 2f - 80, 200);
+        thisRunLabel.setPosition(760, 200);
 
         Label bestRunLabel = new Label(BEST_RUN, labelStyle);
         bestRunLabel.setSize(80, 80);
