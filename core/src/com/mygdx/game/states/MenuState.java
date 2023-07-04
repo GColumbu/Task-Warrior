@@ -128,8 +128,9 @@ public class MenuState implements Screen {
     }
 
     private void configureBackground(){
-        Image background = new Image(new Texture("home_background.jpg"));
+        Image background = new Image(new Texture("assets/main menu screen/main_menu_background.png"));
         background.setPosition(0, 0);
+        background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.addActor(background);
     }
 
