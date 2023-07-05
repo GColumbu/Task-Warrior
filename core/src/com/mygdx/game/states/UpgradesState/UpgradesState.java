@@ -44,6 +44,7 @@ public class UpgradesState implements Screen {
 
     // game elements
     private Image coins;
+    private Image garenCloseUp;
     private Button backToMainMenu;
     private Image upgradesContainer;
     private Label coinsLabel;
@@ -68,6 +69,7 @@ public class UpgradesState implements Screen {
         configureBackToMainMenuButton();
         configureUpgradeContainer();
         configureChampionDescription();
+        configureGarenCloseUp();
         upgrades = configureUpgrades();
 
         Gdx.input.setInputProcessor(stage);
@@ -125,6 +127,13 @@ public class UpgradesState implements Screen {
 
     private void draw(){
         stage.draw();
+    }
+
+    private void configureGarenCloseUp() {
+        this.garenCloseUp = new Image(new Texture("assets/garen_closeup.png"));
+        this.garenCloseUp.setPosition(600, 70);
+        this.garenCloseUp.setScale(4);
+        stage.addActor(garenCloseUp);
     }
 
     private void configureCoinsSection(){
